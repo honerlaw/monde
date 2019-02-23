@@ -3,5 +3,5 @@
 
 **/typescript/bin/
 
-terraform/.terraform
-terraform/env
+deploy/modules/.terraform
+deploy/env
