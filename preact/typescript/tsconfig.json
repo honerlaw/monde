@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "sourceRoot": ".",
+    "outDir": "bin",
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "noImplicitAny": true,
+    "strict": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "typeRoots": ["./types", "../node_modules/@types"]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/**",
+    "bin/**"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "preact",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc -p ./typescript/tsconfig.json",
+    "start": "npm run build && preact-rpc --bundle=./typescript/bin/main.js --port=9000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "preact-rpc": "0.0.4",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.4",
+    "typescript": "^3.3.3333"
+  }
+}
