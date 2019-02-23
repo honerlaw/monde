@@ -7,10 +7,12 @@ import (
 )
 
 func main() {
+
+	// connect to the react rendering server
 	goclient.Connect("tcp", "0.0.0.0:9000");
 
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 
 		resp, err := goclient.RenderComponent("Index", nil, map[string](interface{}){
 			"toWhat": "Universe",

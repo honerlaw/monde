@@ -3,5 +3,8 @@
 
 **/typescript/bin/
 
+server/pkg/
+server/src/monde/vendor/
+
 deploy/modules/.terraform
 deploy/env

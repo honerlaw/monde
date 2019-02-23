@@ -1,11 +1,12 @@
 {
   "name": "render-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "render react components for the main go server",
+  "repository": "https://github.com/honerlaw/monde.git",
   "main": "main.js",
   "scripts": {
     "build": "tsc -p ./typescript/tsconfig.json",
-    "start": "npm run build && preact-rpc --bundle=./typescript/bin/main.js --port=9000"
+    "start": "preact-rpc --bundle=./typescript/bin/main.js --port=9000"
   },
   "keywords": [],
   "author": "",
