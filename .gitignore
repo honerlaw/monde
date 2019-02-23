@@ -1,4 +1,7 @@
 .idea/
 **/node_modules/
 
-/preact/typescript/bin/
+**/typescript/bin/
+
+terraform/.terraform
+terraform/env
