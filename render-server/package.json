@@ -12,12 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/react": "^16.8.4",
     "preact-rpc": "0.0.4",
     "react": "^16.8.3",
-    "react-dom": "^16.8.3"
-  },
-  "devDependencies": {
-    "@types/react": "^16.8.4",
+    "react-dom": "^16.8.3",
     "typescript": "^3.3.3333"
-  }
+  },
+  "devDependencies": {}
 }

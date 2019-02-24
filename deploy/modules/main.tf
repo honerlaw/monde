@@ -17,7 +17,7 @@ module "main_vpc" {
   source = "./vpc"
 }
 
-module "monde_ecs_cluster" {
+module "ecs_cluster" {
   source = "./ecs"
   vpc_id = "${module.main_vpc.vpc_id}"
   public_subnet_1_id = "${module.main_vpc.public_subnet_1_id}"

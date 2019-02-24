@@ -1,10 +1,6 @@
 [
   {
-    "cpu": 512,
     "essential": true,
-    "image": "${image}",
-    "memory": 1024,
-    "launchType": "FARGATE",
-    "name": "monde-ecs"
+    "image": "${image}"
   }
 ]
