@@ -8,3 +8,5 @@ server/src/package/vendor/
 
 deploy/modules/.terraform
 deploy/env
+
+assets/css

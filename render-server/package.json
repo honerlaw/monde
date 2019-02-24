@@ -5,8 +5,10 @@
   "repository": "https://github.com/honerlaw/monde.git",
   "main": "main.js",
   "scripts": {
-    "build": "tsc -p ./typescript/tsconfig.json",
-    "start": "preact-rpc --bundle=./typescript/bin/main.js --port=9000"
+    "scss": "sass --no-source-map scss:../assets/css",
+    "build": "tsc -p ./typescript/tsconfig.json && npm run scss",
+    "start": "preact-rpc --bundle=./typescript/bin/main.js --port=9000",
+    "start:local": "npm run build && npm run start"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,7 @@
     "preact-rpc": "0.0.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
+    "sass": "^1.17.2",
     "typescript": "^3.3.3333"
   },
   "devDependencies": {}

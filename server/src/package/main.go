@@ -1,28 +1,21 @@
 package main
 
 import (
-	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/musawirali/preact-rpc/goclient"
+	"package/controller"
 )
 
 func main() {
 
 	// connect to the react rendering server
-	goclient.Connect("tcp", "0.0.0.0:9000");
+	goclient.Connect("tcp", "0.0.0.0:9000")
 
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
+	router := gin.Default()
+	router.Static("/css", "../../../assets/css")
+	router.StaticFile("/favicon.ico", "../../../assets/favicon.ico")
 
-		resp, err := goclient.RenderComponent("Index", nil, map[string](interface{}){
-			"toWhat": "Universe",
-		})
-		if err != nil {
-			panic(err)
-		}
+	controller.RegisterLoginController(router)
 
-		c.Writer.WriteHeader(http.StatusOK)
-		c.Writer.Write([]byte(resp.Html));
-	})
-	r.Run() // listen and serve on 0.0s.0.0:8080
+	router.Run("0.0.0.0:8080")
 }
