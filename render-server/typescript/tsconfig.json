@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "sourceRoot": ".",
-    "outDir": "bin",
+    "outDir": "dist",
     "module": "commonjs",
     "target": "es5",
     "jsx": "react",
@@ -13,10 +13,10 @@
     "typeRoots": ["./types", "../node_modules/@types"]
   },
   "include": [
-    "src/**/*"
+    "src/main.ts"
   ],
   "exclude": [
-    "node_modules/**",
-    "bin/**"
+    "../node_modules/",
+    "/dist/"
   ]
 }

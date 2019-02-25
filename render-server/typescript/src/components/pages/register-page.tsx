@@ -8,18 +8,19 @@ interface IProps extends IPageProps {
     error: string;
 }
 
-export class LoginPage extends React.Component<IProps, {}> {
+export class RegisterPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <Page isLoggedIn={this.props.isLoggedIn} id={"login-page"}>
+        return <Page isLoggedIn={this.props.isLoggedIn} id={"register-page"}>
             <div className={"row"}>
                 <div className={"col-sm-4 offset-sm-4"}>
-                    <h1 className={"text-center"}>login</h1>
+                    <h1 className={"text-center"}>register</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
-                    <form method={"POST"} action={"/login"}>
+                    <form method={"POST"} action={"/register"}>
                         <InputGroup name={"username"} type={"text"} placeholder={"username"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
-                        <button className="btn btn-primary btn-block" type="submit">login</button>
+                        <InputGroup name={"verify_password"} type={"password"} placeholder={"verify password"}/>
+                        <button className="btn btn-primary btn-block" type="submit">register</button>
                     </form>
                 </div>
             </div>
@@ -28,4 +29,4 @@ export class LoginPage extends React.Component<IProps, {}> {
 
 }
 
-registerComponent('LoginPage', LoginPage);
+registerComponent('RegisterPage', RegisterPage);

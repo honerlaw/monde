@@ -1,10 +1,12 @@
 .idea/
 **/node_modules/
 
-**/typescript/bin/
+**/typescript/dist/
 
 server/pkg/
 server/src/package/vendor/
+server/src/github.com/
+server/src/golang.org/
 
 deploy/modules/.terraform
 deploy/env

@@ -7,19 +7,21 @@
   "scripts": {
     "scss": "sass --no-source-map scss:../assets/css",
     "build": "tsc -p ./typescript/tsconfig.json && npm run scss",
-    "start": "preact-rpc --bundle=./typescript/bin/main.js --port=9000",
+    "start": "preact-rpc --bundle=./typescript/dist/main.js --port=9000",
     "start:local": "npm run build && npm run start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/react": "^16.8.4",
     "preact-rpc": "0.0.4",
     "react": "^16.8.3",
-    "react-dom": "^16.8.3",
+    "react-dom": "^16.8.3"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.4",
+    "bootstrap": "^4.3.1",
     "sass": "^1.17.2",
     "typescript": "^3.3.3333"
-  },
-  "devDependencies": {}
+  }
 }

@@ -7,11 +7,11 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `form:"username"`
-	Password string `form:"password"`
+	Username string `form:"username" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
-func RegisterLoginController(router *gin.Engine) {
+func LoginController(router *gin.Engine) {
 	router.GET("/login", renderLoginPage)
 	router.POST("/login", handleLogin)
 }
