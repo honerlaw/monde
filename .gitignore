@@ -7,8 +7,8 @@ server/pkg/
 server/src/package/vendor/
 server/src/github.com/
 server/src/golang.org/
+server/assets/css
+
 
 deploy/modules/.terraform
 deploy/env
-
-assets/css

@@ -21,10 +21,13 @@ RUN go get -d -v
 RUN go build -o /base/bin/server
 RUN rm -rf /base/server
 
-# build the render server
+# install all dependencies, build, remove dependencies / sources, install only production dependencies
 WORKDIR /base/render-server
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 RUN npm install && npm run build
+RUN rm -rf /base/render-server/typescript/src && rm -rf /base/render-server/typescript/tsconfig.json && rm -rf /base/render-server/typescript/types && rm -rf /base/render-server/typescript/tsconfig.json  && rm -rf /base/render-server/node_modules
+ENV NODE_ENV=production
+RUN npm install
 
 WORKDIR /base
 RUN chmod +x /base/scripts/run.sh

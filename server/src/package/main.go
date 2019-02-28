@@ -22,8 +22,8 @@ func main() {
 	repository.Migrate()
 
 	router := gin.Default()
-	router.Static("/css", "../assets/css")
-	router.StaticFile("/favicon.ico", "../assets/favicon.ico")
+	router.Static("/css", "./assets/css")
+	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	controller.LoginController(router)
 	controller.RegisterController(router)
