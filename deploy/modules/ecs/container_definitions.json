@@ -1,6 +1,13 @@
 [
   {
+    "name": "package-server",
     "essential": true,
-    "image": "${image}"
+    "image": "${image}",
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 80
+      }
+    ]
   }
 ]
