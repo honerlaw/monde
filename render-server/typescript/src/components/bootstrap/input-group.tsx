@@ -7,6 +7,8 @@ interface IProps {
     placeholder: string;
     help?: string;
     description?: string;
+
+    inputProps?: { [key: string]: string };
 }
 
 export class InputGroup extends React.Component<IProps, {}> {
@@ -23,13 +25,14 @@ export class InputGroup extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
         return <div className="form-group">
-            {this.props.label ? <label htmlFor={this.inputId}>{this.props.placeholder}</label> : null }
+            {this.props.label ? <label htmlFor={this.inputId}>{this.props.placeholder}</label> : null}
             <input className="form-control"
                    id={this.inputId}
                    name={this.props.name}
                    type={this.props.type}
                    aria-describedby={this.helpId}
-                   placeholder={this.props.placeholder}/>
+                   placeholder={this.props.placeholder}
+                   {...this.props.inputProps}/>
             {this.renderHelp()}
         </div>;
     }

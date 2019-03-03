@@ -12,7 +12,7 @@ import (
 )
 
 type AuthPayload struct {
-	ID    float64
+	ID    int64
 	Roles []string
 }
 
@@ -86,7 +86,7 @@ func InitAuthMiddleware() {
 			}
 
 			return &AuthPayload{
-				ID:    claims[identityKey].(float64),
+				ID:    int64(claims[identityKey].(float64)),
 				Roles: roles,
 			}
 		},
@@ -103,7 +103,7 @@ func InitAuthMiddleware() {
 			}
 
 			return &AuthPayload{
-				ID:    float64(user.ID),
+				ID:    int64(user.ID), // definition says unit, runtime says float64...
 				Roles: []string{"user"},
 			}, nil
 		},

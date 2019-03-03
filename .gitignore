@@ -8,6 +8,7 @@ server/src/package/vendor/
 server/src/github.com/
 server/src/golang.org/
 server/assets/css
+server/.env
 
 
 deploy/modules/.terraform

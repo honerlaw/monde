@@ -30,6 +30,7 @@ func main() {
 
 	controller.LoginController(router)
 	controller.RegisterController(router)
+	controller.UploadController(router)
 	controller.HomeController(router)
 
 	router.Run("0.0.0.0:8080")

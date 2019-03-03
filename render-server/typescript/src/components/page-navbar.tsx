@@ -22,7 +22,7 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
     private renderLoggedIn(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <a className="nav-link" href="#">account</a>
+                <a className="nav-link" href="/upload">upload</a>
             </li>
             <li className="nav-item">
                 <a className="nav-link" href="/logout">logout</a>
