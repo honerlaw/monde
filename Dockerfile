@@ -7,6 +7,7 @@ WORKDIR /base
 # copy everythinng over
 COPY deploy/scripts/docker scripts
 COPY server server
+COPY render-server/scss render-server/scss
 COPY render-server/typescript/src render-server/typescript/src
 COPY render-server/typescript/types render-server/typescript/types
 COPY render-server/typescript/tsconfig.json render-server/typescript/tsconfig.json
@@ -18,8 +19,8 @@ WORKDIR /base/server/src/package
 ENV GOPATH=/base/server
 ENV GIN_MODE=release
 RUN go get -d -v
-RUN go build -o /base/bin/server
-RUN rm -rf /base/server
+RUN go build -o /base/server/server
+RUN rm -rf /base/server/pkg /base/server/src
 
 # install all dependencies, build, remove dependencies / sources, install only production dependencies
 WORKDIR /base/render-server
@@ -29,6 +30,6 @@ RUN rm -rf /base/render-server/typescript/src && rm -rf /base/render-server/type
 ENV NODE_ENV=production
 RUN npm install
 
-WORKDIR /base
+WORKDIR /base/server
 RUN chmod +x /base/scripts/run.sh
 ENTRYPOINT ["/base/scripts/run.sh"]
