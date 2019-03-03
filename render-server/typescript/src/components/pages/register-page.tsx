@@ -5,13 +5,13 @@ import {InputGroup} from "../bootstrap/input-group";
 import {AlertMessage} from "../bootstrap/alert-message";
 
 interface IProps extends IPageProps {
-    error: string;
+
 }
 
 export class RegisterPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <Page isLoggedIn={this.props.isLoggedIn} id={"register-page"}>
+        return <Page authPayload={this.props.authPayload} id={"register-page"}>
             <div className={"row"}>
                 <div className={"col-sm-4 offset-sm-4"}>
                     <h1 className={"text-center"}>register</h1>

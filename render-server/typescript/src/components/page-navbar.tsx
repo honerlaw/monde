@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface IPageNavbarProps {
-    isLoggedIn: boolean;
+    authPayload: boolean;
 }
 
 export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
@@ -14,7 +14,7 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
                 <span className="navbar-toggler-icon" />
             </button>
             <div className="collapse navbar-collapse" id="navbarNavDropdown">
-                { this.props.isLoggedIn ? this.renderLoggedIn() : this.renderLoggedOut()}
+                { this.props.authPayload ? this.renderLoggedIn() : this.renderLoggedOut()}
             </div>
         </nav>;
     }
@@ -22,10 +22,10 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
     private renderLoggedIn(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <a className="nav-link" href="#">Features</a>
+                <a className="nav-link" href="#">account</a>
             </li>
             <li className="nav-item">
-                <a className="nav-link" href="#">Pricing</a>
+                <a className="nav-link" href="/logout">logout</a>
             </li>
         </ul>;
     }

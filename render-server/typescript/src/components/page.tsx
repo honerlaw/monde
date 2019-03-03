@@ -3,6 +3,7 @@ import {IPageNavbarProps, PageNavbar} from "./page-navbar";
 
 export interface IPageProps extends IPageNavbarProps {
     id: string;
+    error?: string;
 }
 
 export class Page extends React.Component<IPageProps, {}> {
@@ -15,7 +16,7 @@ export class Page extends React.Component<IPageProps, {}> {
             <link rel={"stylesheet"} href={"/css/index.css"}/>
         </head>
         <body>
-        <PageNavbar isLoggedIn={this.props.isLoggedIn}/>
+        <PageNavbar authPayload={this.props.authPayload}/>
         <div className="container" id={this.props.id}>
             {this.props.children}
         </div>

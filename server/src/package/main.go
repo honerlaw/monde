@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"os"
 	"package/repository"
+	"package/middleware"
 )
 
 func main() {
@@ -21,12 +22,15 @@ func main() {
 	defer repository.Connect(os.Getenv("DB_URL")).Close()
 	repository.Migrate()
 
+	middleware.InitAuthMiddleware()
+
 	router := gin.Default()
 	router.Static("/css", "./assets/css")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	controller.LoginController(router)
 	controller.RegisterController(router)
+	controller.HomeController(router)
 
 	router.Run("0.0.0.0:8080")
 }
