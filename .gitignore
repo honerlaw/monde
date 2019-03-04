@@ -11,5 +11,8 @@ server/assets/css
 server/.env
 
 
-deploy/modules/.terraform
+deploy/terraform/server/.terraform
+deploy/terraform/transcoder/.terraform
+deploy/terraform/env/server/prod.tfvars
+deploy/terraform/env/transcoder/prod.tfvars
 deploy/env

@@ -6,7 +6,7 @@ variable "container_port"{}
 terraform {
   backend "s3" {
     bucket = "bddevelop-monde"
-    key = "terraform/terraform.tfstate"
+    key = "terraform/server.tfstate"
     region = "us-east-1"
   }
 }
