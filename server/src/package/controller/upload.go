@@ -65,6 +65,7 @@ func renderUploadPage(c *gin.Context) {
 	signature := hex.EncodeToString(signatureHmac)
 
 	props := gin.H{
+		"authPayload": payload,
 		"uploadBucketUrl": "http://" + os.Getenv("AWS_UPLOAD_BUCKET") + ".s3.amazonaws.com/",
 		"uploadParams": gin.H{
 			"acl":                acl,

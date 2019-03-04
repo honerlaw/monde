@@ -16,6 +16,14 @@ func LoginController(router *gin.Engine) {
 }
 
 func renderLoginPage(c *gin.Context) {
+	payload := middleware.GetAuthPayload(c)
+
+	if payload != nil {
+		c.Redirect(http.StatusFound, "/")
+		c.Abort()
+		return
+	}
+
 	util.RenderPage(c, http.StatusOK, "LoginPage", nil)
 }
 

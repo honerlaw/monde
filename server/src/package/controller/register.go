@@ -14,6 +14,14 @@ func RegisterController(router *gin.Engine) {
 }
 
 func renderRegisterPage(c *gin.Context) {
+	payload := middleware.GetAuthPayload(c)
+
+	if payload != nil {
+		c.Redirect(http.StatusFound, "/")
+		c.Abort()
+		return
+	}
+
 	util.RenderPage(c, http.StatusOK, "RegisterPage", nil)
 }
 
