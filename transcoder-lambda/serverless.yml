@@ -1,0 +1,33 @@
+service: transcoder-lambda
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: go1.x
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+    - "s3:GetBucketNotification"
+    - "s3:PutBucketNotification"
+    Resource:
+      Fn::Join:
+      - ""
+      - - "arn:aws:s3:::monde-aws-transcoder-upload or *"
+
+plugins:
+- serverless-plugin-existing-s3
+
+package:
+  exclude:
+  - ./**
+  include:
+  - ./bin/**
+
+functions:
+  transcoder:
+    handler: bin/transcoder
+    events:
+    - existingS3:
+        bucket: monde-aws-transcoder-upload
+        events:
+        - s3:ObjectCreated:*

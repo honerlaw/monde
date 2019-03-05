@@ -30,7 +30,7 @@ resource "aws_s3_bucket" "transcoder_thumbnails" {
 
 resource "aws_elastictranscoder_pipeline" "transcoder_pipeline" {
   input_bucket = "${aws_s3_bucket.transcoder_upload.bucket}"
-  name = "aws_elastictranscoder_transcoder_pipeline"
+  name = "transcoder-pipeline"
   role = "${module.transcoder_iam.transcoder_pipeline_role_arn}"
 
   content_config {

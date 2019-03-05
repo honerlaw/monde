@@ -41,7 +41,7 @@ resource "aws_iam_role_policy_attachment" "transcoder_pipeline_role_policy_attac
 }
 
 resource "aws_iam_role" "transcoder_pipeline_role" {
-  name = "ecs_execution_role"
+  name = "transcoder-pipeline-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

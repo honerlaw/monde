@@ -8,6 +8,16 @@ variable "subnet_ids" {
 variable "dbuser" {}
 variable "dbpass" {}
 
+resource "aws_secretsmanager_secret" "core_db_credential_secret" {
+  name = "core-db-credential-secret"
+  description = "core db credentials"
+}
+
+resource "aws_secretsmanager_secret_version" "core_db_credential_secret_version" {
+  secret_id     = "${aws_secretsmanager_secret.core_db_credential_secret.id}"
+  secret_string = "{\"username\":\"${var.dbuser}\",\"password\":\"${var.dbpass}\"}"
+}
+
 resource "aws_security_group" "core_db_security_group" {
   vpc_id = "${var.vpc_id}"
   name = "core-db-security-group"

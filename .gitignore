@@ -10,11 +10,14 @@ server/src/golang.org/
 server/assets/css
 server/.env
 
-
 deploy/terraform/src/core/.terraform
 deploy/terraform/src/server/.terraform
 deploy/terraform/src/transcoder/.terraform
 deploy/terraform/env/core/prod.tfvars
 deploy/terraform/env/server/prod.tfvars
 deploy/terraform/env/transcoder/prod.tfvars
-deploy/env
+
+transcoder-lambda/bin/
+transcoder-lambda/.serverless/
+transcoder-lambda/node_modules/
+transcoder-lambda/.env
