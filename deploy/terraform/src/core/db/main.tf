@@ -69,6 +69,7 @@ resource "aws_rds_cluster" "core-rds-cluster" {
   master_password = "${var.dbpass}"
   backup_retention_period = 7
   skip_final_snapshot = false
+  final_snapshot_identifier = "core-rds-final-snapshot"
 
   scaling_configuration {
     auto_pause = true
