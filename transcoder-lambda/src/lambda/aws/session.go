@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
@@ -20,4 +19,6 @@ func InitSession() (error) {
 	}
 
 	Session = sess
+
+	return nil
 }

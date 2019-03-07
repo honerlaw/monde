@@ -18,6 +18,6 @@ deploy/terraform/env/server/prod.tfvars
 deploy/terraform/env/transcoder/prod.tfvars
 
 transcoder-lambda/bin/
-transcoder-lambda/.serverless/
-transcoder-lambda/node_modules/
+transcoder-lambda/transcoder-lambda.zip
+transcoder-lambda/.terraform/
 transcoder-lambda/.env

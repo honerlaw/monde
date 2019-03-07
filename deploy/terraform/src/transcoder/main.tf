@@ -1,4 +1,5 @@
 variable "region" {}
+variable "lambda_file_path" {}
 
 terraform {
   backend "s3" {
@@ -14,6 +15,13 @@ provider "aws" {
 
 module "transcoder_iam" {
   source = "./iam"
+}
+
+module "transcoder_lambda" {
+  source = "./lambda"
+  upload_bucket_id = "${aws_s3_bucket.transcoder_upload.id}"
+  upload_bucket_arn = "${aws_s3_bucket.transcoder_upload.arn}"
+  lambda_file_path = "${var.lambda_file_path}"
 }
 
 resource "aws_s3_bucket" "transcoder_upload" {
