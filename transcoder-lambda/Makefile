@@ -1,10 +1,10 @@
 .PHONY: clean build deploy
 
-TERRAFORM_SRC_PATH=../deploy/terraform/src/transcoder/
+TERRAFORM_SRC_PATH=../terraform/src/transcoder/
 LAMBDA_PATH=$(shell pwd)
 LAMBDA_ZIP_FILE=transcoder-lambda.zip
 LAMBDA_FILE_PATH=$(LAMBDA_PATH)/$(LAMBDA_ZIP_FILE)
-TERRAFORM_VAR_FILE=../deploy/terraform/env/transcoder/prod.tfvars
+TERRAFORM_VAR_FILE=../terraform/env/transcoder/prod.tfvars
 
 clean:
 	rm -rf ./bin $(LAMBDA_ZIP_FILE)

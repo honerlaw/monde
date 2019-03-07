@@ -5,7 +5,7 @@ RUN apk add --no-cache --virtual .build-deps bash gcc musl-dev openssl go git
 WORKDIR /base
 
 # copy everythinng over
-COPY deploy/scripts/docker scripts
+COPY scripts/docker scripts
 COPY server server
 COPY render-server/scss render-server/scss
 COPY render-server/typescript/src render-server/typescript/src
