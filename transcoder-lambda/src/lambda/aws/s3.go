@@ -9,7 +9,10 @@ import (
 )
 
 type S3RecordMetadata struct {
-	UserId int64
+	Bucket  string
+	Key     string
+	UserId  int64
+	VideoId string
 }
 
 var _s3Client *s3.S3
@@ -41,20 +44,22 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	});
-
 	if err != nil {
 		return nil, err
 	}
 
 	rawUserId, foundUserId := head.Metadata["User-Id"];
-
-	if !foundUserId {
-		return nil, errors.New("could not find user id in user metadata")
+	rawVideoId, foundVideoId := head.Metadata["Video-Id"];
+	if !foundUserId || !foundVideoId {
+		return nil, errors.New("could not find required data in s3 user metadata")
 	}
 
 	userId, _ := strconv.ParseInt(*rawUserId, 10, 64)
 
 	return &S3RecordMetadata{
-		UserId: userId,
+		Bucket:  bucket,
+		Key:     key,
+		UserId:  userId,
+		VideoId: *rawVideoId,
 	}, nil
 }

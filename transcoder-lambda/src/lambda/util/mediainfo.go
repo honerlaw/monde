@@ -5,6 +5,7 @@ import (
 	"lambda/aws"
 	"encoding/xml"
 	"fmt"
+	"errors"
 )
 
 type MediaInfo struct {
@@ -20,7 +21,7 @@ type Media struct {
 type Track struct {
 	XMLName      xml.Name `xml:"track"`
 	Type         string   `xml:"type,attr"`
-	Duration     string   `xml:"Duration"`
+	Duration     float64  `xml:"Duration"`
 	Width        int64    `xml:"Width"`
 	Height       int64    `xml:"Height"`
 	Format       string   `xml:"Format"`
@@ -50,4 +51,15 @@ func GetMediaInfo(bucket string, key string) (*MediaInfo, error) {
 	}
 
 	return &info, nil;
+}
+
+func ValidateMediaInfo(mediainfo *MediaInfo) (error) {
+	for _, media := range mediainfo.Medias {
+		for _, track := range media.Tracks {
+			if track.Duration > 30 {
+				return errors.New("Duration must be less than 30 seconds")
+			}
+		}
+	}
+	return nil
 }

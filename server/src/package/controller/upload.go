@@ -44,13 +44,14 @@ func renderUploadPage(c *gin.Context) {
 	policy := []byte(`{
 		"expiration": "2020-12-01T12:00:00.000Z",
 		"conditions": [
-			{"acl": "`+acl+`"},
-			{"bucket": "`+bucket+`"},
-			{"x-amz-meta-user-id": "`+userId+`"},
-			{"x-amz-algorithm": "`+algorithm+`"},
-			{"x-amz-credential": "`+credential+`"},
-			{"x-amz-date": "`+dateIso8601+`"},
-			["starts-with", "$key", "process/`+userId+`/"]
+			{"acl": "` + acl + `"},
+			{"bucket": "` + bucket + `"},
+			{"x-amz-meta-user-id": "` + userId + `"},
+			{"x-amz-meta-video-id": "` + id.String() + `"},
+			{"x-amz-algorithm": "` + algorithm + `"},
+			{"x-amz-credential": "` + credential + `"},
+			{"x-amz-date": "` + dateIso8601 + `"},
+			["starts-with", "$key", "process/` + userId + `/"]
 		]
 	}`)
 
@@ -65,17 +66,18 @@ func renderUploadPage(c *gin.Context) {
 	signature := hex.EncodeToString(signatureHmac)
 
 	props := gin.H{
-		"authPayload": payload,
+		"authPayload":     payload,
 		"uploadBucketUrl": "http://" + os.Getenv("AWS_UPLOAD_BUCKET") + ".s3.amazonaws.com/",
 		"uploadParams": gin.H{
-			"acl":                acl,
-			"key":                "process/" + userId + "/" + id.String(),
-			"x-amz-meta-user-id": userId,
-			"policy":             policyBase64,
-			"x-amz-algorithm":    algorithm,
-			"x-amz-credential":   credential,
-			"x-amz-date":         dateIso8601,
-			"x-amz-signature":    signature,
+			"acl":                 acl,
+			"key":                 "process/" + userId + "/" + id.String(),
+			"x-amz-meta-user-id":  userId,
+			"x-amz-meta-video-id": id.String(),
+			"policy":              policyBase64,
+			"x-amz-algorithm":     algorithm,
+			"x-amz-credential":    credential,
+			"x-amz-date":          dateIso8601,
+			"x-amz-signature":     signature,
 		},
 	}
 
