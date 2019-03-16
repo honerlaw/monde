@@ -13,7 +13,8 @@ clean:
 mediainfo:
 	docker build ./mediainfo -t $(MEDIA_INFO_TAG)
 	mkdir -p ./bin/
-	docker run --rm $(MEDIA_INFO_TAG):latest cat /MediaInfo_CLI_GNU_FromSource/MediaInfo/Project/GNU/CLI/mediainfo > ./bin/mediainfo
+	docker run --rm $(MEDIA_INFO_TAG):latest cat mediainfo > ./bin/mediainfo
+	chmod +x ./bin/mediainfo
 
 build:
 	env GOOS=linux go build -ldflags="-s -w" -o bin/transcoder ./src/lambda/main.go

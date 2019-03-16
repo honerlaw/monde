@@ -1,4 +1,4 @@
-FROM amazonlinux:latest
+FROM amazonlinux:2017.03
 
 # Install Development Tools necessary to compile MediaInfo
 RUN yum -y groupinstall 'Development Tools'
@@ -16,6 +16,3 @@ WORKDIR /MediaInfo_CLI_GNU_FromSource
 RUN ./CLI_Compile.sh --with-libcurl
 
 WORKDIR /MediaInfo_CLI_GNU_FromSource/MediaInfo/Project/GNU/CLI
-
-# verify it worked
-RUN ./mediainfo --version
