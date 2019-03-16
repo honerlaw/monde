@@ -51,7 +51,7 @@ func renderUploadPage(c *gin.Context) {
 			{"x-amz-algorithm": "` + algorithm + `"},
 			{"x-amz-credential": "` + credential + `"},
 			{"x-amz-date": "` + dateIso8601 + `"},
-			["starts-with", "$key", "process/` + userId + `/"]
+			["starts-with", "$key", "` + userId + `/"]
 		]
 	}`)
 
@@ -70,7 +70,7 @@ func renderUploadPage(c *gin.Context) {
 		"uploadBucketUrl": "http://" + os.Getenv("AWS_UPLOAD_BUCKET") + ".s3.amazonaws.com/",
 		"uploadParams": gin.H{
 			"acl":                 acl,
-			"key":                 "process/" + userId + "/" + id.String(),
+			"key":                 userId + "/" + id.String(),
 			"x-amz-meta-user-id":  userId,
 			"x-amz-meta-video-id": id.String(),
 			"policy":              policyBase64,
