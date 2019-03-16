@@ -1,5 +1,6 @@
-.PHONY: clean build deploy
+.PHONY: clean build deploy mediainfo
 
+MEDIA_INFO_TAG=media-info-image
 TERRAFORM_SRC_PATH=../terraform/src/transcoder/
 LAMBDA_PATH=$(shell pwd)
 LAMBDA_ZIP_FILE=transcoder-lambda.zip
@@ -9,9 +10,15 @@ TERRAFORM_VAR_FILE=../terraform/env/transcoder/prod.tfvars
 clean:
 	rm -rf ./bin $(LAMBDA_ZIP_FILE)
 
+mediainfo:
+	docker build ./mediainfo -t $(MEDIA_INFO_TAG)
+	mkdir -p ./bin/
+	docker run --rm $(MEDIA_INFO_TAG):latest cat /MediaInfo_CLI_GNU_FromSource/MediaInfo/Project/GNU/CLI/mediainfo > ./bin/mediainfo
+
 build:
 	env GOOS=linux go build -ldflags="-s -w" -o bin/transcoder ./src/lambda/main.go
-	zip $(LAMBDA_ZIP_FILE) bin/transcoder .env
+	$(MAKE) mediainfo
+	zip $(LAMBDA_ZIP_FILE) bin/transcoder bin/mediainfo .env
 
 deploy: clean build
 	terraform init $(TERRAFORM_SRC_PATH)
