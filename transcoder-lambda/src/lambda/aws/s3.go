@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"strconv"
+	"errors"
 )
 
 type S3RecordMetadata struct {
@@ -29,7 +30,13 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 		return nil, err
 	}
 
-	userId, _ := strconv.ParseInt(*head.Metadata["User-Id"], 10, 64)
+	rawUserId, foundUserId := head.Metadata["User-Id"];
+
+	if !foundUserId {
+		return nil, errors.New("could not find user id in user metadata")
+	}
+
+	userId, _ := strconv.ParseInt(*rawUserId, 10, 64)
 
 	return &S3RecordMetadata{
 		UserId: userId,

@@ -11,10 +11,11 @@ variable "dbpass" {}
 resource "aws_secretsmanager_secret" "core_db_credential_secret" {
   name = "core-db-credential-secret"
   description = "core db credentials"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "core_db_credential_secret_version" {
-  secret_id     = "${aws_secretsmanager_secret.core_db_credential_secret.id}"
+  secret_id = "${aws_secretsmanager_secret.core_db_credential_secret.id}"
   secret_string = "{\"username\":\"${var.dbuser}\",\"password\":\"${var.dbpass}\"}"
 }
 
@@ -80,7 +81,7 @@ resource "aws_rds_cluster" "core-rds-cluster" {
 
   lifecycle {
     ignore_changes = [
-      "engine_vers¬ion"
+      "engine_version"
     ]
   }
 }

@@ -20,14 +20,21 @@ resource "aws_iam_role" "transcoder_lambda_iam_role" {
 EOF
 }
 
-resource "aws_iam_policy" "transcoder_logging_policy" {
-  name = "transcoder-logging-policy"
+resource "aws_iam_policy" "transcoder_lambda_policy" {
+  name = "transcoder-lambda-policy"
   path = "/"
   description = "policy for logging from the transcoder lambda"
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
+    {
+      "Action": [
+        "*"
+      ],
+      "Resource": "*",
+      "Effect": "Allow"
+    },
     {
       "Action": [
         "logs:CreateLogStream",
@@ -42,9 +49,9 @@ resource "aws_iam_policy" "transcoder_logging_policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "transcoder_lambda_log_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "transcoder_lambda_policy_attachment" {
   role = "${aws_iam_role.transcoder_lambda_iam_role.name}"
-  policy_arn = "${aws_iam_policy.transcoder_logging_policy.arn}"
+  policy_arn = "${aws_iam_policy.transcoder_lambda_policy.arn}"
 }
 
 resource "aws_lambda_function" "transcoder_lambda_function" {

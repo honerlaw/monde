@@ -15,12 +15,13 @@ func Handler(ctx context.Context, event events.S3Event) {
 	for _, record := range event.Records {
 		_, err := aws2.GetS3RecordMetadata(record.S3.Bucket.Name, record.S3.Object.Key)
 		if err != nil {
-			fmt.Print(err.Error())
+			fmt.Print("Failed to get s3 metadata", err)
 			continue
 		}
-		_, err = aws2.ExecuteSQL("select * from table")
+
+		_, err = aws2.ExecuteSQL("select * from monde.test")
 		if err != nil {
-			fmt.Print(err.Error())
+			fmt.Print("Failed to execute sql", err)
 			continue
 		}
 	}
