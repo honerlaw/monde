@@ -40,16 +40,6 @@ var presets = []*VideoPreset{
 		Name:     "hls-v-400k",
 		FullName: "HLS Video - 400k",
 	},
-	{
-		Id:       "1351620000001-200060",
-		Name:     "hls-v-1-160k",
-		FullName: "HLS Video - 160k",
-	},
-	{
-		Id:       "1351620000001-200071",
-		Name:     "hls-v-64k",
-		FullName: "HLS Video - 64k",
-	},
 }
 
 var _etClient *elastictranscoder.ElasticTranscoder
@@ -117,7 +107,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 		outputs = append(outputs, &elastictranscoder.CreateJobOutput{
 			Key:              key,
 			PresetId:         aws.String(preset.Id),
-			ThumbnailPattern: aws.String("thumb/" + preset.Name + "-{count}"),
+			ThumbnailPattern: aws.String(preset.Name + "-{count}"),
 			Rotate:           aws.String("0"),
 			SegmentDuration:  aws.String("5"),
 		})
@@ -133,7 +123,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 			Interlaced:  aws.String("auto"),
 			Resolution:  aws.String("auto"),
 		},
-		OutputKeyPrefix: aws.String(strconv.FormatInt(metadata.UserId, 10) + "/" + metadata.VideoId),
+		OutputKeyPrefix: aws.String(strconv.FormatInt(metadata.UserId, 10) + "/" + metadata.VideoId + "/"),
 		Outputs:         outputs,
 		Playlists: []*elastictranscoder.CreateJobPlaylist{
 			{

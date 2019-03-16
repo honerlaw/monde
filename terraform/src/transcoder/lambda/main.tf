@@ -61,6 +61,8 @@ resource "aws_lambda_function" "transcoder_lambda_function" {
   handler = "bin/transcoder"
   source_code_hash = "${base64sha256(file("${var.lambda_file_path}"))}"
   runtime = "go1.x"
+  timeout = 900
+  memory_size = 512
 }
 
 resource "aws_lambda_permission" "transcoder_lambda_allow_upload_bucket" {

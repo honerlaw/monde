@@ -50,6 +50,7 @@ resource "aws_iam_role" "transcoder_pipeline_role" {
       "Effect": "Allow",
       "Principal": {
         "Service": [
+          "elastictranscoder.amazonaws.com",
           "ec2.amazonaws.com"
         ]
       },
