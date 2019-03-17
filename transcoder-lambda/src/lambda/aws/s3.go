@@ -11,7 +11,7 @@ import (
 type S3RecordMetadata struct {
 	Bucket  string
 	Key     string
-	UserId  int64
+	UserId  uint
 	VideoId string
 }
 
@@ -54,12 +54,12 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 		return nil, errors.New("could not find required data in s3 user metadata")
 	}
 
-	userId, _ := strconv.ParseInt(*rawUserId, 10, 64)
+	userId, _ := strconv.ParseUint(*rawUserId, 10, 32)
 
 	return &S3RecordMetadata{
 		Bucket:  bucket,
 		Key:     key,
-		UserId:  userId,
+		UserId:  uint(userId),
 		VideoId: *rawVideoId,
 	}, nil
 }

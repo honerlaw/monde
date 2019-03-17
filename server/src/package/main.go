@@ -8,6 +8,7 @@ import (
 	"os"
 	"package/repository"
 	"package/middleware"
+	"log"
 )
 
 func main() {
@@ -15,6 +16,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	log.SetOutput(gin.DefaultWriter)
 
 	// connect to the react rendering server
 	goclient.Connect("tcp", "0.0.0.0:9000")

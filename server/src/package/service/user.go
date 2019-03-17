@@ -21,7 +21,8 @@ func VerifyUser(req VerifyUserRequest) (*model.User, error) {
 	var user model.User
 	repository.DB.Where(model.User{Username: req.Username}).First(&user)
 
-	if (model.User{}) == user {
+	// can't check an empty struct, so just make sure their username exists to see if we found it
+	if user.Username == "" {
 		return nil, errors.New("invalid username or password")
 	}
 
@@ -49,7 +50,8 @@ func CreateUser(req CreateUserRequest) (*model.User, error) {
 	var user model.User
 	repository.DB.Where(model.User{Username: req.Username}).First(&user)
 
-	if (model.User{}) != user {
+	// check the username since we can't easily compare to an empty struct
+	if user.Username != "" {
 		return nil, errors.New("user already exists")
 	}
 
