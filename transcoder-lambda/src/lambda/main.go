@@ -39,11 +39,11 @@ func Handler(ctx context.Context, event events.S3Event) {
 		// set the job id so we can look it up later if we need to
 		mediainfo.JobID = *job.Id
 
-		/*_, err = aws2.ExecuteSQL("select * from monde.test")
+		err = aws2.Insert(mediainfo)
 		if err != nil {
-			log.Print("Failed to execute sql", err)
+			log.Print("Failed to insert media and job informations", err)
 			continue
-		}*/
+		}
 	}
 }
 

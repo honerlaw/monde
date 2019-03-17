@@ -123,7 +123,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 			Interlaced:  aws.String("auto"),
 			Resolution:  aws.String("auto"),
 		},
-		OutputKeyPrefix: aws.String(strconv.FormatInt(metadata.UserId, 10) + "/" + metadata.VideoId + "/"),
+		OutputKeyPrefix: aws.String(strconv.FormatUint(uint64(metadata.UserId), 10) + "/" + metadata.VideoId + "/"),
 		Outputs:         outputs,
 		Playlists: []*elastictranscoder.CreateJobPlaylist{
 			{
