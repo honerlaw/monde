@@ -6,6 +6,7 @@ import (
 	"os"
 	"errors"
 	"strconv"
+	"strings"
 )
 
 type VideoPreset struct {
@@ -39,6 +40,11 @@ var presets = []*VideoPreset{
 		Id:       "1351620000001-200055",
 		Name:     "hls-v-400k",
 		FullName: "HLS Video - 400k",
+	},
+	{
+		Id: "1351620000001-000010",
+		Name: "g-720p",
+		FullName: "Generic 720p",
 	},
 }
 
@@ -94,15 +100,18 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 		return nil, err
 	}
 
-	var outputKeys []*string
+	var playlistOutputKeys []*string
 	var outputs []*elastictranscoder.CreateJobOutput
 
 	// build the outputs from the presets defined above, ideally we would fetch this info from the database or
-	// somewhere else
+	// somewhere else instead of have them hardcoded...
 	for _, preset := range presets {
 		key := aws.String("video/" + preset.Name)
 
-		outputKeys = append(outputKeys, key)
+		// we only want to add the hls files to be added to the playlist
+		if strings.HasPrefix(preset.Name, "hls-") {
+			playlistOutputKeys = append(playlistOutputKeys, key)
+		}
 
 		outputs = append(outputs, &elastictranscoder.CreateJobOutput{
 			Key:              key,
@@ -129,7 +138,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 			{
 				Format:     aws.String("HLSv3"),
 				Name:       aws.String("playlist.m3u8"),
-				OutputKeys: outputKeys,
+				OutputKeys: playlistOutputKeys,
 			},
 		},
 	})
