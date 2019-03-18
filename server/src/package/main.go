@@ -28,7 +28,8 @@ func main() {
 	middleware.InitAuthMiddleware()
 
 	router := gin.Default()
-	router.Static("/css", "./assets/css")
+	router.Static("/css/", "./assets/css/")
+	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	controller.LoginController(router)

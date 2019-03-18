@@ -16,7 +16,16 @@ import (
 )
 
 func UploadController(router *gin.Engine) {
+	router.GET("/upload/list", renderUploadListPage);
 	router.GET("/upload", renderUploadPage);
+}
+
+func renderUploadListPage(c *gin.Context) {
+	payload := middleware.GetAuthPayload(c);
+
+	util.RenderPage(c, http.StatusOK, "UploadListPage", gin.H{
+		"authPayload": payload,
+	})
 }
 
 func renderUploadPage(c *gin.Context) {
@@ -40,12 +49,14 @@ func renderUploadPage(c *gin.Context) {
 	shortTime := currentTime.Format("20060102")
 	service := "s3"
 	credential := accessKey + "/" + shortTime + "/" + region + "/" + service + "/aws4_request"
+	redirect := os.Getenv("UPLOAD_REDIRECT_DOMAIN") + "/upload/list"
 
 	policy := []byte(`{
 		"expiration": "2020-12-01T12:00:00.000Z",
 		"conditions": [
 			{"acl": "` + acl + `"},
 			{"bucket": "` + bucket + `"},
+			{"success_action_redirect": "` + redirect + `"},
 			{"x-amz-meta-user-id": "` + userId + `"},
 			{"x-amz-meta-video-id": "` + id.String() + `"},
 			{"x-amz-algorithm": "` + algorithm + `"},
@@ -69,15 +80,16 @@ func renderUploadPage(c *gin.Context) {
 		"authPayload":     payload,
 		"uploadBucketUrl": "http://" + os.Getenv("AWS_UPLOAD_BUCKET") + ".s3.amazonaws.com/",
 		"uploadParams": gin.H{
-			"acl":                 acl,
-			"key":                 userId + "/" + id.String(),
-			"x-amz-meta-user-id":  userId,
-			"x-amz-meta-video-id": id.String(),
-			"policy":              policyBase64,
-			"x-amz-algorithm":     algorithm,
-			"x-amz-credential":    credential,
-			"x-amz-date":          dateIso8601,
-			"x-amz-signature":     signature,
+			"acl":                     acl,
+			"key":                     userId + "/" + id.String(),
+			"success_action_redirect": redirect,
+			"x-amz-meta-user-id":      userId,
+			"x-amz-meta-video-id":     id.String(),
+			"policy":                  policyBase64,
+			"x-amz-algorithm":         algorithm,
+			"x-amz-credential":        credential,
+			"x-amz-date":              dateIso8601,
+			"x-amz-signature":         signature,
 		},
 	}
 

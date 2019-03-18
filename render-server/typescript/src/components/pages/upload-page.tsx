@@ -28,6 +28,8 @@ export class UploadPage extends React.Component<IProps, {}> {
                     </form>
                 </div>
             </div>
+
+            <script type={"text/javascript"} src={"/js/upload-form.js"} />
         </Page>;
     }
 
@@ -36,6 +38,7 @@ export class UploadPage extends React.Component<IProps, {}> {
             return <input name={key} value={this.props.uploadParams[key]} hidden={true}/>;
         });
     }
+
 }
 
 
