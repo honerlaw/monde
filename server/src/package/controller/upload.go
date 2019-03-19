@@ -5,7 +5,6 @@ import (
 	"package/util"
 	"net/http"
 	"os"
-	"package/middleware"
 	"strconv"
 	"github.com/satori/go.uuid"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"package/middleware/auth"
 )
 
 func UploadController(router *gin.Engine) {
@@ -21,15 +21,22 @@ func UploadController(router *gin.Engine) {
 }
 
 func renderUploadListPage(c *gin.Context) {
-	payload := middleware.GetAuthPayload(c);
-
-	util.RenderPage(c, http.StatusOK, "UploadListPage", gin.H{
+	payload := c.MustGet("JWT_IDENTITY")
+	props := gin.H{
 		"authPayload": payload,
-	})
+	}
+
+	if payload != nil {
+		// 1. fetch all mediainfo for the user
+		// 2. fetch the job id and see if it finished
+
+	}
+
+	util.RenderPage(c, http.StatusOK, "UploadListPage", props)
 }
 
 func renderUploadPage(c *gin.Context) {
-	payload := middleware.GetAuthPayload(c);
+	payload := c.MustGet("JWT_IDENTITY").(*auth.AuthPayload)
 	if payload == nil {
 		c.Redirect(http.StatusFound, "/")
 		c.Abort()

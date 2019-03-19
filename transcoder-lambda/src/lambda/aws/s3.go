@@ -3,9 +3,9 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
-	"strconv"
 	"errors"
-	"time"
+	"strconv"
+	aws2 "package/service/aws"
 )
 
 type S3RecordMetadata struct {
@@ -15,32 +15,8 @@ type S3RecordMetadata struct {
 	VideoId string
 }
 
-var _s3Client *s3.S3
-
-func getS3Client() (*s3.S3) {
-	if _s3Client == nil {
-		_s3Client = s3.New(Session)
-	}
-	return _s3Client
-}
-
-func GetSignedS3Url(bucket string, key string) (*string, error) {
-	req, _ := getS3Client().GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-
-	url, presignErr := req.Presign(1 * time.Minute)
-
-	if presignErr != nil {
-		return nil, presignErr
-	}
-
-	return &url, nil;
-}
-
 func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
-	head, err := getS3Client().HeadObject(&s3.HeadObjectInput{
+	head, err := aws2.GetS3Service().GetClient().HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	});
@@ -63,3 +39,4 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 		VideoId: *rawVideoId,
 	}, nil
 }
+

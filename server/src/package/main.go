@@ -6,9 +6,10 @@ import (
 	"package/controller"
 	"github.com/joho/godotenv"
 	"os"
-	"package/repository"
-	"package/middleware"
 	"log"
+	"package/service/aws"
+	"package/middleware/auth"
+	"package/repository"
 )
 
 func main() {
@@ -19,15 +20,23 @@ func main() {
 
 	log.SetOutput(gin.DefaultWriter)
 
+	// init aws session
+	err = aws.InitSession()
+	if err != nil {
+		panic(err)
+	}
+
 	// connect to the react rendering server
 	goclient.Connect("tcp", "0.0.0.0:9000")
 
 	defer repository.Connect(os.Getenv("DB_URL")).Close()
 	repository.Migrate()
 
-	middleware.InitAuthMiddleware()
-
 	router := gin.Default()
+
+	// initialize the auth middleware
+	auth.Init(router)
+
 	router.Static("/css/", "./assets/css/")
 	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")

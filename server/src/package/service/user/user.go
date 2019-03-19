@@ -1,23 +1,23 @@
-package service
+package user
 
 import (
 	"package/model"
-	"package/repository"
 	"golang.org/x/crypto/bcrypt"
 	"errors"
+	"package/repository"
 )
 
-type VerifyUserRequest struct {
+type VerifyRequest struct {
 	Username string `form:"username" binding:"required"`
 	Password string `form:"password" binding:"required"`
 }
 
-type CreateUserRequest struct {
-	VerifyUserRequest
+type CreateRequest struct {
+	VerifyRequest
 	VerifyPassword string `form:"verify_password" binding:"required"`
 }
 
-func VerifyUser(req VerifyUserRequest) (*model.User, error) {
+func Verify(req VerifyRequest) (*model.User, error) {
 	var user model.User
 	repository.DB.Where(model.User{Username: req.Username}).First(&user)
 
@@ -34,7 +34,7 @@ func VerifyUser(req VerifyUserRequest) (*model.User, error) {
 	return &user, nil
 }
 
-func CreateUser(req CreateUserRequest) (*model.User, error) {
+func Create(req CreateRequest) (*model.User, error) {
 	if len(req.Username) < 6 {
 		return nil, errors.New("username must be at least 6 characters in length")
 	}

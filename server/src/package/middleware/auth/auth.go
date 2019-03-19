@@ -1,14 +1,14 @@
-package middleware
+package auth
 
 import (
 	"github.com/appleboy/gin-jwt"
 	"time"
 	"github.com/gin-gonic/gin"
 	"os"
-	"package/service"
 	"errors"
 	"net/http"
 	"package/util"
+	"package/service/user"
 )
 
 type AuthPayload struct {
@@ -23,44 +23,8 @@ var unauthorizedUrlToPageMap = gin.H{
 	"/register": "RegisterPage",
 }
 
-var AuthMiddleware *jwt.GinJWTMiddleware
-
-func GetAuthPayload(c *gin.Context) (*AuthPayload) {
-	mw := AuthMiddleware
-
-	claims, err := mw.GetClaimsFromJWT(c)
-	if err != nil {
-		return nil
-	}
-
-	if claims["exp"] == nil {
-		return nil
-	}
-
-	if _, ok := claims["exp"].(float64); !ok {
-		return nil
-	}
-
-	if int64(claims["exp"].(float64)) < mw.TimeFunc().Unix() {
-		return nil
-	}
-
-	c.Set("JWT_PAYLOAD", claims)
-	identity := mw.IdentityHandler(c)
-
-	if identity != nil {
-		c.Set(mw.IdentityKey, identity)
-	}
-
-	if !mw.Authorizator(identity, c) {
-		return nil
-	}
-
-	return identity.(*AuthPayload)
-}
-
-func InitAuthMiddleware() {
-	middleware, err := jwt.New(&jwt.GinJWTMiddleware{
+func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
+	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       os.Getenv("JWT_REALM"),
 		Key:         []byte(os.Getenv("JWT_SECRET_KEY")),
 		Timeout:     time.Hour,
@@ -91,19 +55,19 @@ func InitAuthMiddleware() {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var req service.VerifyUserRequest
+			var req user.VerifyRequest
 
 			if err := c.ShouldBind(&req); err != nil {
 				return nil, errors.New("all fields are requred")
 			}
 
-			user, err := service.VerifyUser(req)
+			verifiedUser, err := user.Verify(req)
 			if err != nil {
 				return nil, err
 			}
 
 			return &AuthPayload{
-				ID:    int64(user.ID), // definition says unit, runtime says float64...
+				ID:    int64(verifiedUser.ID), // definition says unit, runtime says float64...
 				Roles: []string{"user"},
 			}, nil
 		},
@@ -137,10 +101,96 @@ func InitAuthMiddleware() {
 		TimeFunc:      time.Now,
 		SendCookie:    true,
 	})
+}
+
+func logoutHandler(mw *jwt.GinJWTMiddleware, c *gin.Context) {
+	cookieName := mw.CookieName
+	cookie, err := c.Request.Cookie(cookieName)
 
 	if err != nil {
 		panic(err)
 	}
 
-	AuthMiddleware = middleware
+	cookie.Value = "invalid"
+	cookie.Expires = time.Unix(0, 0)
+
+	http.SetCookie(c.Writer, cookie)
+
+	c.Redirect(http.StatusFound, "/")
+	c.Abort()
+}
+
+func handleRegister(mw *jwt.GinJWTMiddleware, c *gin.Context) {
+	var req user.CreateRequest
+
+	if err := c.ShouldBind(&req); err != nil {
+		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+			"error": "all fields are required",
+		})
+		return
+	}
+
+	_, err := user.Create(req)
+
+	if err != nil {
+		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	mw.LoginHandler(c)
+}
+
+func Init(router *gin.Engine) {
+	mw, err := createJwtMiddleware()
+
+	router.POST("/login", mw.LoginHandler)
+	router.GET("/logout", func(c *gin.Context) {
+		logoutHandler(mw, c)
+	})
+	router.POST("/register", func(c *gin.Context) {
+		handleRegister(mw, c)
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	// we use custom middleware so we don't trigger the unauthorized callback, instead we will handle it ourselves
+	router.Use(func(c *gin.Context) {
+		claims, err := mw.GetClaimsFromJWT(c)
+		if err != nil {
+			return
+		}
+
+		if claims["exp"] == nil {
+			return
+		}
+
+		if _, ok := claims["exp"].(float64); !ok {
+			return
+		}
+
+		if int64(claims["exp"].(float64)) < mw.TimeFunc().Unix() {
+			return
+		}
+
+		c.Set("JWT_PAYLOAD", claims)
+		identity := mw.IdentityHandler(c)
+
+		if identity != nil {
+			c.Set(mw.IdentityKey, identity)
+		}
+
+		if !mw.Authorizator(identity, c) {
+			return
+		}
+
+		c.Set("JWT_IDENTITY", identity.(*AuthPayload))
+
+		c.Next()
+	})
+
+
 }

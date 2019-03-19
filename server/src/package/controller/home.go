@@ -2,7 +2,6 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"package/middleware"
 	"package/util"
 	"net/http"
 )
@@ -12,7 +11,7 @@ func HomeController(router *gin.Engine) {
 }
 
 func renderHomePage(c *gin.Context) {
-	payload := middleware.GetAuthPayload(c);
+	payload := c.MustGet("JWT_IDENTITY")
 
 	util.RenderPage(c, http.StatusOK, "HomePage", gin.H{
 		"authPayload": payload,

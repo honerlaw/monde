@@ -7,6 +7,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	aws2 "package/service/aws"
 )
 
 type VideoPreset struct {
@@ -52,7 +53,7 @@ var _etClient *elastictranscoder.ElasticTranscoder
 
 func getETClient() (*elastictranscoder.ElasticTranscoder) {
 	if _etClient == nil {
-		_etClient = elastictranscoder.New(Session)
+		_etClient = elastictranscoder.New(aws2.Session)
 	}
 	return _etClient
 }

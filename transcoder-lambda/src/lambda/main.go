@@ -5,9 +5,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/joho/godotenv"
-	aws2 "lambda/aws"
 	"lambda/util"
 	"log"
+	"package/service/aws"
+	aws2 "lambda/aws"
 )
 
 func Handler(ctx context.Context, event events.S3Event) {
@@ -39,7 +40,7 @@ func Handler(ctx context.Context, event events.S3Event) {
 		// set the job id so we can look it up later if we need to
 		mediainfo.JobID = *job.Id
 
-		err = aws2.Insert(mediainfo)
+		err = util.Insert(mediainfo)
 		if err != nil {
 			log.Print("Failed to insert media and job informations", err)
 			continue
@@ -53,7 +54,7 @@ func main() {
 		panic(err)
 	}
 
-	err = aws2.InitSession()
+	err = aws.InitSession()
 	if err != nil {
 		panic(err)
 	}
