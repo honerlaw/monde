@@ -159,6 +159,9 @@ func Init(router *gin.Engine) {
 
 	// we use custom middleware so we don't trigger the unauthorized callback, instead we will handle it ourselves
 	router.Use(func(c *gin.Context) {
+		// we always set this so each handler can check if it exists, whether or not are actually logged in
+		c.Set("JWT_IDENTITY", nil)
+
 		claims, err := mw.GetClaimsFromJWT(c)
 		if err != nil {
 			return
