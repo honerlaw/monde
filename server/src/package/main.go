@@ -3,13 +3,15 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/musawirali/preact-rpc/goclient"
-	"package/controller"
 	"github.com/joho/godotenv"
 	"os"
 	"log"
 	"package/service/aws"
 	"package/middleware/auth"
 	"package/repository"
+	"package/routes/media"
+	"package/routes/user"
+	"package/routes"
 )
 
 func main() {
@@ -41,10 +43,11 @@ func main() {
 	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
-	controller.LoginController(router)
-	controller.RegisterController(router)
-	controller.UploadController(router)
-	controller.HomeController(router)
+	router.GET("/media/list", media.List);
+	router.GET("/media/upload", media.Upload);
+	router.GET("/user/login", user.Login)
+	router.GET("/user/register", user.Register)
+	router.GET("/", routes.Home)
 
 	router.Run("0.0.0.0:8080")
 }

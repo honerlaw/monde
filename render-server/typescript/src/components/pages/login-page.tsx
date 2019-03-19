@@ -16,7 +16,7 @@ export class LoginPage extends React.Component<IProps, {}> {
                 <div className={"col-sm-4 offset-sm-4"}>
                     <h1 className={"text-center"}>login</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
-                    <form method={"POST"} action={"/login"}>
+                    <form method={"POST"} action={"/user/login"}>
                         <InputGroup name={"username"} type={"text"} placeholder={"username"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
                         <button className="btn btn-primary btn-block" type="submit">login</button>

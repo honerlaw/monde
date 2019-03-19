@@ -1,4 +1,4 @@
-package controller
+package user
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,11 +6,7 @@ import (
 	"net/http"
 )
 
-func RegisterController(router *gin.Engine) {
-	router.GET("/register", renderRegisterPage)
-}
-
-func renderRegisterPage(c *gin.Context) {
+func Register(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY")
 
 	if payload != nil {

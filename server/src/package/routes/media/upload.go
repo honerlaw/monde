@@ -1,4 +1,4 @@
-package controller
+package media
 
 import (
 	"github.com/gin-gonic/gin"
@@ -15,27 +15,7 @@ import (
 	"package/middleware/auth"
 )
 
-func UploadController(router *gin.Engine) {
-	router.GET("/upload/list", renderUploadListPage);
-	router.GET("/upload", renderUploadPage);
-}
-
-func renderUploadListPage(c *gin.Context) {
-	payload := c.MustGet("JWT_IDENTITY")
-	props := gin.H{
-		"authPayload": payload,
-	}
-
-	if payload != nil {
-		// 1. fetch all mediainfo for the user
-		// 2. fetch the job id and see if it finished
-
-	}
-
-	util.RenderPage(c, http.StatusOK, "UploadListPage", props)
-}
-
-func renderUploadPage(c *gin.Context) {
+func Upload(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY").(*auth.AuthPayload)
 	if payload == nil {
 		c.Redirect(http.StatusFound, "/")

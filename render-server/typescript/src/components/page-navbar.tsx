@@ -22,10 +22,10 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
     private renderLoggedIn(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <a className="nav-link" href="/upload">upload</a>
+                <a className="nav-link" href="/media/upload">upload</a>
             </li>
             <li className="nav-item">
-                <a className="nav-link" href="/logout">logout</a>
+                <a className="nav-link" href="/user/logout">logout</a>
             </li>
         </ul>;
     }
@@ -33,10 +33,10 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
     private renderLoggedOut(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <a className="nav-link" href="/login">login</a>
+                <a className="nav-link" href="/user/login">login</a>
             </li>
             <li className="nav-item">
-                <a className="nav-link" href="/register">register</a>
+                <a className="nav-link" href="/user/register">register</a>
             </li>
         </ul>;
     }

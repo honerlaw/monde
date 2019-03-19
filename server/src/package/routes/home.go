@@ -1,4 +1,4 @@
-package controller
+package routes
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,11 +6,7 @@ import (
 	"net/http"
 )
 
-func HomeController(router *gin.Engine) {
-	router.GET("/", renderHomePage)
-}
-
-func renderHomePage(c *gin.Context) {
+func Home(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY")
 
 	util.RenderPage(c, http.StatusOK, "HomePage", gin.H{

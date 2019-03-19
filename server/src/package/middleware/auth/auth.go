@@ -11,6 +11,8 @@ import (
 	"package/service/user"
 )
 
+// @todo split this up / re-organize it?
+
 type AuthPayload struct {
 	ID    int64
 	Roles []string
@@ -19,8 +21,8 @@ type AuthPayload struct {
 const identityKey = "ID"
 
 var unauthorizedUrlToPageMap = gin.H{
-	"/login":    "LoginPage",
-	"/register": "RegisterPage",
+	"/user/login":    "LoginPage",
+	"/user/register": "RegisterPage",
 }
 
 func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
@@ -145,11 +147,11 @@ func handleRegister(mw *jwt.GinJWTMiddleware, c *gin.Context) {
 func Init(router *gin.Engine) {
 	mw, err := createJwtMiddleware()
 
-	router.POST("/login", mw.LoginHandler)
-	router.GET("/logout", func(c *gin.Context) {
+	router.POST("/user/login", mw.LoginHandler)
+	router.GET("/user/logout", func(c *gin.Context) {
 		logoutHandler(mw, c)
 	})
-	router.POST("/register", func(c *gin.Context) {
+	router.POST("/user/register", func(c *gin.Context) {
 		handleRegister(mw, c)
 	})
 
