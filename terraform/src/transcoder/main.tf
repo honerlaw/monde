@@ -30,6 +30,11 @@ resource "aws_s3_bucket" "transcoder_upload" {
 
 resource "aws_s3_bucket" "transcoder_processed" {
   bucket = "monde-aws-transcoder-processed"
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["http://localhost:8080"]
+  }
 }
 
 resource "aws_s3_bucket" "transcoder_thumbnails" {

@@ -7,11 +7,13 @@ import (
 
 type MediaInfo struct {
 	gorm.Model
-	XMLName       xml.Name `xml:"MediaInfo"`
-	Medias        []Media `xml:"media" gorm:"foreignkey:MediaInfoID"`
-	UserID        uint
-	JobID         string
-	VideoID       string
+	XMLName     xml.Name `xml:"MediaInfo"`
+	Medias      []Media  `xml:"media" gorm:"foreignkey:MediaInfoID"`
+	UserID      uint
+	JobID       string
+	VideoID     string
+	Title       string `gorm:"type:tinytext"`
+	Description string `gorm:"type:text"`
 }
 
 func (*MediaInfo) Migrate(db *gorm.DB, migrate func(model interface{})) {

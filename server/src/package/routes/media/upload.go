@@ -24,7 +24,7 @@ func Upload(c *gin.Context) {
 	}
 
 	id, _ := uuid.NewV4()
-	userId := strconv.FormatInt(payload.ID, 10)
+	userId := strconv.FormatUint(uint64(payload.ID), 10)
 	bucket := os.Getenv("AWS_UPLOAD_BUCKET")
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
@@ -36,7 +36,7 @@ func Upload(c *gin.Context) {
 	shortTime := currentTime.Format("20060102")
 	service := "s3"
 	credential := accessKey + "/" + shortTime + "/" + region + "/" + service + "/aws4_request"
-	redirect := os.Getenv("UPLOAD_REDIRECT_DOMAIN") + "/upload/list"
+	redirect := os.Getenv("UPLOAD_REDIRECT_DOMAIN") + "/media/list"
 
 	policy := []byte(`{
 		"expiration": "2020-12-01T12:00:00.000Z",

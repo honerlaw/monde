@@ -3,11 +3,10 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/elastictranscoder"
 	"github.com/aws/aws-sdk-go/aws"
-	"os"
-	"errors"
 	"strconv"
 	"strings"
 	aws2 "package/service/aws"
+	"os"
 )
 
 type VideoPreset struct {
@@ -44,59 +43,13 @@ var presets = []*VideoPreset{
 	},
 	{
 		Id: "1351620000001-000010",
-		Name: "g-720p",
+		Name: "g-720p.mp4",
 		FullName: "Generic 720p",
 	},
 }
 
-var _etClient *elastictranscoder.ElasticTranscoder
-
-func getETClient() (*elastictranscoder.ElasticTranscoder) {
-	if _etClient == nil {
-		_etClient = elastictranscoder.New(aws2.Session)
-	}
-	return _etClient
-}
-
-func getPipelineID() (*string, error) {
-	name := os.Getenv("TRANSCODER_PIPELINE_NAME")
-
-	var pageToken *string
-
-	// continue searching until we either error out, or run out of pages
-	for true {
-
-		// fetch a list of pipelines
-		output, err := getETClient().ListPipelines(&elastictranscoder.ListPipelinesInput{
-			PageToken: pageToken,
-		})
-
-		// if the request errored, just short circuit with the error
-		if err != nil {
-			return nil, err
-		}
-
-		// otherwise see if the pipeline we are looking for exists
-		for _, pipeline := range output.Pipelines {
-
-			// if it does, short circuit and return the id
-			if *pipeline.Name == name {
-				return pipeline.Id, nil
-			}
-		}
-
-		// if there is a page token, set it for the next request
-		pageToken = output.NextPageToken
-		if pageToken == nil {
-			break
-		}
-	}
-
-	return nil, errors.New("could not find pipeline with name: " + name)
-}
-
 func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.Job, error) {
-	pipelineId, err := getPipelineID()
+	pipelineId, err := aws2.GetETService().GetPipelineID(os.Getenv("TRANSCODER_PIPELINE_NAME"))
 	if err != nil {
 		return nil, err
 	}
@@ -107,23 +60,24 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 	// build the outputs from the presets defined above, ideally we would fetch this info from the database or
 	// somewhere else instead of have them hardcoded...
 	for _, preset := range presets {
-		key := aws.String("video/" + preset.Name)
-
-		// we only want to add the hls files to be added to the playlist
-		if strings.HasPrefix(preset.Name, "hls-") {
-			playlistOutputKeys = append(playlistOutputKeys, key)
-		}
-
-		outputs = append(outputs, &elastictranscoder.CreateJobOutput{
-			Key:              key,
+		output := &elastictranscoder.CreateJobOutput{
+			Key:              aws.String(preset.Name),
 			PresetId:         aws.String(preset.Id),
 			ThumbnailPattern: aws.String(preset.Name + "-{count}"),
 			Rotate:           aws.String("0"),
-			SegmentDuration:  aws.String("5"),
-		})
+		}
+
+		// we only want to add the hls files to be added to the playlist
+		if strings.HasPrefix(preset.Name, "hls-") {
+			output.Key = aws.String("video/" + preset.Name)
+			playlistOutputKeys = append(playlistOutputKeys, output.Key)
+			output.SegmentDuration = aws.String("5")
+		}
+
+		outputs = append(outputs, output)
 	}
 
-	resp, err := getETClient().CreateJob(&elastictranscoder.CreateJobInput{
+	resp, err := aws2.GetETService().GetClient().CreateJob(&elastictranscoder.CreateJobInput{
 		PipelineId: pipelineId,
 		Input: &elastictranscoder.JobInput{
 			Key:         aws.String(metadata.Key),
@@ -138,7 +92,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 		Playlists: []*elastictranscoder.CreateJobPlaylist{
 			{
 				Format:     aws.String("HLSv3"),
-				Name:       aws.String("playlist.m3u8"),
+				Name:       aws.String("playlist"),
 				OutputKeys: playlistOutputKeys,
 			},
 		},

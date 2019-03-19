@@ -14,7 +14,7 @@ import (
 // @todo split this up / re-organize it?
 
 type AuthPayload struct {
-	ID    int64
+	ID    uint
 	Roles []string
 }
 
@@ -52,7 +52,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 
 			return &AuthPayload{
-				ID:    int64(claims[identityKey].(float64)),
+				ID:    uint(claims[identityKey].(float64)),
 				Roles: roles,
 			}
 		},
@@ -69,7 +69,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 
 			return &AuthPayload{
-				ID:    int64(verifiedUser.ID), // definition says unit, runtime says float64...
+				ID:    verifiedUser.ID, // definition says unit, runtime says float64...
 				Roles: []string{"user"},
 			}, nil
 		},
