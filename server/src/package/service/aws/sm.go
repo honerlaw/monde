@@ -13,6 +13,11 @@ type SMService struct {
 	client *secretsmanager.SecretsManager
 }
 
+type SMSecret struct {
+	ARN   string
+	Value string
+}
+
 func GetSMService() (*SMService) {
 	smOnce.Do(func() {
 		smInstance = &SMService{
@@ -26,8 +31,8 @@ func (service *SMService) GetClient() (*secretsmanager.SecretsManager) {
 	return service.client
 }
 
-func (service *SMService) GetRDSSecretArn(secretName string) (*string, error) {
-	output, err := service.client.ListSecretVersionIds(&secretsmanager.ListSecretVersionIdsInput{
+func (service *SMService) GetSecret(secretName string) (*SMSecret, error) {
+	output, err := service.client.GetSecretValue(&secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(secretName),
 	})
 
@@ -35,5 +40,8 @@ func (service *SMService) GetRDSSecretArn(secretName string) (*string, error) {
 		return nil, err
 	}
 
-	return output.ARN, nil
+	return &SMSecret{
+		ARN:   *output.ARN,
+		Value: *output.SecretString,
+	}, nil
 }

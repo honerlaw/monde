@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/musawirali/preact-rpc/goclient"
 	"github.com/joho/godotenv"
-	"os"
 	"log"
 	"package/service/aws"
 	"package/middleware/auth"
@@ -31,7 +30,7 @@ func main() {
 	// connect to the react rendering server
 	goclient.Connect("tcp", "0.0.0.0:9000")
 
-	defer repository.Connect(os.Getenv("DB_URL")).Close()
+	defer repository.Connect().Close()
 	repository.Migrate()
 
 	router := gin.Default()

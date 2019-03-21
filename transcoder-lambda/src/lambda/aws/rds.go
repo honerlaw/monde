@@ -4,61 +4,41 @@ import (
 	"github.com/aws/aws-sdk-go/service/rdsdataservice"
 	"github.com/aws/aws-sdk-go/aws"
 	"os"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"errors"
 	aws2 "package/service/aws"
+	"sync"
 )
 
-var _rdsClient *rds.RDS
-var _rdsDataService *rdsdataservice.RDSDataService
+var rdsdsSync sync.Once
+var rdsdsInstance *RDSDService
 
-func getRDSClient() (*rds.RDS) {
-	if _rdsClient == nil {
-		_rdsClient = rds.New(aws2.Session)
-	}
-	return _rdsClient
+type RDSDService struct {
+	client *rdsdataservice.RDSDataService
 }
 
-func getRDSDataService() (*rdsdataservice.RDSDataService) {
-	if _rdsDataService == nil {
-		_rdsDataService = rdsdataservice.New(aws2.Session)
-	}
-	return _rdsDataService
-}
-
-func getDbClusterArn() (*string, error) {
-	client := getRDSClient()
-
-	clusters, err := client.DescribeDBClusters(&rds.DescribeDBClustersInput{
-		DBClusterIdentifier: aws.String(os.Getenv("CLUSTER_IDENTIFIER")),
+func GetRDSDService() (*RDSDService) {
+	rdsdsSync.Do(func() {
+		rdsdsInstance = &RDSDService{
+			client: rdsdataservice.New(aws2.Session),
+		}
 	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(clusters.DBClusters) != 1 {
-		return nil, errors.New("multiple db clusters found for given cluster identifier")
-	}
-
-	return clusters.DBClusters[0].DBClusterArn, nil
+	return rdsdsInstance
 }
 
-func RDSExecuteSQL(sql string) (*rdsdataservice.ExecuteSqlOutput, error) {
-	secretArn, err := aws2.GetSMService().GetRDSSecretArn(os.Getenv("RDS_SECRET_NAME"))
+func (service *RDSDService) ExecuteSQL(sql string) (*rdsdataservice.ExecuteSqlOutput, error) {
+	secret, err := aws2.GetSMService().GetSecret(os.Getenv("DB_SECRET_NAME"))
 	if err != nil {
 		return nil, err
 	}
 
-	clusterArn, err := getDbClusterArn()
+	cluster, err := aws2.GetRDSService().GetCluster()
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := getRDSDataService().ExecuteSql(&rdsdataservice.ExecuteSqlInput{
-		AwsSecretStoreArn:      secretArn,
-		DbClusterOrInstanceArn: clusterArn,
-		Database:               aws.String(os.Getenv("DATABASE")),
+	output, err := service.client.ExecuteSql(&rdsdataservice.ExecuteSqlInput{
+		AwsSecretStoreArn:      aws.String(secret.ARN),
+		DbClusterOrInstanceArn: aws.String(cluster.ARN),
+		Database:               aws.String(os.Getenv("DB_NAME")),
 		SqlStatements:          aws.String(sql),
 	})
 
