@@ -4,5 +4,5 @@
 cd /base/render-server && nohup npm run start > /dev/null 2>&1 &
 
 # start the main go server
-/base/server/server
+/base/server/bin/server
 

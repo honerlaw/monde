@@ -1,11 +1,11 @@
 {
-  "name": "render-server",
+  "name": "renderer",
   "version": "1.0.0",
   "description": "render react components for the main go server",
   "repository": "https://github.com/honerlaw/monde.git",
   "main": "main.js",
   "scripts": {
-    "scss": "sass --no-source-map scss:../server/assets/css",
+    "scss": "sass --no-source-map scss:../assets/css",
     "build": "tsc -p ./typescript/tsconfig.json && npm run scss",
     "start": "preact-rpc --bundle=./typescript/dist/main.js --port=9000",
     "start:local": "npm run build && npm run start"

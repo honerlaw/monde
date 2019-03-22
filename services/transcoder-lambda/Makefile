@@ -1,11 +1,11 @@
 .PHONY: clean build deploy mediainfo
 
 MEDIA_INFO_TAG=media-info-image
-TERRAFORM_SRC_PATH=../terraform/src/transcoder/
+TERRAFORM_SRC_PATH=../../terraform/src/transcoder/
+TERRAFORM_VAR_FILE=../../terraform/env/transcoder/example.tfvars
 LAMBDA_PATH=$(shell pwd)
 LAMBDA_ZIP_FILE=transcoder-lambda.zip
 LAMBDA_FILE_PATH=$(LAMBDA_PATH)/$(LAMBDA_ZIP_FILE)
-TERRAFORM_VAR_FILE=../terraform/env/transcoder/example.tfvars
 
 clean:
 	rm -rf ./bin $(LAMBDA_ZIP_FILE)

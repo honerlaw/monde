@@ -4,3 +4,5 @@ src/github.com/
 src/golang.org/
 assets/css
 .env
+bin/
+.terraform/
