@@ -1,0 +1,6 @@
+pkg/
+src/package/vendor/
+src/github.com/
+src/golang.org/
+assets/css
+.env
