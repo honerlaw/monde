@@ -11,6 +11,7 @@ import (
 	"server/routes/media"
 	"server/routes/user"
 	"server/routes"
+	"net/http"
 )
 
 func main() {
@@ -46,6 +47,11 @@ func main() {
 	router.GET("/media/upload", media.Upload);
 	router.GET("/user/login", user.Login)
 	router.GET("/user/register", user.Register)
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "healthy",
+		})
+	})
 	router.GET("/", routes.Home)
 
 	router.Run("0.0.0.0:80")

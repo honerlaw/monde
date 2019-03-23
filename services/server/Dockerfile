@@ -8,6 +8,7 @@ WORKDIR /base
 COPY scripts scripts
 COPY src server/src
 COPY .env server/.env
+COPY assets server/assets
 COPY Makefile server/Makefile
 COPY renderer/scss renderer/scss
 COPY renderer/typescript/src renderer/typescript/src
@@ -30,6 +31,7 @@ RUN npm install && npm run build
 RUN rm -rf /base/renderer/typescript/src && rm -rf /base/renderer/typescript/tsconfig.json && rm -rf /base/renderer/typescript/types && rm -rf /base/renderer/typescript/tsconfig.json  && rm -rf /base/renderer/node_modules
 ENV NODE_ENV=production
 RUN npm install
+RUN mv ../assets/* ../server/assets/
 
 WORKDIR /base/server
 RUN chmod +x /base/scripts/run.sh

@@ -77,6 +77,10 @@ resource "aws_security_group" "server_security_group" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "server_log_group" {
+  name = "awslogs-vueon"
+}
+
 resource "aws_ecs_cluster" "server_cluster" {
   name = "server_cluster"
 }
@@ -87,6 +91,7 @@ data "template_file" "server_container_definitions" {
     image = "${var.image}"
     container_port = "${var.container_port}"
     region = "${var.region}"
+    log_group = "${aws_cloudwatch_log_group.server_log_group.name}"
   }
 }
 
@@ -99,6 +104,7 @@ resource "aws_ecs_task_definition" "server_task_definition" {
   requires_compatibilities = [
     "FARGATE"
   ]
+  depends_on = ["aws_cloudwatch_log_group.server_log_group"]
   container_definitions = "${data.template_file.server_container_definitions.rendered}"
 }
 

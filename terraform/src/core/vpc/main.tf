@@ -14,28 +14,35 @@ resource "aws_vpc" "core_vpc" {
   }
 }
 
-resource "aws_subnet" "core_public_subnet_1" {
+resource "aws_route_table" "core_public_route_table" {
   vpc_id = "${aws_vpc.core_vpc.id}"
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
-  map_public_ip_on_launch = true
-  depends_on = ["aws_internet_gateway.core_internet_gateway"]
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.core_internet_gateway.id}"
+  }
 
   tags {
-    Name = "core public subnet 1"
+    Name = "Core Public Subnet Route Table"
   }
 }
 
-resource "aws_subnet" "core_public_subnet_2" {
+module "public_subnet_1" {
+  source = "./subnet"
   vpc_id = "${aws_vpc.core_vpc.id}"
-  availability_zone = "us-east-1b"
-  cidr_block = "10.0.2.0/24"
-  map_public_ip_on_launch = true
-  depends_on = ["aws_internet_gateway.core_internet_gateway"]
+  cidr_prefix = "10.0.1"
+  availability_zone = "us-east-1a"
+  count = "1"
+  route_table_id = "${aws_route_table.core_public_route_table.id}"
+}
 
-  tags {
-    Name = "core public subnet 2"
-  }
+module "public_subnet_2" {
+  source = "./subnet"
+  vpc_id = "${aws_vpc.core_vpc.id}"
+  cidr_prefix = "10.0.3"
+  availability_zone = "us-east-1b"
+  count = "2"
+  route_table_id = "${aws_route_table.core_public_route_table.id}"
 }
 
 output "vpc_id" {
@@ -43,17 +50,17 @@ output "vpc_id" {
 }
 
 output "public_subnet_1_id" {
-  value = "${aws_subnet.core_public_subnet_1.id}"
+  value = "${module.public_subnet_1.public_subnet_id}"
 }
 
 output "public_subnet_2_id" {
-  value = "${aws_subnet.core_public_subnet_2.id}"
+  value = "${module.public_subnet_2.public_subnet_id}"
 }
 
 output "public_subnet_ids" {
-  value = "${list(aws_subnet.core_public_subnet_1.id, aws_subnet.core_public_subnet_2.id)}"
+  value = "${list(module.public_subnet_1.public_subnet_id, module.public_subnet_2.public_subnet_id)}"
 }
 
 output "public_subnet_cidr_blocks" {
-  value = "${list(aws_subnet.core_public_subnet_1.cidr_block, aws_subnet.core_public_subnet_2.cidr_block)}"
+  value = "${list(module.public_subnet_1.cidr_block, module.public_subnet_2.cidr_block)}"
 }
