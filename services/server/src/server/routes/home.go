@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"package/util"
+	"server/util"
 	"net/http"
 )
 

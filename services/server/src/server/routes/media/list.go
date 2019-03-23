@@ -2,11 +2,11 @@ package media
 
 import (
 	"github.com/gin-gonic/gin"
-	"package/util"
+	"server/util"
 	"net/http"
-	"package/middleware/auth"
-	"package/service/media"
-	"package/service/aws"
+	"server/middleware/auth"
+	"server/service/media"
+	"server/service/aws"
 	"os"
 	"fmt"
 	"strconv"

@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
-	"package/model/media"
+	"server/model/media"
 )
 
 type User struct {

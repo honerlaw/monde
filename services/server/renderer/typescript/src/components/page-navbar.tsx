@@ -8,7 +8,7 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
 
     public render(): JSX.Element {
         return <nav className="navbar navbar-expand-lg navbar-light">
-            <a className="navbar-brand" href="#">package</a>
+            <a className="navbar-brand" href="#">vueon</a>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
                     aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon" />

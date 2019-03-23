@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rdsdataservice"
 	"github.com/aws/aws-sdk-go/aws"
 	"os"
-	aws2 "package/service/aws"
+	aws2 "server/service/aws"
 	"sync"
 )
 

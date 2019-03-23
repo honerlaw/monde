@@ -5,7 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"errors"
 	"strconv"
-	aws2 "package/service/aws"
+	aws2 "server/service/aws"
 )
 
 type S3RecordMetadata struct {

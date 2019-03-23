@@ -1,10 +1,10 @@
 package user
 
 import (
-	"package/model"
+	"server/model"
 	"golang.org/x/crypto/bcrypt"
 	"errors"
-	"package/repository"
+	"server/repository"
 )
 
 type VerifyRequest struct {

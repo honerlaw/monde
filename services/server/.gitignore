@@ -1,5 +1,5 @@
 pkg/
-src/package/vendor/
+src/server/vendor/
 src/github.com/
 src/golang.org/
 assets/css

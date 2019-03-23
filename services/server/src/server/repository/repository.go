@@ -3,13 +3,13 @@ package repository
 import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
-	"package/model"
-	"package/model/media"
+	"server/model"
+	"server/model/media"
 	"reflect"
 	"log"
 	"os"
 	"fmt"
-	"package/service/aws"
+	"server/service/aws"
 	"encoding/json"
 )
 

@@ -4,7 +4,7 @@ variable "dbpass" {}
 
 terraform {
   backend "s3" {
-    bucket = "monde-terraform"
+    bucket = "vueon-terraform"
     key = "terraform/core.tfstate"
     region = "us-east-1"
   }

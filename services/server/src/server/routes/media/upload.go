@@ -2,7 +2,7 @@ package media
 
 import (
 	"github.com/gin-gonic/gin"
-	"package/util"
+	"server/util"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,7 +12,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"package/middleware/auth"
+	"server/middleware/auth"
 )
 
 func Upload(c *gin.Context) {

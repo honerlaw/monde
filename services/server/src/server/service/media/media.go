@@ -1,8 +1,8 @@
 package media
 
 import (
-	"package/model/media"
-	"package/repository"
+	"server/model/media"
+	"server/repository"
 	"log"
 )
 

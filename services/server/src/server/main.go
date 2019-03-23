@@ -5,12 +5,12 @@ import (
 	"github.com/musawirali/preact-rpc/goclient"
 	"github.com/joho/godotenv"
 	"log"
-	"package/service/aws"
-	"package/middleware/auth"
-	"package/repository"
-	"package/routes/media"
-	"package/routes/user"
-	"package/routes"
+	"server/service/aws"
+	"server/middleware/auth"
+	"server/repository"
+	"server/routes/media"
+	"server/routes/user"
+	"server/routes"
 )
 
 func main() {
@@ -48,5 +48,5 @@ func main() {
 	router.GET("/user/register", user.Register)
 	router.GET("/", routes.Home)
 
-	router.Run("0.0.0.0:8080")
+	router.Run("0.0.0.0:80")
 }

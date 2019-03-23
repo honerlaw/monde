@@ -5,14 +5,14 @@ import (
 	"lambda/aws"
 	"encoding/xml"
 	"errors"
-	"package/model/media"
+	"server/model/media"
 	"log"
 	"fmt"
-	packageAWS "package/service/aws"
+	serverAWS "server/service/aws"
 )
 
 func GetMediaInfo(metadata *aws.S3RecordMetadata) (*media.MediaInfo, error) {
-	url, err := packageAWS.GetS3Service().GetSignedUrl(metadata.Bucket, metadata.Key)
+	url, err := serverAWS.GetS3Service().GetSignedUrl(metadata.Bucket, metadata.Key)
 
 	if err != nil {
 		return nil, err

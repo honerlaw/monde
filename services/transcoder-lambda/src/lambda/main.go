@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"lambda/util"
 	"log"
-	"package/service/aws"
+	"server/service/aws"
 	aws2 "lambda/aws"
 )
 

@@ -7,8 +7,8 @@ import (
 	"os"
 	"errors"
 	"net/http"
-	"package/util"
-	"package/service/user"
+	"server/util"
+	"server/service/user"
 )
 
 // @todo split this up / re-organize it?

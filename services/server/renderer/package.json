@@ -2,7 +2,7 @@
   "name": "renderer",
   "version": "1.0.0",
   "description": "render react components for the main go server",
-  "repository": "https://github.com/honerlaw/monde.git",
+  "repository": "https://github.com/honerlaw/vueon.git",
   "main": "main.js",
   "scripts": {
     "scss": "sass --no-source-map scss:../assets/css",

@@ -3,7 +3,7 @@ variable "lambda_file_path" {}
 
 terraform {
   backend "s3" {
-    bucket = "monde-terraform"
+    bucket = "vueon-terraform"
     key = "terraform/transcoder.tfstate"
     region = "us-east-1"
   }
@@ -25,11 +25,11 @@ module "transcoder_lambda" {
 }
 
 resource "aws_s3_bucket" "transcoder_upload" {
-  bucket = "monde-aws-transcoder-upload"
+  bucket = "vueon-aws-transcoder-upload"
 }
 
 resource "aws_s3_bucket" "transcoder_processed" {
-  bucket = "monde-aws-transcoder-processed"
+  bucket = "vueon-aws-transcoder-processed"
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET"]
@@ -38,7 +38,7 @@ resource "aws_s3_bucket" "transcoder_processed" {
 }
 
 resource "aws_s3_bucket" "transcoder_thumbnails" {
-  bucket = "monde-aws-transcoder-thumbnails"
+  bucket = "vueon-aws-transcoder-thumbnails"
 }
 
 resource "aws_elastictranscoder_pipeline" "transcoder_pipeline" {

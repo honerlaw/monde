@@ -21,6 +21,7 @@ WORKDIR /base/server/
 ENV GOPATH=/base/server
 ENV GIN_MODE=release
 RUN make build
+RUN rm -rf src/ Makefile
 
 # install all dependencies, build, remove dependencies / sources, install only production dependencies
 WORKDIR /base/renderer
