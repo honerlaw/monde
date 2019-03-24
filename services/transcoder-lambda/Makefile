@@ -23,7 +23,7 @@ build:
 
 deploy: clean build
 	terraform init $(TERRAFORM_SRC_PATH)
-	terraform apply -var-file=$(TERRAFORM_VAR_FILE) -var="lambda_file_path=$(LAMBDA_FILE_PATH)" $(TERRAFORM_SRC_PATH)
+	terraform apply -auto-approve -var-file=$(TERRAFORM_VAR_FILE) -var="lambda_file_path=$(LAMBDA_FILE_PATH)" $(TERRAFORM_SRC_PATH)
 
 destroy: clean build
 	terraform destroy -var-file=$(TERRAFORM_VAR_FILE) -var="lambda_file_path=$(LAMBDA_FILE_PATH)" $(TERRAFORM_SRC_PATH)

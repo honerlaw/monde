@@ -1,4 +1,4 @@
-.PHONY: build docker clean deploy destroy
+.PHONY: build docker clean deploy destroy docker-deploy
 
 TERRAFORM_SRC_PATH=../../terraform/src/server/
 TERRAFORM_VAR_FILE=../../terraform/env/server/example.tfvars
@@ -21,9 +21,11 @@ docker:
 	docker build -t $(URL) .
 	docker push $(URL)
 
+docker-deploy: docker deploy
+
 deploy:
 	terraform init $(TERRAFORM_SRC_PATH)
-	terraform apply -var-file=$(TERRAFORM_VAR_FILE) -var="image=$(LATEST_URL)" $(TERRAFORM_SRC_PATH)
+	terraform apply -auto-approve -var-file=$(TERRAFORM_VAR_FILE) -var="image=$(LATEST_URL)" $(TERRAFORM_SRC_PATH)
 
 destroy:
 	terraform init $(TERRAFORM_SRC_PATH)

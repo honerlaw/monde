@@ -5,7 +5,7 @@ deploy: deploy-core deploy-lambda deploy-server
 destroy: destroy-server destroy-lambda destroy-core
 
 deploy-core:
-	cd terraform/src/core/; terraform init; terraform apply -var-file=../../env/core/example.tfvars
+	cd terraform/src/core/; terraform init; terraform apply -auto-approve -var-file=../../env/core/example.tfvars
 
 destroy-core:
 	cd terraform/src/core/; terraform init; terraform destroy -var-file=../../env/core/example.tfvars

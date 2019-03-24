@@ -16,7 +16,7 @@ export class RegisterPage extends React.Component<IProps, {}> {
                 <div className={"col-sm-4 offset-sm-4"}>
                     <h1 className={"text-center"}>register</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
-                    <form method={"POST"} action={"/register"}>
+                    <form method={"POST"} action={"/user/register"}>
                         <InputGroup name={"username"} type={"text"} placeholder={"username"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
                         <InputGroup name={"verify_password"} type={"password"} placeholder={"verify password"}/>
