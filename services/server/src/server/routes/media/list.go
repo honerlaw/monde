@@ -48,7 +48,7 @@ func List(c *gin.Context) {
 					},
 					{
 						"type": "mp4",
-						"url": fmt.Sprintf("%s/%s/%s/g-720p", baseUrl, strconv.FormatUint(uint64(payload.ID), 10), info.VideoID),
+						"url": fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, strconv.FormatUint(uint64(payload.ID), 10), info.VideoID),
 					},
 				},
 			})

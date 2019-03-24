@@ -30,10 +30,30 @@ resource "aws_s3_bucket" "transcoder_upload" {
 
 resource "aws_s3_bucket" "transcoder_processed" {
   bucket = "vueon-aws-transcoder-processed"
+  acl = "public-read"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::vueon-aws-transcoder-processed/*"
+        }
+    ]
+}
+EOF
   cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET"]
-    allowed_origins = ["http://localhost:8080"]
+    allowed_headers = [
+      "*"
+    ]
+    allowed_methods = [
+      "GET"
+    ]
+    allowed_origins = [
+      "*"
+    ]
   }
 }
 
