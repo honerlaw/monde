@@ -5,13 +5,13 @@ import (
 	"lambda/aws"
 	"encoding/xml"
 	"errors"
-	"server/model/media"
+	"server/media/model"
 	"log"
 	"fmt"
 	serverAWS "server/service/aws"
 )
 
-func GetMediaInfo(metadata *aws.S3RecordMetadata) (*media.MediaInfo, error) {
+func GetMediaInfo(metadata *aws.S3RecordMetadata) (*model.MediaInfo, error) {
 	url, err := serverAWS.GetS3Service().GetSignedUrl(metadata.Bucket, metadata.Key)
 
 	if err != nil {
@@ -25,7 +25,7 @@ func GetMediaInfo(metadata *aws.S3RecordMetadata) (*media.MediaInfo, error) {
 		return nil, err
 	}
 
-	var info media.MediaInfo
+	var info model.MediaInfo
 	if err = xml.Unmarshal(data, &info); err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func GetMediaInfo(metadata *aws.S3RecordMetadata) (*media.MediaInfo, error) {
 	return &info, nil;
 }
 
-func ValidateMediaInfo(mediainfo *media.MediaInfo) (error) {
+func ValidateMediaInfo(mediainfo *model.MediaInfo) (error) {
 	for _, mediaInfoMedia := range mediainfo.Medias {
 		for _, track := range mediaInfoMedia.Tracks {
 			if track.Duration > 30 {
@@ -52,7 +52,7 @@ func ValidateMediaInfo(mediainfo *media.MediaInfo) (error) {
 // We shouldn't need to worry about escaping things because we generated all the data...
 // HOWEVER, we should probably still try and escape crap just in case mediainfo gets some weird results back
 // @todo escape things to prevent sql injections / unintended side effects
-func Insert(mediainfo *media.MediaInfo) (error) {
+func Insert(mediainfo *model.MediaInfo) (error) {
 	service := aws.GetRDSDService()
 
 	_, err := service.ExecuteSQL(fmt.Sprintf(

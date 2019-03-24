@@ -4,12 +4,12 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
 	"server/model"
-	"server/model/media"
 	"reflect"
 	"log"
 	"os"
 	"fmt"
 	"server/service/aws"
+	mediaModel "server/media/model"
 	"encoding/json"
 )
 
@@ -52,9 +52,9 @@ func Connect() *gorm.DB {
 
 func Migrate() {
 	(&model.User{}).Migrate(DB, migrateModel)
-	(&media.MediaInfo{}).Migrate(DB, migrateModel)
-	(&media.Media{}).Migrate(DB, migrateModel)
-	(&media.Track{}).Migrate(DB, migrateModel)
+	(&mediaModel.MediaInfo{}).Migrate(DB, migrateModel)
+	(&mediaModel.Media{}).Migrate(DB, migrateModel)
+	(&mediaModel.Track{}).Migrate(DB, migrateModel)
 }
 
 func migrateModel(model interface{}) {

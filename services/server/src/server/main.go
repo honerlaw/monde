@@ -8,11 +8,11 @@ import (
 	"server/service/aws"
 	"server/middleware/auth"
 	"server/repository"
-	"server/routes/media"
 	"server/routes/user"
 	"server/routes"
 	"net/http"
 	"os"
+	"server/media"
 )
 
 func main() {
@@ -44,8 +44,7 @@ func main() {
 	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
-	router.GET("/media/list", media.List);
-	router.GET("/media/upload", media.Upload);
+	media.RegisterRoutes(router)
 	router.GET("/user/login", user.Login)
 	router.GET("/user/register", user.Register)
 	router.GET("/health", func(c *gin.Context) {

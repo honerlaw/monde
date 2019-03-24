@@ -1,15 +1,15 @@
-package media
+package route
 
 import (
 	"github.com/gin-gonic/gin"
 	"server/util"
 	"net/http"
 	"server/middleware/auth"
-	"server/service/media"
 	"server/service/aws"
 	"os"
 	"fmt"
 	"strconv"
+	"server/media/service"
 )
 
 func List(c *gin.Context) {
@@ -21,7 +21,7 @@ func List(c *gin.Context) {
 
 	if payload != nil {
 
-		infos, err := media.GetMediaInfoByUserId(payload.ID)
+		infos, err := service.GetMediaInfoByUserId(payload.ID)
 		if err != nil {
 			// @todo redirect to 500 page or something
 			return
