@@ -4,6 +4,10 @@ export interface IPageNavbarProps {
     authPayload: boolean;
 }
 
+/**
+ * @TODO
+ * - fix dropdown stuff to actually work... since when the window is small the dropdown is broken
+ */
 export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
 
     public render(): JSX.Element {
@@ -22,7 +26,7 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
     private renderLoggedIn(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-                <a className="nav-link" href="/media/upload">upload</a>
+                <a className="nav-link" href="/media/list">my videos</a>
             </li>
             <li className="nav-item">
                 <a className="nav-link" href="/user/logout">logout</a>

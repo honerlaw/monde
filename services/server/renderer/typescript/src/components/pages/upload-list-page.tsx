@@ -1,6 +1,8 @@
 import {IPageProps, Page} from "../page";
 import * as React from "react";
 import {registerComponent} from "preact-rpc";
+import {InputGroup} from "../bootstrap/input-group";
+import {TextareaGroup} from "../bootstrap/textarea-group";
 
 interface IUploadInfo {
     videoId: string;
@@ -8,6 +10,7 @@ interface IUploadInfo {
         title: string;
         description: string;
         status: string;
+        hashtags: string[];
     };
     thumbs: string[];
     videos: Array<{
@@ -20,32 +23,63 @@ interface IProps extends IPageProps {
     uploads: IUploadInfo[];
 }
 
+/**
+ * @todo
+ * - no video place holder (e.g. no videos exist)
+ * - display thumbnail after upload so the user can see what it is
+ * - add ability to publish / unpublish a video (this will be sketch at first, since we aren't going to modify the s3 bucket itself)
+ * - add a button that links to the /media/upload page
+ */
 export class UploadListPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <Page id={"upload-success-page"} authPayload={this.props.authPayload}>
-            <div className={"row"}>
-                <div className={"col-sm-4 offset-sm-4"}>
-                    {this.props.uploads.map((upload: IUploadInfo): JSX.Element => {
-                        if (upload.info.status !== "Complete") {
-                            return <div>
-                                <span>Current Status: {upload.info.status}</span>
-                            </div>;
-                        }
-                        return <div>
-                            <form>
-                                <input type={"text"} value={upload.info.title}/>
-                                <textarea>{upload.info.description}</textarea>
-                            </form>
+        return <Page id={"upload-list-page"} authPayload={this.props.authPayload}>
+            <ol className={"upload-list"}>
+                {this.props.uploads.map((upload: IUploadInfo): JSX.Element => {
+                    if (upload.info.status !== "Complete") {
+                        return this.renderPending(upload);
+                    }
+                    return this.renderInfo(upload);
+                })}
+            </ol>
+        </Page>;
+    }
 
-                            <video width={500} height={500} controls={true}>
-                                <source src={upload.videos.filter((video) => video.type === "mp4")[0].url} type="video/mp4"/>
-                            </video>
-                        </div>
-                    })}
+    private renderPending(upload: IUploadInfo): JSX.Element {
+        return <li className={"upload-list-item row"}>
+            <div className={"col-sm-4"}>
+                <div className={"placeholder"}>
+                    <span>v</span>
                 </div>
             </div>
-        </Page>;
+            <div className={"col-sm-8 text-center"}>
+                <span className={"status"}>status: {upload.info.status}</span>
+            </div>
+        </li>;
+    }
+
+    private renderInfo(upload: IUploadInfo): JSX.Element {
+        return <li className={"upload-list-item row"}>
+            <div className={"col-sm-4"}>
+                <video controls={true}>
+                    <source src={this.getMp4Url(upload)} type="video/mp4"/>
+                </video>
+            </div>
+            <div className={"col-sm-8"}>
+                <form method={"POST"} action={"/media/update"}>
+                    <input type={"hidden"} name={"video_id"} value={upload.videoId} />
+                    <InputGroup name={"title"} type={"text"} value={upload.info.title} placeholder={"title"}/>
+                    <TextareaGroup name={"description"} value={upload.info.description}
+                                   placeholder={"description"}/>
+                    <InputGroup name={"hashtags"} type={"text"} placeholder={"hashtags"}/>
+                    <button className="btn btn-primary" type="submit">update</button>
+                </form>
+            </div>
+        </li>;
+    }
+
+    private getMp4Url(upload: IUploadInfo): string {
+        return upload.videos.filter((video) => video.type === "mp4")[0].url;
     }
 
 }

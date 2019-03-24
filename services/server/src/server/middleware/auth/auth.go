@@ -78,6 +78,9 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			c.Abort()
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
+			var req user.VerifyRequest
+			c.ShouldBind(&req);
+
 			page := unauthorizedUrlToPageMap[c.Request.URL.String()]
 
 			if page == nil {
@@ -85,6 +88,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 
 			util.RenderPage(c, http.StatusUnauthorized, page.(string), gin.H{
+				"usernname": req.Username,
 				"error": message,
 			})
 		},
@@ -127,6 +131,7 @@ func handleRegister(mw *jwt.GinJWTMiddleware, c *gin.Context) {
 
 	if err := c.ShouldBind(&req); err != nil {
 		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+			"usernname": req.Username,
 			"error": "all fields are required",
 		})
 		return
@@ -136,6 +141,7 @@ func handleRegister(mw *jwt.GinJWTMiddleware, c *gin.Context) {
 
 	if err != nil {
 		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+			"usernname": req.Username,
 			"error": err.Error(),
 		})
 		return

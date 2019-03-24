@@ -12,6 +12,7 @@ import (
 	"server/routes/user"
 	"server/routes"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -54,5 +55,5 @@ func main() {
 	})
 	router.GET("/", routes.Home)
 
-	router.Run("0.0.0.0:80")
+	router.Run("0.0.0.0:" + os.Getenv("PORT"))
 }

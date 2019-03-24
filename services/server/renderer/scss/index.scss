@@ -5,5 +5,10 @@ body {
   padding: 0;
 }
 
+* {
+  border-radius: 0 !important;
+}
+
 @import "login-page";
 @import "register-page";
+@import "upload-list-page";

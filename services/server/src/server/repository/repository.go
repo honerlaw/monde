@@ -20,31 +20,25 @@ type DBCredentials struct {
 	Password string `json:"password"`
 }
 
+type DBInfo struct {
+	creds *DBCredentials
+	endpoint string
+	dbname string
+}
+
 func Connect() *gorm.DB {
-	// get the database cluster information
-	cluster, err := aws.GetRDSService().GetCluster()
-	if err != nil {
-		panic(err)
-	}
 
-	// get the database credentials secret
-	secret, err := aws.GetSMService().GetSecret(os.Getenv("DB_SECRET_NAME"))
-	if err != nil {
-		panic(err)
-	}
-
-	// secret is stored as json so unmarshal it
-	var creds DBCredentials
-	json.Unmarshal([]byte(secret.Value), &creds)
+	info := getDBInfo()
 
 	// create the db
-	err = createDatabaseIfNotExists(&creds, cluster.Endpoint)
+	url := generateDbUrl(info.creds, info.endpoint, nil)
+	err := createDatabaseIfNotExists(url, info.dbname)
 	if err != nil {
 		panic(err)
 	}
 
 	// get the actual db connection
-	url := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", creds.Username, creds.Password, cluster.Endpoint, os.Getenv("DB_NAME"))
+	url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
 	DB, err = gorm.Open("mysql", url)
 	if err != nil {
 		panic(err)
@@ -75,17 +69,55 @@ func migrateModel(model interface{}) {
 	log.Printf("%s was successfully migrated\n", modelType)
 }
 
-func createDatabaseIfNotExists(creds *DBCredentials, endpoint string) (error) {
+func getDBInfo() (*DBInfo) {
+	if os.Getenv("ENV") == "local" {
+		return &DBInfo{
+			creds: &DBCredentials{
+				Username: os.Getenv("DB_USER_LOCAL"),
+				Password: os.Getenv("DB_PASS_LOCAL"),
+			},
+			endpoint: os.Getenv("DB_ENDPOINT_LOCAL"),
+			dbname: os.Getenv("DB_NAME"),
+		}
+	}
 
-	// get the db url without the database name
-	dbUrl := fmt.Sprintf("%s:%s@tcp(%s)/?parseTime=true", creds.Username, creds.Password, endpoint)
+	// get the database cluster information
+	cluster, err := aws.GetRDSService().GetCluster()
+	if err != nil {
+		panic(err)
+	}
 
+	// get the database credentials secret
+	secret, err := aws.GetSMService().GetSecret(os.Getenv("DB_SECRET_NAME"))
+	if err != nil {
+		panic(err)
+	}
+
+	// secret is stored as json so unmarshal it
+	var creds DBCredentials
+	json.Unmarshal([]byte(secret.Value), &creds)
+
+	return &DBInfo{
+		creds: &creds,
+		endpoint: cluster.Endpoint,
+		dbname: os.Getenv("DB_NAME"),
+	}
+}
+
+func generateDbUrl(creds *DBCredentials, endpoint string, dbname *string) (string) {
+	if dbname != nil {
+		return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", creds.Username, creds.Password, endpoint, *dbname)
+	}
+	return fmt.Sprintf("%s:%s@tcp(%s)/?parseTime=true", creds.Username, creds.Password, endpoint)
+}
+
+func createDatabaseIfNotExists(dbUrl string, dbname string) (error) {
 	// attempt to create the database first
 	tempDb, err := gorm.Open("mysql", dbUrl)
 	if err != nil {
 		panic(err)
 	}
-	tempDb.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", os.Getenv("DB_NAME")))
+	tempDb.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
 	if tempDb.Error != nil {
 		panic(tempDb.Error)
 	}

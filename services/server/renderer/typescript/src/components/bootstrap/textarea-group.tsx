@@ -3,38 +3,37 @@ import * as React from "react";
 interface IProps {
     label?: string;
     name: string;
-    type: string;
     placeholder: string;
     value?: string;
     help?: string;
     description?: string;
 
-    inputProps?: { [key: string]: string };
+    textareaProps?: { [key: string]: string };
 }
 
-export class InputGroup extends React.Component<IProps, {}> {
+export class TextareaGroup extends React.Component<IProps, {}> {
 
-    private readonly inputId: string;
+    private readonly id: string;
     private readonly helpId: string;
 
     public constructor(props: IProps) {
         super(props);
 
-        this.inputId = this.getInputId();
+        this.id = this.getId();
         this.helpId = Math.random().toString().replace(".", "");
     }
 
     public render(): JSX.Element {
         return <div className="form-group">
-            {this.props.label ? <label htmlFor={this.inputId}>{this.props.placeholder}</label> : null}
-            <input className="form-control"
-                   id={this.inputId}
+            {this.props.label ? <label htmlFor={this.id}>{this.props.placeholder}</label> : null}
+            <textarea className="form-control"
+                   id={this.id}
                    name={this.props.name}
-                   type={this.props.type}
                    aria-describedby={this.helpId}
                    placeholder={this.props.placeholder}
-                   value={this.props.value}
-                   {...this.props.inputProps}/>
+                      {...this.props.textareaProps}>
+                {this.props.value}
+            </textarea>
             {this.renderHelp()}
         </div>;
     }
@@ -51,9 +50,9 @@ export class InputGroup extends React.Component<IProps, {}> {
         return `${id}-help`;
     }
 
-    private getInputId(): string {
+    private getId(): string {
         const id: string = Math.random().toString().replace(".", "");
-        return `${id}-input`;
+        return `${id}-textarea`;
     }
 
 }
