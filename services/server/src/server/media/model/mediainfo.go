@@ -3,17 +3,21 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	"encoding/xml"
+	"time"
 )
 
 type MediaInfo struct {
 	gorm.Model
-	XMLName     xml.Name `xml:"MediaInfo"`
-	Medias      []Media  `xml:"media" gorm:"foreignkey:MediaInfoID"`
-	UserID      uint
-	JobID       string
-	VideoID     string
-	Title       string `gorm:"type:tinytext"`
-	Description string `gorm:"type:text"`
+	XMLName       xml.Name  `xml:"MediaInfo"`
+	Medias        []Media   `xml:"media" gorm:"foreignkey:MediaInfoID"`
+	Hashtags      []Hashtag `gorm:"many2many:media_info_hashtag"`
+	UserID        uint
+	JobID         string
+	VideoID       string
+	Title         string `gorm:"type:tinytext"`
+	Description   string `gorm:"type:text"`
+	Published     bool
+	PublishedDate time.Time
 }
 
 func (*MediaInfo) Migrate(db *gorm.DB, migrate func(model interface{})) {

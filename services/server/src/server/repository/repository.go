@@ -46,6 +46,7 @@ func Connect() *gorm.DB {
 
 	// all tables are named singluar, e.g. user instead of users
 	DB.SingularTable(true)
+	DB.LogMode(true)
 
 	return DB
 }
@@ -55,6 +56,7 @@ func Migrate() {
 	(&mediaModel.MediaInfo{}).Migrate(DB, migrateModel)
 	(&mediaModel.Media{}).Migrate(DB, migrateModel)
 	(&mediaModel.Track{}).Migrate(DB, migrateModel)
+	(&mediaModel.Hashtag{}).Migrate(DB, migrateModel)
 }
 
 func migrateModel(model interface{}) {

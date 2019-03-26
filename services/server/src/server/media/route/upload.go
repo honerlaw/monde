@@ -17,11 +17,6 @@ import (
 
 func Upload(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY").(*auth.AuthPayload)
-	if payload == nil {
-		c.Redirect(http.StatusFound, "/")
-		c.Abort()
-		return
-	}
 
 	id, _ := uuid.NewV4()
 	userId := strconv.FormatUint(uint64(payload.ID), 10)

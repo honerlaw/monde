@@ -6,8 +6,8 @@ import (
 	"server/media/service"
 )
 
-func Update(c *gin.Context) {
-	var req service.UpdateRequest
+func Publish(c *gin.Context) {
+	var req service.PublishRequest
 	if err := c.ShouldBind(&req); err != nil {
 		// @todo show error
 		c.Redirect(http.StatusFound, "/media/list")
@@ -15,7 +15,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	err := service.Update(req)
+	err := service.TogglePublish(req)
 	if err != nil {
 		// @todo show error
 		c.Redirect(http.StatusFound, "/media/list")

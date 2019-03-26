@@ -36,6 +36,14 @@
         display: block;
         text-transform: lowercase;
       }
+      .form-container {
+        position: relative;
+        .publish-form {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+        }
+      }
     }
   }
 }

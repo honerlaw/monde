@@ -3,10 +3,15 @@ package media
 import (
 	"github.com/gin-gonic/gin"
 	"server/media/route"
+	"server/middleware/auth"
 )
 
 func RegisterRoutes(router *gin.Engine) {
-	router.GET("/media/list", route.List);
-	router.GET("/media/upload", route.Upload);
-	router.GET("/media/update", route.Update);
+	media := router.Group("/media")
+	media.Use(auth.Authorize())
+
+	media.GET("/list", route.List);
+	media.GET("/upload", route.Upload);
+	media.POST("/update", route.Update);
+	media.POST("/publish", route.Publish);
 }
