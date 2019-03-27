@@ -1,12 +1,12 @@
-package user
+package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/util"
 	"net/http"
+	"server/core/util"
 )
 
-func Register(c *gin.Context) {
+func Login(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY")
 
 	if payload != nil {
@@ -15,5 +15,5 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	util.RenderPage(c, http.StatusOK, "RegisterPage", nil)
+	util.RenderPage(c, http.StatusOK, "LoginPage", nil)
 }

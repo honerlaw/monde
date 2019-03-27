@@ -2,9 +2,9 @@ package service
 
 import (
 	"server/media/model"
-	"server/repository"
 	"log"
 	"errors"
+	"server/core/repository"
 )
 
 type SelectPage struct {

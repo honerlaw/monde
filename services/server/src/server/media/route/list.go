@@ -2,21 +2,24 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/util"
 	"net/http"
-	"server/middleware/auth"
-	"server/service/aws"
 	"os"
 	"fmt"
 	"strconv"
 	"server/media/service"
-	"server/repository"
+	"strings"
+	"server/core/util"
+	"server/core/service/aws"
+	"server/core/repository"
+	"server/user/middleware"
 )
 
 func List(c *gin.Context) {
-	payload := c.MustGet("JWT_IDENTITY").(*auth.AuthPayload)
+	payload := c.MustGet("JWT_IDENTITY").(*middleware.AuthPayload)
+	uploadFormProps := service.GetUploadFormProps(payload)
 	props := gin.H{
 		"authPayload": payload,
+		"uploadForm": *uploadFormProps,
 		"uploads":     []gin.H{},
 	}
 
@@ -46,10 +49,14 @@ func List(c *gin.Context) {
 		}
 
 		baseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_PROCESSED_BUCKET"))
-		// thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s/", os.Getenv("AWS_THUMBNAIL_BUCKET"))
+		thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s/", os.Getenv("AWS_THUMBNAIL_BUCKET"))
+
+		userId := strconv.FormatUint(uint64(payload.ID), 10)
 
 		props["uploads"] = append(props["uploads"].([]gin.H), gin.H{
+			// "uploadForm": *service.GetUploadFormProps(payload),
 			"videoId": info.VideoID,
+			"canPublish": len(strings.TrimSpace(info.Description)) > 0,
 			"info": gin.H{
 				"title":       info.Title,
 				"description": info.Description,
@@ -57,15 +64,22 @@ func List(c *gin.Context) {
 				"hashtags":    hashtags,
 				"published":   info.Published,
 			},
-			"thumbs": []string{""}, // @todo figure out what this actually is
+			"thumbs": []string{
+				fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, userId, info.VideoID),
+			},
 			"videos": []gin.H{
 				{
 					"type": "hls",
-					"url":  fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, strconv.FormatUint(uint64(payload.ID), 10), info.VideoID),
+					"url":  fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, userId, info.VideoID),
 				},
 				{
 					"type": "mp4",
-					"url":  fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, strconv.FormatUint(uint64(payload.ID), 10), info.VideoID),
+					"url":  fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, userId, info.VideoID),
 				},
 			},
 		})

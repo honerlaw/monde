@@ -1,29 +1,25 @@
-package auth
+package middleware
 
 import (
+	"sync"
+	"server/user/service"
 	"github.com/appleboy/gin-jwt"
+	"os"
 	"time"
 	"github.com/gin-gonic/gin"
-	"os"
 	"errors"
 	"net/http"
-	"server/util"
-	"server/service/user"
+	"server/core/util"
 )
 
-// @todo split this up / re-organize it?
-
-type AuthPayload struct {
-	ID    uint
-	Roles []string
-}
-
 const identityKey = "ID"
-
 var unauthorizedUrlToPageMap = gin.H{
 	"/user/login":    "LoginPage",
 	"/user/register": "RegisterPage",
 }
+
+var jwtAuthSync sync.Once
+var jwtAuth *jwt.GinJWTMiddleware
 
 func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -57,13 +53,13 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var req user.VerifyRequest
+			var req service.VerifyRequest
 
 			if err := c.ShouldBind(&req); err != nil {
 				return nil, errors.New("all fields are requred")
 			}
 
-			verifiedUser, err := user.Verify(req)
+			verifiedUser, err := service.Verify(req)
 			if err != nil {
 				return nil, err
 			}
@@ -78,7 +74,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			c.Abort()
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			var req user.VerifyRequest
+			var req service.VerifyRequest
 			c.ShouldBind(&req);
 
 			page := unauthorizedUrlToPageMap[c.Request.URL.String()]
@@ -88,7 +84,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 
 			util.RenderPage(c, http.StatusUnauthorized, page.(string), gin.H{
-				"usernname": req.Username,
+				"username": req.Username,
 				"error": message,
 			})
 		},
@@ -109,99 +105,9 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 	})
 }
 
-func logoutHandler(mw *jwt.GinJWTMiddleware, c *gin.Context) {
-	cookieName := mw.CookieName
-	cookie, err := c.Request.Cookie(cookieName)
-
-	if err != nil {
-		panic(err)
-	}
-
-	cookie.Value = "invalid"
-	cookie.Expires = time.Unix(0, 0)
-
-	http.SetCookie(c.Writer, cookie)
-
-	c.Redirect(http.StatusFound, "/")
-	c.Abort()
-}
-
-func handleRegister(mw *jwt.GinJWTMiddleware, c *gin.Context) {
-	var req user.CreateRequest
-
-	if err := c.ShouldBind(&req); err != nil {
-		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
-			"usernname": req.Username,
-			"error": "all fields are required",
-		})
-		return
-	}
-
-	_, err := user.Create(req)
-
-	if err != nil {
-		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
-			"usernname": req.Username,
-			"error": err.Error(),
-		})
-		return
-	}
-
-	mw.LoginHandler(c)
-}
-
-func Init(router *gin.Engine) {
-	mw, err := createJwtMiddleware()
-
-	router.POST("/user/login", mw.LoginHandler)
-	router.GET("/user/logout", func(c *gin.Context) {
-		logoutHandler(mw, c)
+func GetJWTAuth() (*jwt.GinJWTMiddleware) {
+	jwtAuthSync.Do(func() {
+		jwtAuth, _ = createJwtMiddleware()
 	})
-	router.POST("/user/register", func(c *gin.Context) {
-		handleRegister(mw, c)
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	// we use custom middleware so we don't trigger the unauthorized callback, instead we will handle it ourselves
-	router.Use(func(c *gin.Context) {
-		// we always set this so each handler can check if it exists, whether or not are actually logged in
-		c.Set("JWT_IDENTITY", nil)
-
-		claims, err := mw.GetClaimsFromJWT(c)
-		if err != nil {
-			return
-		}
-
-		if claims["exp"] == nil {
-			return
-		}
-
-		if _, ok := claims["exp"].(float64); !ok {
-			return
-		}
-
-		if int64(claims["exp"].(float64)) < mw.TimeFunc().Unix() {
-			return
-		}
-
-		c.Set("JWT_PAYLOAD", claims)
-		identity := mw.IdentityHandler(c)
-
-		if identity != nil {
-			c.Set(mw.IdentityKey, identity)
-		}
-
-		if !mw.Authorizator(identity, c) {
-			return
-		}
-
-		c.Set("JWT_IDENTITY", identity.(*AuthPayload))
-
-		c.Next()
-	})
-
-
+	return jwtAuth
 }

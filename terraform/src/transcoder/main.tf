@@ -59,6 +59,31 @@ EOF
 
 resource "aws_s3_bucket" "transcoder_thumbnails" {
   bucket = "vueon-aws-transcoder-thumbnails"
+  acl = "public-read"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::vueon-aws-transcoder-thumbnails/*"
+        }
+    ]
+}
+EOF
+  cors_rule {
+    allowed_headers = [
+      "*"
+    ]
+    allowed_methods = [
+      "GET"
+    ]
+    allowed_origins = [
+      "*"
+    ]
+  }
 }
 
 resource "aws_elastictranscoder_pipeline" "transcoder_pipeline" {

@@ -6,6 +6,7 @@ import {TextareaGroup} from "../bootstrap/textarea-group";
 
 interface IUploadInfo {
     videoId: string;
+    canPublish: boolean;
     info: {
         title: string;
         description: string;
@@ -70,24 +71,36 @@ export class UploadListPage extends React.Component<IProps, {}> {
                 <div className={"form-container"}>
                     <form method={"POST"} action={"/media/update"}>
                         <input type={"hidden"} name={"video_id"} value={upload.videoId}/>
-                        <InputGroup name={"title"} type={"text"} value={upload.info.title} placeholder={"title"}/>
-                        <TextareaGroup name={"description"} value={upload.info.description}
-                                       placeholder={"description"}/>
+                        <InputGroup name={"title"}
+                                    type={"text"}
+                                    value={upload.info.title}
+                                    placeholder={"title (optional)"}/>
+                        <TextareaGroup name={"description"}
+                                       value={upload.info.description}
+                                       placeholder={"description (required)"}/>
                         <InputGroup name={"hashtags"}
                                     type={"text"}
                                     value={upload.info.hashtags.join(" ")}
-                                    placeholder={"hashtags"}/>
+                                    placeholder={"hashtags (optional)"}/>
                         <button className="btn btn-primary" type="submit">update</button>
                     </form>
-                    <form method={"POST"} action={"/media/publish"} className={"publish-form"}>
-                        <input type={"hidden"} name={"video_id"} value={upload.videoId}/>
-                        <button className="btn btn-primary" type={"submit"}>
-                            {upload.info.published ? "unpublish" : "publish"}
-                        </button>
-                    </form>
+                    {this.renderPublishForm(upload)}
                 </div>
             </div>
         </li>;
+    }
+
+    private renderPublishForm(upload: IUploadInfo): JSX.Element | null {
+        if (!upload.canPublish) {
+            return null;
+        }
+
+        return <form method={"POST"} action={"/media/publish"} className={"publish-form"}>
+            <input type={"hidden"} name={"video_id"} value={upload.videoId}/>
+            <button className="btn btn-primary" type={"submit"}>
+                {upload.info.published ? "unpublish" : "publish"}
+            </button>
+        </form>
     }
 
     private getMp4Url(upload: IUploadInfo): string {

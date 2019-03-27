@@ -46,3 +46,7 @@ output "public_subnet_1_id" {
 output "public_subnet_2_id" {
   value = "${module.core_vpc.public_subnet_2_id}"
 }
+
+output "rds_cluster_endpoint" {
+  value = "${module.core_db.core_rds_cluster_endpoint}"
+}

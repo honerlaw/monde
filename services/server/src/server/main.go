@@ -5,14 +5,13 @@ import (
 	"github.com/musawirali/preact-rpc/goclient"
 	"github.com/joho/godotenv"
 	"log"
-	"server/service/aws"
-	"server/middleware/auth"
-	"server/repository"
-	"server/routes/user"
-	"server/routes"
-	"net/http"
 	"os"
 	"server/media"
+	"server/core/repository"
+	"server/core/service/aws"
+	"server/user"
+	"server/core"
+	"server/user/middleware"
 )
 
 func main() {
@@ -33,26 +32,21 @@ func main() {
 	goclient.Connect("tcp", "0.0.0.0:9000")
 
 	defer repository.Connect().Close()
-	repository.Migrate()
+
+	user.Migrate()
+	media.Migrate()
 
 	router := gin.Default()
 
-	// initialize the auth middleware
-	auth.Init(router)
+	router.Use(middleware.AuthIdentity())
 
 	router.Static("/css/", "./assets/css/")
 	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	media.RegisterRoutes(router)
-	router.GET("/user/login", user.Login)
-	router.GET("/user/register", user.Register)
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "healthy",
-		})
-	})
-	router.GET("/", routes.Home)
+	user.RegisterRoutes(router)
+	core.RegisterRoutes(router)
 
 	router.Run("0.0.0.0:" + os.Getenv("PORT"))
 }

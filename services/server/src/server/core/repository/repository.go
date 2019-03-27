@@ -3,16 +3,16 @@ package repository
 import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
-	"server/model"
 	"reflect"
 	"log"
 	"os"
 	"fmt"
-	"server/service/aws"
-	mediaModel "server/media/model"
 	"encoding/json"
+	"server/core/service/aws"
+	"sync"
 )
 
+var dbOnce sync.Once
 var DB *gorm.DB
 
 type DBCredentials struct {
@@ -27,39 +27,31 @@ type DBInfo struct {
 }
 
 func Connect() *gorm.DB {
+	dbOnce.Do(func() {
+		info := getDBInfo()
 
-	info := getDBInfo()
+		// create the db
+		url := generateDbUrl(info.creds, info.endpoint, nil)
+		err := createDatabaseIfNotExists(url, info.dbname)
+		if err != nil {
+			panic(err)
+		}
 
-	// create the db
-	url := generateDbUrl(info.creds, info.endpoint, nil)
-	err := createDatabaseIfNotExists(url, info.dbname)
-	if err != nil {
-		panic(err)
-	}
+		// get the actual db connection
+		url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
+		DB, err = gorm.Open("mysql", url)
+		if err != nil {
+			panic(err)
+		}
 
-	// get the actual db connection
-	url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
-	DB, err = gorm.Open("mysql", url)
-	if err != nil {
-		panic(err)
-	}
-
-	// all tables are named singluar, e.g. user instead of users
-	DB.SingularTable(true)
-	DB.LogMode(true)
-
+		// all tables are named singluar, e.g. user instead of users
+		DB.SingularTable(true)
+		DB.LogMode(true)
+	})
 	return DB
 }
 
-func Migrate() {
-	(&model.User{}).Migrate(DB, migrateModel)
-	(&mediaModel.MediaInfo{}).Migrate(DB, migrateModel)
-	(&mediaModel.Media{}).Migrate(DB, migrateModel)
-	(&mediaModel.Track{}).Migrate(DB, migrateModel)
-	(&mediaModel.Hashtag{}).Migrate(DB, migrateModel)
-}
-
-func migrateModel(model interface{}) {
+func MigrateModel(model interface{}) {
 	modelType := reflect.TypeOf(model)
 	log.Printf("Auto Migrating %s\n", modelType)
 
@@ -72,17 +64,6 @@ func migrateModel(model interface{}) {
 }
 
 func getDBInfo() (*DBInfo) {
-	if os.Getenv("ENV") == "local" {
-		return &DBInfo{
-			creds: &DBCredentials{
-				Username: os.Getenv("DB_USER_LOCAL"),
-				Password: os.Getenv("DB_PASS_LOCAL"),
-			},
-			endpoint: os.Getenv("DB_ENDPOINT_LOCAL"),
-			dbname: os.Getenv("DB_NAME"),
-		}
-	}
-
 	// get the database cluster information
 	cluster, err := aws.GetRDSService().GetCluster()
 	if err != nil {

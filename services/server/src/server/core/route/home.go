@@ -1,9 +1,9 @@
-package routes
+package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/util"
 	"net/http"
+	"server/core/util"
 )
 
 func Home(c *gin.Context) {

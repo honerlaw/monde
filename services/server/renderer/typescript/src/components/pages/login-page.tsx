@@ -5,7 +5,7 @@ import {InputGroup} from "../bootstrap/input-group";
 import {AlertMessage} from "../bootstrap/alert-message";
 
 interface IProps extends IPageProps {
-
+    username: string;
 }
 
 export class LoginPage extends React.Component<IProps, {}> {
@@ -17,7 +17,7 @@ export class LoginPage extends React.Component<IProps, {}> {
                     <h1 className={"text-center"}>login</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
                     <form method={"POST"} action={"/user/login"}>
-                        <InputGroup name={"username"} type={"text"} placeholder={"username"}/>
+                        <InputGroup name={"username"} type={"text"} value={this.props.username} placeholder={"username"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
                         <button className="btn btn-primary btn-block" type="submit">login</button>
                     </form>

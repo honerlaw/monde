@@ -5,7 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"strconv"
 	"strings"
-	aws2 "server/service/aws"
+	aws2 "server/core/service/aws"
 	"os"
 )
 

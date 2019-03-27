@@ -8,7 +8,7 @@ deploy-core:
 	cd terraform/src/core/; terraform init; terraform apply -auto-approve -var-file=../../env/core/example.tfvars
 
 destroy-core:
-	cd terraform/src/core/; terraform init; terraform destroy -var-file=../../env/core/example.tfvars
+	cd terraform/src/core/; terraform init; terraform destroy -auto-approve -var-file=../../env/core/example.tfvars
 
 deploy-lambda:
 	$(MAKE) -C ./services/transcoder-lambda deploy

@@ -3,15 +3,23 @@ package media
 import (
 	"github.com/gin-gonic/gin"
 	"server/media/route"
-	"server/middleware/auth"
+	"server/user/middleware"
+	"server/media/model"
+	"server/core/repository"
 )
 
 func RegisterRoutes(router *gin.Engine) {
 	media := router.Group("/media")
-	media.Use(auth.Authorize())
+	media.Use(middleware.Authorize())
 
 	media.GET("/list", route.List);
-	media.GET("/upload", route.Upload);
 	media.POST("/update", route.Update);
 	media.POST("/publish", route.Publish);
+}
+
+func Migrate() {
+	(&model.MediaInfo{}).Migrate(repository.DB, repository.MigrateModel)
+	(&model.Media{}).Migrate(repository.DB, repository.MigrateModel)
+	(&model.Track{}).Migrate(repository.DB, repository.MigrateModel)
+	(&model.Hashtag{}).Migrate(repository.DB, repository.MigrateModel)
 }

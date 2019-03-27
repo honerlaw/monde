@@ -7,11 +7,15 @@ import (
 	"github.com/joho/godotenv"
 	"lambda/util"
 	"log"
-	"server/service/aws"
 	aws2 "lambda/aws"
+	"server/core/service/aws"
+	"server/core/repository"
 )
 
 func Handler(ctx context.Context, event events.S3Event) {
+	// @todo we shouldn't need to close everytime, but for now we will
+	defer repository.Connect().Close()
+
 	for _, record := range event.Records {
 		metadata, err := aws2.GetS3RecordMetadata(record.S3.Bucket.Name, record.S3.Object.Key)
 		if err != nil {
