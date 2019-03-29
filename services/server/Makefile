@@ -30,3 +30,6 @@ deploy:
 destroy:
 	terraform init $(TERRAFORM_SRC_PATH)
 	terraform destroy -auto-approve -var-file=$(TERRAFORM_VAR_FILE) -var="image=$(LATEST_URL)" $(TERRAFORM_SRC_PATH)
+
+run-local:
+	go run src/server/main.go

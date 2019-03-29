@@ -5,6 +5,10 @@ body {
   padding: 0;
 }
 
+form {
+  margin-bottom: 0;
+}
+
 * {
   border-radius: 0 !important;
 }
@@ -12,3 +16,4 @@ body {
 @import "login-page";
 @import "register-page";
 @import "upload-list-page";
+@import "upload-form";

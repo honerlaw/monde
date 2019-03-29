@@ -9,11 +9,10 @@
     "strict": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": true,
-    "typeRoots": ["./types", "../node_modules/@types"]
+    "sourceMap": true
   },
   "include": [
-    "src/main.ts"
+    "src/main.tsx"
   ],
   "exclude": [
     "../node_modules/",

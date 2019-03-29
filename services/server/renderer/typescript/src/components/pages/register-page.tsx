@@ -1,17 +1,16 @@
 import * as React from "react";
-import {registerComponent} from "preact-rpc";
-import {IPageProps, Page} from "../page";
 import {InputGroup} from "../bootstrap/input-group";
 import {AlertMessage} from "../bootstrap/alert-message";
+import {IGlobalProps} from "../../global-props";
 
-interface IProps extends IPageProps {
-    username: string;
+interface IProps extends IGlobalProps {
+    username?: string;
 }
 
 export class RegisterPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <Page authPayload={this.props.authPayload} id={"register-page"}>
+        return <div id={"register-page"}>
             <div className={"row"}>
                 <div className={"col-sm-4 offset-sm-4"}>
                     <h1 className={"text-center"}>register</h1>
@@ -24,9 +23,7 @@ export class RegisterPage extends React.Component<IProps, {}> {
                     </form>
                 </div>
             </div>
-        </Page>;
+        </div>;
     }
 
 }
-
-registerComponent('RegisterPage', RegisterPage);

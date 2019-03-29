@@ -12,6 +12,9 @@ import (
 	"server/user"
 	"server/core"
 	"server/user/middleware"
+	mediaMW "server/media/middleware"
+	renderMW "server/core/render/middleware"
+	"server/core/render"
 )
 
 func main() {
@@ -39,10 +42,13 @@ func main() {
 	router := gin.Default()
 
 	router.Use(middleware.AuthIdentity())
+	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", false, router))
+	router.Use(mediaMW.UploadFormMiddleware())
 
 	router.Static("/css/", "./assets/css/")
 	router.Static("/js/", "./assets/js/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
+	router.NoRoute(render.RenderNoRoute)
 
 	media.RegisterRoutes(router)
 	user.RegisterRoutes(router)

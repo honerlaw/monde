@@ -3,9 +3,9 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/core/util"
 	"server/user/service"
 	"server/user/middleware"
+	"server/core/render"
 )
 
 func Register(c *gin.Context) {
@@ -17,14 +17,14 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	util.RenderPage(c, http.StatusOK, "RegisterPage", nil)
+	render.RenderPage(c, http.StatusOK, nil)
 }
 
 func RegisterPost(c *gin.Context) {
 	var req service.CreateRequest
 
 	if err := c.ShouldBind(&req); err != nil {
-		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+		render.RenderPage(c, http.StatusBadRequest, gin.H{
 			"usernname": req.Username,
 			"error": "all fields are required",
 		})
@@ -34,7 +34,7 @@ func RegisterPost(c *gin.Context) {
 	_, err := service.Create(req)
 
 	if err != nil {
-		util.RenderPage(c, http.StatusBadRequest, "RegisterPage", gin.H{
+		render.RenderPage(c, http.StatusBadRequest, gin.H{
 			"usernname": req.Username,
 			"error": err.Error(),
 		})

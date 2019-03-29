@@ -8,23 +8,20 @@ import (
 	"strconv"
 	"server/media/service"
 	"strings"
-	"server/core/util"
 	"server/core/service/aws"
 	"server/core/repository"
 	"server/user/middleware"
+	"server/core/render"
 )
 
 func List(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY").(*middleware.AuthPayload)
-	uploadFormProps := service.GetUploadFormProps(payload)
 	props := gin.H{
-		"authPayload": payload,
-		"uploadForm": *uploadFormProps,
-		"uploads":     []gin.H{},
+		"uploads":     []*gin.H{},
 	}
 
 	if payload == nil {
-		util.RenderPage(c, http.StatusOK, "UploadListPage", props)
+		render.RenderPage(c, http.StatusOK, props)
 		return
 	}
 
@@ -34,7 +31,7 @@ func List(c *gin.Context) {
 		Count: 50,
 	})
 	if err != nil {
-		util.RenderPage500(c)
+		render.RenderPage(c, http.StatusInternalServerError, nil)
 		return
 	}
 
@@ -54,8 +51,7 @@ func List(c *gin.Context) {
 		userId := strconv.FormatUint(uint64(payload.ID), 10)
 
 		props["uploads"] = append(props["uploads"].([]gin.H), gin.H{
-			// "uploadForm": *service.GetUploadFormProps(payload),
-			"videoId": info.VideoID,
+			"videoId":    info.VideoID,
 			"canPublish": len(strings.TrimSpace(info.Description)) > 0,
 			"info": gin.H{
 				"title":       info.Title,
@@ -85,5 +81,5 @@ func List(c *gin.Context) {
 		})
 	}
 
-	util.RenderPage(c, http.StatusOK, "UploadListPage", props)
+	render.RenderPage(c, http.StatusOK, props)
 }

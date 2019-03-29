@@ -27,10 +27,10 @@ export class TextareaGroup extends React.Component<IProps, {}> {
         return <div className="form-group">
             {this.props.label ? <label htmlFor={this.id}>{this.props.placeholder}</label> : null}
             <textarea className="form-control"
-                   id={this.id}
-                   name={this.props.name}
-                   aria-describedby={this.helpId}
-                   placeholder={this.props.placeholder}
+                      id={this.id}
+                      name={this.props.name}
+                      aria-describedby={this.helpId}
+                      placeholder={this.props.placeholder}
                       {...this.props.textareaProps}>
                 {this.props.value}
             </textarea>

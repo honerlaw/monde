@@ -1,6 +1,12 @@
 #upload-form {
   display: inline-block;
   position: relative;
+  transition: .2s;
+  opacity: 1;
+  cursor: pointer;
+  &:hover {
+    opacity: .5;
+  }
 
   input[type="file"] {
     position: absolute;
@@ -9,16 +15,23 @@
     display: block;
     width: 100%;
     height: 100%;
-    background-color: red;
     opacity: 0;
     z-index: 500;
 
+    &:valid {
+      display: none !important;
+    }
     &:valid ~ .select {
       display: none !important;
     }
     &:valid ~ .upload {
       display: block !important;
     }
+  }
+  button {
+    @extend .btn;
+    @extend .btn-primary;
+    margin-right: 10px;
   }
 
   .upload {

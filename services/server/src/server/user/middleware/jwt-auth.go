@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"errors"
 	"net/http"
-	"server/core/util"
+	"server/core/render"
 )
 
 const identityKey = "ID"
@@ -77,13 +77,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			var req service.VerifyRequest
 			c.ShouldBind(&req);
 
-			page := unauthorizedUrlToPageMap[c.Request.URL.String()]
-
-			if page == nil {
-				page = "UnauthorizedPage"
-			}
-
-			util.RenderPage(c, http.StatusUnauthorized, page.(string), gin.H{
+			render.RenderPage(c, http.StatusUnauthorized, gin.H{
 				"username": req.Username,
 				"error": message,
 			})

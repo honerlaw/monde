@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/core/util"
+	"server/core/render"
 )
 
 func Login(c *gin.Context) {
@@ -15,5 +15,5 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	util.RenderPage(c, http.StatusOK, "LoginPage", nil)
+	render.RenderPage(c, http.StatusOK, nil)
 }

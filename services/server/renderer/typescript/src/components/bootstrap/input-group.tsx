@@ -20,8 +20,8 @@ export class InputGroup extends React.Component<IProps, {}> {
     public constructor(props: IProps) {
         super(props);
 
-        this.inputId = this.getInputId();
-        this.helpId = Math.random().toString().replace(".", "");
+        this.inputId = `${this.props.name}-input`;
+        this.helpId = `${this.props.name}-help`;
     }
 
     public render(): JSX.Element {
@@ -44,16 +44,6 @@ export class InputGroup extends React.Component<IProps, {}> {
             return null;
         }
         return <small id={this.helpId} className="form-text text-muted">{this.props.description}</small>;
-    }
-
-    private getHelpId(): string {
-        const id: string = Math.random().toString().replace(".", "");
-        return `${id}-help`;
-    }
-
-    private getInputId(): string {
-        const id: string = Math.random().toString().replace(".", "");
-        return `${id}-input`;
     }
 
 }

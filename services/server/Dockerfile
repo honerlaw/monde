@@ -24,14 +24,11 @@ ENV GIN_MODE=release
 RUN make build
 RUN rm -rf src/ Makefile
 
-# install all dependencies, build, remove dependencies / sources, install only production dependencies
+# install all the renderer dependencies, and build the bundles, then remove the sources
 WORKDIR /base/server/renderer
 ENV NODE_ENV=development
 RUN npm install && npm run build
-RUN rm -rf /base/server/renderer/typescript/src && rm -rf /base/server/renderer/typescript/tsconfig.json && rm -rf /base/server/renderer/typescript/types && rm -rf /base/server/renderer/typescript/tsconfig.json  && rm -rf /base/server/renderer/node_modules
-ENV NODE_ENV=production
-RUN npm install
+RUN rm -rf /base/server/renderer
 
 WORKDIR /base/server
-RUN chmod +x /base/scripts/run.sh
-ENTRYPOINT ["/base/scripts/run.sh"]
+ENTRYPOINT ["/base/server/bin/server"]

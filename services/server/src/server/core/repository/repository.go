@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"server/core/service/aws"
 	"sync"
+	"strconv"
 )
 
 var dbOnce sync.Once
@@ -44,14 +45,21 @@ func Connect() *gorm.DB {
 			panic(err)
 		}
 
+		logMode, _ := strconv.ParseBool(os.Getenv("DB_LOG_MODE"))
+
 		// all tables are named singluar, e.g. user instead of users
 		DB.SingularTable(true)
-		DB.LogMode(true)
+		DB.LogMode(logMode);
 	})
 	return DB
 }
 
 func MigrateModel(model interface{}) {
+	shouldMigrate, _ := strconv.ParseBool(os.Getenv("DB_MIGRATE"))
+	if shouldMigrate != true {
+		return;
+	}
+
 	modelType := reflect.TypeOf(model)
 	log.Printf("Auto Migrating %s\n", modelType)
 

@@ -1,7 +1,9 @@
 import * as React from "react";
+import {UploadForm} from "./pages/upload-list-page/upload-form";
+import {IGlobalProps} from "../global-props";
 
-export interface IPageNavbarProps {
-    authPayload: boolean;
+export interface IPageNavbarProps extends IGlobalProps {
+    uploadForm: any;
 }
 
 /**
@@ -12,7 +14,7 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
 
     public render(): JSX.Element {
         return <nav className="navbar navbar-expand-lg navbar-light">
-            <a className="navbar-brand" href="#">vueon</a>
+            <a className="navbar-brand" href="/">vueon</a>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
                     aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon" />
@@ -25,6 +27,9 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
 
     private renderLoggedIn(): JSX.Element {
         return <ul className="navbar-nav ml-auto">
+            <li className={"nav-item"}>
+                <UploadForm form={this.props.uploadForm}/>
+            </li>
             <li className="nav-item">
                 <a className="nav-link" href="/media/list">my videos</a>
             </li>
