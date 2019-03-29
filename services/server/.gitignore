@@ -2,7 +2,8 @@ pkg/
 src/server/vendor/
 src/github.com/
 src/golang.org/
-assets/css
+assets/css/
+assets/js/
 .env
 bin/
 .terraform/
