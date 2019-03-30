@@ -12,12 +12,14 @@ import (
 	"server/core/repository"
 	"server/user/middleware"
 	"server/core/render"
+	"server/media/model"
+	"server/core/util"
 )
 
 func List(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY").(*middleware.AuthPayload)
 	props := gin.H{
-		"uploads":     []*gin.H{},
+		"uploads":     []gin.H{},
 	}
 
 	if payload == nil {
@@ -25,16 +27,21 @@ func List(c *gin.Context) {
 		return
 	}
 
-	// @todo get page info from query parameters
-	infos, err := service.GetMediaInfoByUserId(payload.ID, &service.SelectPage{
-		Page:  0,
-		Count: 50,
-	})
+	// fetch requested media info for given page
+	infos, err := service.GetMediaInfoByUserId(payload.ID, util.GetSelectPage(c))
 	if err != nil {
 		render.RenderPage(c, http.StatusInternalServerError, nil)
 		return
 	}
 
+	// there is a chance that the lambda has not started the job processing yet, so the media info won't exist
+	// in those cases, we should append a pending upload in its place
+	pending := getPendingUploadIfNeeded(c, infos)
+	if pending != nil {
+		props["uploads"] = append(props["uploads"].([]gin.H), pending)
+	}
+
+	// convert all of the infos to some data needed to properly render the list of items
 	for _, info := range *infos {
 		status := aws.GetETService().GetJobStatus(info.JobID)
 
@@ -82,4 +89,34 @@ func List(c *gin.Context) {
 	}
 
 	render.RenderPage(c, http.StatusOK, props)
+}
+
+func getPendingUploadIfNeeded(c *gin.Context, infos *[]model.MediaInfo) (gin.H) {
+	params := c.Request.URL.Query()
+	bucket, okBucket := params["bucket"]
+	key, okKey := params["key"]
+	if okBucket && okKey {
+		pieces := strings.Split(key[0], "/")
+		videoId := pieces[len(pieces) - 1]
+		info := (*infos)[0]
+
+		// basically, we don't have the latest info from the trannscoder, but the file was definitely uploaded
+		// so we should append the info anyways...
+		if info.VideoID != videoId && aws.GetS3Service().FileExists(bucket[0], key[0]) {
+			return gin.H{
+				"videoId": videoId,
+				"canPublish": false,
+				"info": gin.H{
+					"title": nil,
+					"description": nil,
+					"status": "pending",
+					"hashtags": []string{},
+					"published": false,
+				},
+				"thumbs": []gin.H{},
+				"videos": []gin.H{},
+			}
+		}
+	}
+	return nil;
 }

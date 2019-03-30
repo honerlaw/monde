@@ -27,7 +27,7 @@ export class UploadForm extends React.Component<IProps, {}> {
                      encType={"multipart/form-data"}>
             {this.renderInputParams()}
 
-            <input type={"file"} name={"file"} readOnly={true} required={true} {...INPUT_PROPS} />
+            <input type={"file"} name={"file"} required={true} {...INPUT_PROPS} />
             <button className="select">select a video</button>
             <button className="upload" type={"submit"}>upload</button>
         </form>

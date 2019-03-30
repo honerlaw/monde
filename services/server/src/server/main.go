@@ -50,9 +50,9 @@ func main() {
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	router.NoRoute(render.RenderNoRoute)
 
-	media.RegisterRoutes(router)
 	user.RegisterRoutes(router)
 	core.RegisterRoutes(router)
+	media.RegisterRoutes(router)
 
 	router.Run("0.0.0.0:" + os.Getenv("PORT"))
 }

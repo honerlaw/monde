@@ -37,9 +37,9 @@ export class UploadListPage extends React.Component<IProps, {}> {
             <ol className={"upload-list"}>
                 {this.props.uploads.map((upload: IUploadInfo): JSX.Element => {
                     if (upload.info.status !== "Complete") {
-                        return <PendingUploadItem status={upload.info.status}/>;
+                        return <PendingUploadItem key={upload.videoId} status={upload.info.status}/>;
                     }
-                    return <UploadItem upload={upload}/>;
+                    return <UploadItem key={upload.videoId} upload={upload}/>;
                 })}
             </ol>
         </div>;

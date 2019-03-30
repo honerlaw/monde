@@ -5,14 +5,29 @@ import (
 	"log"
 	"errors"
 	"server/core/repository"
+	"server/core/util"
 )
 
-type SelectPage struct {
-	Page int
-	Count int
+
+func GetMediaInfo(selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
+	var infos *[]model.MediaInfo
+
+	repository.DB.Select(model.MediaInfo{}).Order("created_at DESC").Offset(0).Limit(selectPage.Count).Find(infos)
+
+	if repository.DB.Error != nil {
+		log.Print("failed to get media info for user", repository.DB.Error)
+		return nil, errors.New("failed to find media information")
+	}
+
+	// also fetch the hashtags for each one
+	for _, info := range *infos {
+		repository.DB.Model(info).Related(&info.Hashtags, "Hashtags")
+	}
+
+	return infos, nil
 }
 
-func GetMediaInfoByUserId(userId uint, selectPage *SelectPage) (*[]model.MediaInfo, error) {
+func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
 	var infos []model.MediaInfo
 
 	offset := selectPage.Page * selectPage.Count

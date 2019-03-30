@@ -19,8 +19,8 @@ export class TextareaGroup extends React.Component<IProps, {}> {
     public constructor(props: IProps) {
         super(props);
 
-        this.id = this.getId();
-        this.helpId = Math.random().toString().replace(".", "");
+        this.id =  `${this.props.name}-textarea`;
+        this.helpId = `${this.props.name}-help`;
     }
 
     public render(): JSX.Element {
@@ -31,8 +31,9 @@ export class TextareaGroup extends React.Component<IProps, {}> {
                       name={this.props.name}
                       aria-describedby={this.helpId}
                       placeholder={this.props.placeholder}
+                      value={this.props.value ? this.props.value : undefined}
+                      defaultValue={this.props.value ? undefined : this.props.value}
                       {...this.props.textareaProps}>
-                {this.props.value}
             </textarea>
             {this.renderHelp()}
         </div>;
@@ -43,16 +44,6 @@ export class TextareaGroup extends React.Component<IProps, {}> {
             return null;
         }
         return <small id={this.helpId} className="form-text text-muted">{this.props.description}</small>;
-    }
-
-    private getHelpId(): string {
-        const id: string = Math.random().toString().replace(".", "");
-        return `${id}-help`;
-    }
-
-    private getId(): string {
-        const id: string = Math.random().toString().replace(".", "");
-        return `${id}-textarea`;
     }
 
 }

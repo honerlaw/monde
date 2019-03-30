@@ -41,3 +41,14 @@ func (service *S3Service) GetSignedUrl(bucket string, key string) (*string, erro
 
 	return &url, nil;
 }
+
+func (service *S3Service) FileExists(bucket string, key string) (bool) {
+	_, err := service.client.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key: aws.String(key),
+	})
+	if err != nil {
+		return false
+	}
+	return true
+}

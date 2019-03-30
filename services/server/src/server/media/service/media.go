@@ -91,4 +91,3 @@ func TogglePublish(req PublishRequest) (error) {
 
 	return nil
 }
-

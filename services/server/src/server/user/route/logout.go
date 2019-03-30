@@ -15,6 +15,8 @@ func Logout(c *gin.Context) {
 		panic(err)
 	}
 
+	cookie.Name = cookieName
+	cookie.Path = "/"
 	cookie.Value = "invalid"
 	cookie.Expires = time.Unix(0, 0)
 

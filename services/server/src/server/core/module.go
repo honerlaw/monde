@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/core/route"
 )
 
 func RegisterRoutes(router *gin.Engine) {
@@ -12,5 +11,4 @@ func RegisterRoutes(router *gin.Engine) {
 			"status": "healthy",
 		})
 	})
-	router.GET("/", route.Home)
 }
