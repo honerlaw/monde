@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"server/core/util"
 )
 
 func Authorize() (gin.HandlerFunc) {
@@ -10,8 +10,7 @@ func Authorize() (gin.HandlerFunc) {
 		// if we don't have the payload, just redirect home
 		value, exists := c.Get("JWT_IDENTITY")
 		if !exists || value == nil {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
+			util.Redirect(c, "/")
 			return
 		}
 

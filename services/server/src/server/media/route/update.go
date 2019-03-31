@@ -2,27 +2,24 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"server/media/service"
+	"server/core/util"
 )
 
 func Update(c *gin.Context) {
 	var req service.UpdateRequest
 	if err := c.ShouldBind(&req); err != nil {
-		// @todo show error
-		c.Redirect(http.StatusFound, "/media/list")
-		c.Abort()
+		c.Set("error", err.Error())
+		util.Redirect(c, "/media/list")
 		return
 	}
 
 	err := service.Update(req)
 	if err != nil {
-		// @todo show error
-		c.Redirect(http.StatusFound, "/media/list")
-		c.Abort()
+		c.Set("error", err.Error())
+		util.Redirect(c, "/media/list")
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/media/list")
-	c.Abort()
+	util.Redirect(c, "/media/list")
 }

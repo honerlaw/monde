@@ -16,7 +16,7 @@ func ReactRenderMiddleware(filePath string, debug bool, router *gin.Engine) (gin
 	return func(c *gin.Context) {
 		c.Next() // handle the request
 
-		// only render the response if react metadata was set
+		// only render the response if react metadata was set (so we know that we want to render through react
 		if _, exists := c.Get("react-meta"); exists {
 			react.Handle(c)
 		}

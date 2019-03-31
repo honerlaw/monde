@@ -6,14 +6,14 @@ import (
 	"server/user/service"
 	"server/user/middleware"
 	"server/core/render"
+	"server/core/util"
 )
 
 func Register(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY")
 
 	if payload != nil {
-		c.Redirect(http.StatusFound, "/")
-		c.Abort()
+		util.Redirect(c, "/")
 		return
 	}
 

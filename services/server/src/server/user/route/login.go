@@ -4,14 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"server/core/render"
+	"server/core/util"
 )
 
 func Login(c *gin.Context) {
 	payload := c.MustGet("JWT_IDENTITY")
 
 	if payload != nil {
-		c.Redirect(http.StatusFound, "/")
-		c.Abort()
+		util.Redirect(c, "/")
 		return
 	}
 

@@ -3,6 +3,9 @@ package util
 import (
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"net/http"
+	"strings"
+	"fmt"
 )
 
 type SelectPage struct {
@@ -37,4 +40,18 @@ func GetSelectPage(c *gin.Context) (*SelectPage) {
 	}
 
 	return selectPage
+}
+
+func Redirect(c *gin.Context, path string) {
+	// append an error if we set one so it can be picked up and parsed in the next route
+	if err, ok := c.Get("error"); ok {
+		if strings.Index(path, "?") == -1 {
+			path = fmt.Sprintf("%s?error=%s", path, err)
+		} else {
+			path = fmt.Sprintf("%s&error=%s", path, err)
+		}
+	}
+
+	c.Redirect(http.StatusFound, path)
+	c.Abort()
 }

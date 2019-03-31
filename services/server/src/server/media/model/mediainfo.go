@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"encoding/xml"
 	"time"
+	"strings"
 )
 
 type MediaInfo struct {
@@ -18,6 +19,10 @@ type MediaInfo struct {
 	Description   string `gorm:"type:text"`
 	Published     bool
 	PublishedDate time.Time
+}
+
+func (info *MediaInfo) CanPublish() (bool) {
+	return len(strings.TrimSpace(info.Description)) > 0
 }
 
 func (*MediaInfo) Migrate(db *gorm.DB, migrate func(model interface{})) {

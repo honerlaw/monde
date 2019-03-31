@@ -10,6 +10,7 @@ import (
 	"errors"
 	"net/http"
 	"server/core/render"
+	"server/core/util"
 )
 
 const identityKey = "ID"
@@ -70,8 +71,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}, nil
 		},
 		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
+			util.Redirect(c, "/")
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			var req service.VerifyRequest

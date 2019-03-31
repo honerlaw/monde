@@ -35,9 +35,8 @@ func NewReact(filePath string, debug bool, proxy http.Handler) *React {
 	if !debug {
 		r.Pool = NewFixedPool(filePath, runtime.NumCPU(), proxy)
 	} else {
-		// Use onDemandPool to load full react
-		// app each time for any http requests.
-		// Useful to debug the app.
+
+		// on demand initializes a new JSVM for each request
 		r.Pool = &OnDemandPool{
 			path:  filePath,
 			proxy: proxy,
@@ -46,21 +45,22 @@ func NewReact(filePath string, debug bool, proxy http.Handler) *React {
 	return r
 }
 
-// Handle handles all HTTP requests which
-// have not been caught via static file
-// handler or other middlewares.
+// @todo use some html templates for the 500 error
 func (r *React) Handle(c *gin.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
 			SendHtml(c, &SendHtmlOptions{
 				StatusCode: http.StatusInternalServerError,
-				Html: "Internal Server Error",
+				Html:       "Internal Server Error",
 			})
 		}
 	}()
 
 	vm := r.get()
 	reactMeta := c.MustGet("react-meta").(ReactMeta)
+
+	// set the error no the meta props, if there is an error to set
+	setError(c, &reactMeta)
 
 	start := time.Now()
 	select {
@@ -74,25 +74,45 @@ func (r *React) Handle(c *gin.Context) error {
 		if len(re.Error) == 0 {
 			return SendHtml(c, &SendHtmlOptions{
 				StatusCode: reactMeta.StatusCode,
-				Html: re.Html,
+				Html:       re.Html,
 			})
 		} else if len(re.Error) != 0 {
 			log.Print(re.Error)
 
-			return SendHtml(c,  &SendHtmlOptions{
+			return SendHtml(c, &SendHtmlOptions{
 				Headers: HtmlHeaders{
 					"X-RENDER-TIME": time.Since(start).String(),
 				},
 				StatusCode: http.StatusInternalServerError,
-				Html: "Internal Server Error",
+				Html:       "Internal Server Error",
 			})
 		}
 	case <-time.After(2 * time.Second):
 		r.drop(vm)
 		return SendHtml(c, &SendHtmlOptions{
 			StatusCode: http.StatusInternalServerError,
-			Html: "Timeout while rendering",
+			Html:       "Timeout while rendering",
 		})
 	}
 	return nil
+}
+
+func setError(c *gin.Context, meta *ReactMeta) {
+
+	// there is already an error set so do nothing
+	if _, ok := meta.Props["error"]; ok {
+		return
+	}
+
+	// set the error from the context if it exists
+	if err, ok := c.Get("error"); ok {
+		meta.Props["error"] = err
+		return
+	}
+
+	// last if there is an error in the url query params (e.g. we redirected with an error)
+	params := c.Request.URL.Query()
+	if err, ok := params["error"]; ok {
+		meta.Props["error"] = err
+	}
 }

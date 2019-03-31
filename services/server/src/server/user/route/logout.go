@@ -5,6 +5,7 @@ import (
 	"time"
 	"net/http"
 	"server/user/middleware"
+	"server/core/util"
 )
 
 func Logout(c *gin.Context) {
@@ -22,6 +23,5 @@ func Logout(c *gin.Context) {
 
 	http.SetCookie(c.Writer, cookie)
 
-	c.Redirect(http.StatusFound, "/")
-	c.Abort()
+	util.Redirect(c, "/")
 }
