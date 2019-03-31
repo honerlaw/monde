@@ -17,3 +17,28 @@ form {
 @import "register-page";
 @import "upload-list-page";
 @import "upload-form";
+@import "home-page";
+
+.media-thumbnail-video {
+  .media-thumbnail-video-thumbnail, video {
+    width: 100%;
+    height: auto;
+    outline: none;
+    padding: 10px 0;
+    .img {
+      background: no-repeat center;
+      background-size: contain;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  video {
+    display: none;
+  }
+  &:hover .media-thumbnail-video-thumbnail {
+    display: none;
+  }
+  &:hover video {
+    display: block;
+  }
+}

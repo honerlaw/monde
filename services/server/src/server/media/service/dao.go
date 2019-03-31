@@ -10,21 +10,25 @@ import (
 
 
 func GetMediaInfo(selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
-	var infos *[]model.MediaInfo
+	var infos []model.MediaInfo
 
-	repository.DB.Select(model.MediaInfo{}).Order("created_at DESC").Offset(0).Limit(selectPage.Count).Find(infos)
+	// @todo optimize this? makes 3 queries...
+	repository.DB.Where(&model.MediaInfo{
+		Published: true,
+	}).Order("created_at DESC").
+		Offset(selectPage.Page).
+		Limit(selectPage.Count).
+		Preload("Hashtags").
+		Preload("Medias").
+		Preload("Medias.Tracks").
+		Find(&infos)
 
 	if repository.DB.Error != nil {
 		log.Print("failed to get media info for user", repository.DB.Error)
 		return nil, errors.New("failed to find media information")
 	}
 
-	// also fetch the hashtags for each one
-	for _, info := range *infos {
-		repository.DB.Model(info).Related(&info.Hashtags, "Hashtags")
-	}
-
-	return infos, nil
+	return &infos, nil
 }
 
 func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
@@ -32,7 +36,14 @@ func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.Me
 
 	offset := selectPage.Page * selectPage.Count
 
-	repository.DB.Where(model.MediaInfo{UserID: userId}).Order("created_at DESC").Offset(offset).Limit(selectPage.Count).Find(&infos)
+	// @todo optimize this? makes 3 queries...
+	repository.DB.Where(model.MediaInfo{UserID: userId}).
+		Order("created_at DESC").
+		Offset(offset).Limit(selectPage.Count).
+		Preload("Hashtags").
+		Preload("Medias").
+		Preload("Medias.Tracks").
+		Find(&infos)
 
 	if repository.DB.Error != nil {
 		log.Print("failed to get media info for user", repository.DB.Error)

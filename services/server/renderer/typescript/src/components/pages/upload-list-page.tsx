@@ -4,25 +4,27 @@ import {PendingUploadItem} from "./upload-list-page/pending-upload-item";
 import {UploadItem} from "./upload-list-page/upload-item";
 import {IGlobalProps} from "../../global-props";
 
-export interface IUploadInfo {
-    videoId: string;
-    canPublish: boolean;
-    info: {
-        title: string;
-        description: string;
-        status: string;
-        hashtags: string[];
-        published: boolean;
-    };
-    thumbs: string[];
-    videos: Array<{
-        type: string;
-        url: string;
-    }>
+export interface IMediaVideoResponse {
+    type: string;
+    width: number;
+    height: number;
+    url: string;
+}
+
+export interface IMediaResponse {
+    id: string;
+    title: string;
+    description: string;
+    transcoding_status: string;
+    hashtags: string[];
+    is_published: boolean;
+    can_publish: boolean;
+    thumbnails: string[];
+    videos: IMediaVideoResponse[];
 }
 
 interface IProps extends IGlobalProps {
-    uploads: IUploadInfo[];
+    uploads: IMediaResponse[];
     uploadForm: IUploadForm;
 }
 
@@ -35,11 +37,11 @@ export class UploadListPage extends React.Component<IProps, {}> {
     public render(): JSX.Element {
         return <div id={"upload-list-page"}>
             <ol className={"upload-list"}>
-                {this.props.uploads.map((upload: IUploadInfo): JSX.Element => {
-                    if (upload.info.status !== "Complete") {
-                        return <PendingUploadItem key={upload.videoId} status={upload.info.status}/>;
+                {this.props.uploads.map((upload: IMediaResponse): JSX.Element => {
+                    if (upload.transcoding_status !== "Complete") {
+                        return <PendingUploadItem key={upload.id} status={upload.transcoding_status}/>;
                     }
-                    return <UploadItem key={upload.videoId} upload={upload}/>;
+                    return <UploadItem key={upload.id} upload={upload}/>;
                 })}
             </ol>
         </div>;

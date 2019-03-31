@@ -8,11 +8,15 @@ import (
 	"strings"
 	"server/core/service/aws"
 	"server/media/model"
+	"strconv"
+	"log"
 )
 
 type MediaVideoResponse struct {
-	Type string `json:"type"`
-	Url  string `json:"url"`
+	Type   string `json:"type"`
+	Url    string `json:"url"`
+	Width  int64  `json:"width"`
+	Height int64  `json:"height"`
 }
 
 type MediaResponse struct {
@@ -35,7 +39,7 @@ func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
 		"media": []MediaResponse{},
 	}
 
-	if err != nil {
+	if err == nil {
 		props["media"] = ConvertMediaInfo(infos, nil)
 	}
 
@@ -67,7 +71,7 @@ func ConvertMediaInfo(infos *[]model.MediaInfo, callback func(info *model.MediaI
 	media := []MediaResponse{}
 
 	baseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_PROCESSED_BUCKET"))
-	thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s/", os.Getenv("AWS_THUMBNAIL_BUCKET"))
+	thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_THUMBNAIL_BUCKET"))
 
 	for _, info := range *infos {
 
@@ -76,29 +80,52 @@ func ConvertMediaInfo(infos *[]model.MediaInfo, callback func(info *model.MediaI
 			hashtags = append(hashtags, hashtag.Tag)
 		}
 
+		userId := strconv.FormatUint(uint64(info.UserID), 10)
+
+		log.Print(info.Medias)
+
+		videos := []MediaVideoResponse{}
+		for _, media := range info.Medias {
+			for _, track := range media.Tracks {
+				log.Print(track.Type)
+				if track.Type == "Video" {
+					// @todo
+					// we need post processing information about the videos (e.g. we need to store the types of videos
+					// associated files, genenral video information, etc
+					videos = append(videos, []MediaVideoResponse{
+						{
+							Type:   "hls",
+							Width:  track.Width,
+							Height: track.Height,
+							Url:    fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, userId, info.VideoID),
+						},
+						{
+							Type: "mp4",
+							Width:  track.Width,
+							Height: track.Height,
+							Url:  fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, userId, info.VideoID),
+						},
+					}...)
+				}
+			}
+		}
+
+		log.Print(videos)
+
 		resp := MediaResponse{
 			ID:          info.VideoID,
 			Title:       info.Title,
 			Description: info.Description,
 			Hashtags:    hashtags,
 			Thumbnails: []string{
-				fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
-				fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
-				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
-				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
-				fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
-				fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, info.UserID, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, userId, info.VideoID),
+				fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, userId, info.VideoID),
 			},
-			Videos: []MediaVideoResponse{
-				{
-					Type: "hls",
-					Url:  fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, info.UserID, info.VideoID),
-				},
-				{
-					Type: "mp4",
-					Url:  fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, info.UserID, info.VideoID),
-				},
-			},
+			Videos: videos,
 		}
 
 		// optionally allow additional data to be added to the info
@@ -119,7 +146,9 @@ func getPendingUploadIfNeeded(c *gin.Context, infos *[]model.MediaInfo) (*MediaR
 	if okBucket && okKey {
 		pieces := strings.Split(key[0], "/")
 		videoId := pieces[len(pieces)-1]
-		info := (*infos)[0]
+
+		temp := *infos
+		info := temp[0]
 
 		// basically, we don't have the latest info from the trannscoder, but the file was definitely uploaded
 		// so we should append the info anyways...
@@ -127,8 +156,8 @@ func getPendingUploadIfNeeded(c *gin.Context, infos *[]model.MediaInfo) (*MediaR
 			return &MediaResponse{
 				ID:                videoId,
 				CanPublish:        false,
-				Title:             nil,
-				Description:       nil,
+				Title:             "",
+				Description:       "",
 				TranscodingStatus: "pending",
 				Hashtags:          []string{},
 				IsPublished:       false,
