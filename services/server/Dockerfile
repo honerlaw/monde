@@ -5,7 +5,6 @@ RUN apk add --no-cache --virtual .build-deps bash gcc musl-dev openssl go git ma
 WORKDIR /base
 
 # copy everythinng over
-COPY scripts scripts
 COPY src server/src
 COPY .env server/.env
 COPY assets server/assets
