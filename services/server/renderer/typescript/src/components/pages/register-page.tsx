@@ -2,6 +2,7 @@ import * as React from "react";
 import {InputGroup} from "../bootstrap/input-group";
 import {AlertMessage} from "../bootstrap/alert-message";
 import {IGlobalProps} from "../../global-props";
+import "./register-page.scss";
 
 interface IProps extends IGlobalProps {
     username?: string;

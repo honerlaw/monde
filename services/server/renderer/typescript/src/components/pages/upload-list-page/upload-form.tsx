@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import "./upload-form.scss";
 
 export interface IUploadForm {
     uploadBucketUrl: string;

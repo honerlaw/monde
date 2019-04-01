@@ -31,8 +31,7 @@ export class TextareaGroup extends React.Component<IProps, {}> {
                       name={this.props.name}
                       aria-describedby={this.helpId}
                       placeholder={this.props.placeholder}
-                      value={this.props.value ? this.props.value : undefined}
-                      defaultValue={this.props.value ? undefined : this.props.value}
+                      defaultValue={this.props.value}
                       {...this.props.textareaProps}>
             </textarea>
             {this.renderHelp()}

@@ -14,7 +14,7 @@ export class UploadItem extends React.Component<IProps, {}> {
     public render(): JSX.Element {
         return <li className={"upload-list-item row"}>
             <div className={"col-sm-4"}>
-                <ThumbVideo isLink={false} media={this.props.upload}/>
+                <ThumbVideo isLink={false} showMetadata={false} media={this.props.upload}/>
             </div>
             <div className={"col-sm-8"}>
                 <div className={"form-container"}>

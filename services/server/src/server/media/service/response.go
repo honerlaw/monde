@@ -9,7 +9,6 @@ import (
 	"server/core/service/aws"
 	"server/media/model"
 	"strconv"
-	"log"
 )
 
 type MediaVideoResponse struct {
@@ -82,12 +81,9 @@ func ConvertMediaInfo(infos *[]model.MediaInfo, callback func(info *model.MediaI
 
 		userId := strconv.FormatUint(uint64(info.UserID), 10)
 
-		log.Print(info.Medias)
-
 		videos := []MediaVideoResponse{}
 		for _, media := range info.Medias {
 			for _, track := range media.Tracks {
-				log.Print(track.Type)
 				if track.Type == "Video" {
 					// @todo
 					// we need post processing information about the videos (e.g. we need to store the types of videos
@@ -109,8 +105,6 @@ func ConvertMediaInfo(infos *[]model.MediaInfo, callback func(info *model.MediaI
 				}
 			}
 		}
-
-		log.Print(videos)
 
 		resp := MediaResponse{
 			ID:          info.VideoID,
@@ -146,13 +140,11 @@ func getPendingUploadIfNeeded(c *gin.Context, infos *[]model.MediaInfo) (*MediaR
 	if okBucket && okKey {
 		pieces := strings.Split(key[0], "/")
 		videoId := pieces[len(pieces)-1]
-
-		temp := *infos
-		info := temp[0]
+		canAddPending := len(*infos) == 0 || (*infos)[0].VideoID != videoId
 
 		// basically, we don't have the latest info from the trannscoder, but the file was definitely uploaded
 		// so we should append the info anyways...
-		if info.VideoID != videoId && aws.GetS3Service().FileExists(bucket[0], key[0]) {
+		if canAddPending && aws.GetS3Service().FileExists(bucket[0], key[0]) {
 			return &MediaResponse{
 				ID:                videoId,
 				CanPublish:        false,

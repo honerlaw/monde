@@ -33,6 +33,11 @@ func Update(req UpdateRequest) (error) {
 	info.Title = req.Title
 	info.Description = req.Description
 
+	// if they remove the description, unpublish the video
+	if len(strings.TrimSpace(info.Description)) == 0 {
+		info.Published = false;
+	}
+
 	err = Save(info)
 	if err != nil {
 		tx.Rollback()

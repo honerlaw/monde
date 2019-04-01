@@ -1,3 +1,5 @@
+@import "~bootstrap/scss/bootstrap";
+
 #upload-list-page {
   .upload-list {
     padding: 0;
@@ -6,12 +8,6 @@
       list-style-type: none;
       border-bottom: 1px solid $gray-300;
       align-items: center;
-      video {
-        width: 100%;
-        height: auto;
-        outline: none;
-        padding: 10px 0;
-      }
       form {
         padding: 10px 0;
         margin-bottom: 0;

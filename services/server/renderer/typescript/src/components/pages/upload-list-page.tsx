@@ -3,6 +3,7 @@ import {IUploadForm} from "./upload-list-page/upload-form";
 import {PendingUploadItem} from "./upload-list-page/pending-upload-item";
 import {UploadItem} from "./upload-list-page/upload-item";
 import {IGlobalProps} from "../../global-props";
+import "./upload-list-page.scss";
 
 export interface IMediaVideoResponse {
     type: string;

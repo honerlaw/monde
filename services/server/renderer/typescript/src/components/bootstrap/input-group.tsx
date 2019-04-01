@@ -33,8 +33,7 @@ export class InputGroup extends React.Component<IProps, {}> {
                    type={this.props.type}
                    aria-describedby={this.helpId}
                    placeholder={this.props.placeholder}
-                   value={this.props.value ? this.props.value : undefined}
-                   defaultValue={this.props.value ? undefined : this.props.value}
+                   defaultValue={this.props.value}
                    {...this.props.inputProps}/>
             {this.renderHelp()}
         </div>;

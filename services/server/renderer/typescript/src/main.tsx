@@ -1,5 +1,5 @@
 import "babel-polyfill";
-import "../../scss/global.scss"
+import "./main.scss"
 import * as React from "react";
 import {renderToString} from "react-dom/server";
 import {Route, StaticRouter, Switch} from "react-router";
@@ -9,7 +9,6 @@ import {RegisterPage} from "./components/pages/register-page";
 import {HomePage} from "./components/pages/home-page";
 import {UploadListPage} from "./components/pages/upload-list-page";
 import {Page} from "./components/page";
-import {BrowserRouter} from "react-router-dom";
 import {hydrate} from "react-dom";
 
 declare const global: any;

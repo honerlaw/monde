@@ -1,0 +1,33 @@
+@import "~bootstrap/scss/bootstrap";
+
+.thumb-video-link {
+  text-decoration: none !important;
+}
+
+.thumb-video {
+  .media-thumbnail-video {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1px;
+    .media-thumbnail-video-thumbnail, video {
+      outline: none;
+    }
+    video {
+      display: none;
+    }
+    &:hover .media-thumbnail-video-thumbnail {
+      display: none;
+    }
+    &:hover video {
+      display: block;
+    }
+  }
+  .metadata {
+    padding: 10px 5px 5px 5px;
+    span {
+      display: block;
+      color: $gray-900;
+    }
+  }
+}
