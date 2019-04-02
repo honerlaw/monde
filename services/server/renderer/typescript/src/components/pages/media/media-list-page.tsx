@@ -1,9 +1,9 @@
 import * as React from "react";
-import {IUploadForm} from "./upload-list-page/upload-form";
-import {PendingUploadItem} from "./upload-list-page/pending-upload-item";
-import {UploadItem} from "./upload-list-page/upload-item";
-import {IGlobalProps} from "../../global-props";
-import "./upload-list-page.scss";
+import "./media-list-page.scss";
+import {IGlobalProps} from "../../../global-props";
+import {IUploadForm} from "../../media/upload-form";
+import {MediaPendingItem} from "./media-list-page/media-pending-item";
+import {MediaItem} from "./media-list-page/media-item";
 
 export interface IMediaVideoResponse {
     type: string;
@@ -33,16 +33,16 @@ interface IProps extends IGlobalProps {
  * @todo
  * - display thumbnail after upload so the user can see what it is
  */
-export class UploadListPage extends React.Component<IProps, {}> {
+export class MediaListPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
         return <div id={"upload-list-page"}>
             <ol className={"upload-list"}>
                 {this.props.uploads.map((upload: IMediaResponse): JSX.Element => {
                     if (upload.transcoding_status !== "Complete") {
-                        return <PendingUploadItem key={upload.id} status={upload.transcoding_status}/>;
+                        return <MediaPendingItem key={upload.id} status={upload.transcoding_status}/>;
                     }
-                    return <UploadItem key={upload.id} upload={upload}/>;
+                    return <MediaItem key={upload.id} upload={upload}/>;
                 })}
             </ol>
         </div>;

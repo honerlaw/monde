@@ -1,0 +1,16 @@
+#not-found-page {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  text-align: center;
+  margin: 0 auto;
+  opacity: .75;
+  img {
+    width: 180px;
+  }
+  h3 {
+    margin-top: 25px;
+    font-weight: 300;
+  }
+}

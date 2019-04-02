@@ -1,6 +1,6 @@
 import * as React from "react";
-import {UploadForm} from "./pages/upload-list-page/upload-form";
 import {IGlobalProps} from "../global-props";
+import {UploadForm} from "./media/upload-form";
 
 export interface IPageNavbarProps extends IGlobalProps {
     uploadForm: any;

@@ -4,7 +4,7 @@ interface IProps {
     status: string;
 }
 
-export class PendingUploadItem extends React.Component<IProps, {}> {
+export class MediaPendingItem extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
         return <li className={"upload-list-item row"}>

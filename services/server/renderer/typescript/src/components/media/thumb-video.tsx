@@ -1,6 +1,7 @@
 import * as React from "react";
-import {IMediaResponse, IMediaVideoResponse} from "../pages/upload-list-page";
 import "./thumb-video.scss"
+import {IMediaResponse} from "../pages/media/media-list-page";
+import {Video} from "./video";
 
 interface IProps {
     media: IMediaResponse;
@@ -18,21 +19,20 @@ const MAX_AXIS_SIZE: number = 200;
 export class ThumbVideo extends React.Component<IProps, {}> {
 
     public render(): JSX.Element | null {
-        const mp4: string | null = this.getMp4Url();
-        if (this.props.media.thumbnails.length === 0 || !mp4) {
+        if (this.props.media.thumbnails.length === 0) {
             return null;
         }
 
         if (this.props.isLink) {
             return <a className={"thumb-video-link"} href={`/media/view/${this.props.media.id}`}>
-                {this.renderMainView(mp4)}
+                {this.renderMainView()}
             </a>
         }
 
-        return this.renderMainView(mp4);
+        return this.renderMainView();
     }
 
-    private renderMainView(mp4: string): JSX.Element {
+    private renderMainView(): JSX.Element {
         const dim: IDimensions = this.getDimensions();
         const style: React.CSSProperties = {
             width: "100%",
@@ -43,9 +43,7 @@ export class ThumbVideo extends React.Component<IProps, {}> {
         return <div className={"thumb-video"}>
             <div className={"media-thumbnail-video"}>
                 <img className="media-thumbnail-video-thumbnail" src={this.props.media.thumbnails[0]} style={style}/>
-                <video controls={false} autoPlay={true} loop={true} style={style}>
-                    <source src={mp4} type="video/mp4"/>
-                </video>
+                <Video media={this.props.media} style={style}/>
             </div>
             {this.renderMetadata()}
         </div>;
@@ -73,14 +71,6 @@ export class ThumbVideo extends React.Component<IProps, {}> {
             height: height,
             width: MAX_AXIS_SIZE
         }
-    }
-
-    private getMp4Url(): string | null {
-        const videos: IMediaVideoResponse[] = this.props.media.videos.filter((video) => video.type === "mp4");
-        if (videos.length > 0) {
-            return videos[0].url;
-        }
-        return null;
     }
 
 }

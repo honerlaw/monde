@@ -47,6 +47,7 @@ func main() {
 
 	router.Static("/css/", "./assets/css/")
 	router.Static("/js/", "./assets/js/")
+	router.Static("/gen/", "./assets/gen/")
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	router.NoRoute(render.RenderNoRoute)
 

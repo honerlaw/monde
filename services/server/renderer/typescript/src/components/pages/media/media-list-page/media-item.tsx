@@ -1,15 +1,15 @@
 import * as React from "react";
-import {InputGroup} from "../../bootstrap/input-group";
-import {TextareaGroup} from "../../bootstrap/textarea-group";
-import {IMediaResponse} from "../upload-list-page";
-import {UploadPublishForm} from "./upload-publish-form";
-import {ThumbVideo} from "../../media/thumb-video";
+import {ThumbVideo} from "../../../media/thumb-video";
+import {IMediaResponse} from "../media-list-page";
+import {InputGroup} from "../../../bootstrap/input-group";
+import {TextareaGroup} from "../../../bootstrap/textarea-group";
+import {MediaPublishForm} from "./media-publish-form";
 
 interface IProps {
     upload: IMediaResponse;
 }
 
-export class UploadItem extends React.Component<IProps, {}> {
+export class MediaItem extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
         return <li className={"upload-list-item row"}>
@@ -33,9 +33,9 @@ export class UploadItem extends React.Component<IProps, {}> {
                                     placeholder={"hashtags (optional)"}/>
                         <button className="btn btn-primary" type="submit">update</button>
                     </form>
-                    <UploadPublishForm videoId={this.props.upload.id}
-                                       canPublish={this.props.upload.can_publish}
-                                       isPublished={this.props.upload.is_published}/>
+                    <MediaPublishForm videoId={this.props.upload.id}
+                                      canPublish={this.props.upload.can_publish}
+                                      isPublished={this.props.upload.is_published}/>
                 </div>
             </div>
         </li>;

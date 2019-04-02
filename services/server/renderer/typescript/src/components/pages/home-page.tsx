@@ -1,7 +1,7 @@
 import * as React from "react";
-import {IMediaResponse} from "./upload-list-page";
 import {ThumbVideo} from "../media/thumb-video";
 import "./home-page.scss"
+import {IMediaResponse} from "./media/media-list-page";
 
 interface IProps {
     media: IMediaResponse[];

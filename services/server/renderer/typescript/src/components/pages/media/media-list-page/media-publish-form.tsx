@@ -6,7 +6,7 @@ interface IProps {
     isPublished: boolean;
 }
 
-export class UploadPublishForm extends React.Component<IProps, {}> {
+export class MediaPublishForm extends React.Component<IProps, {}> {
 
     public render(): JSX.Element | null {
         if (!this.props.canPublish) {

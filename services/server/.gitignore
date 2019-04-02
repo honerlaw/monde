@@ -4,6 +4,7 @@ src/github.com/
 src/golang.org/
 assets/css/
 assets/js/
+assets/gen/
 .env
 bin/
 .terraform/

@@ -2,14 +2,16 @@ import "babel-polyfill";
 import "./main.scss"
 import * as React from "react";
 import {renderToString} from "react-dom/server";
-import {Route, StaticRouter, Switch} from "react-router";
-import {NotFoundPage} from "./components/pages/not-found-page";
+import {Route, RouteComponentProps, StaticRouter, Switch} from "react-router";
+import {NotFoundPage} from "./components/pages/error/not-found-page";
 import {LoginPage} from "./components/pages/login-page";
 import {RegisterPage} from "./components/pages/register-page";
 import {HomePage} from "./components/pages/home-page";
-import {UploadListPage} from "./components/pages/upload-list-page";
 import {Page} from "./components/page";
 import {hydrate} from "react-dom";
+import {MediaListPage} from "./components/pages/media/media-list-page";
+import {ComponentClass} from "react";
+import {MediaViewPage} from "./components/pages/media/media-view-page";
 
 declare const global: any;
 
@@ -24,6 +26,40 @@ interface IOptions {
     props: any;
 }
 
+function renderRoute(Component: any, props: any): (props: RouteComponentProps<any>) => JSX.Element {
+    return (routerProps: RouteComponentProps<any>): JSX.Element => {
+        const allProps = {...routerProps, ...props};
+        return <Component {...allProps} />;
+    }
+}
+
+/**
+ * Render all routes in a static router
+ *
+ * @param {IOptions} options
+ * @param {string|null} opts
+ */
+function element(options: IOptions, opts: string | null): JSX.Element {
+    return <StaticRouter location={options.url}>
+        <Page options={opts} uploadForm={options.props.uploadForm} authPayload={options.props.authPayload}>
+            <Switch>
+                <Route exact path={"/"} render={renderRoute(HomePage, options.props)}/>
+                <Route path={"/user/login"} render={renderRoute(LoginPage, options.props)}/>
+                <Route path={"/user/register"} render={renderRoute(RegisterPage, options.props)}/>
+                <Route path={"/media/list"} render={renderRoute(MediaListPage, options.props)}/>
+                <Route path={"/media/view/:mediaId"} render={renderRoute(MediaViewPage, options.props)}/>
+                <Route render={renderRoute(NotFoundPage, options.props)} />
+            </Switch>
+        </Page>
+    </StaticRouter>;
+}
+
+/**
+ * Called by goja to handle server side rendering
+ *
+ * @param {IOptions} opts - options passed from the go server, its a string because of weird issues with goja's ToValue
+ * @param {string} cbk - name of the callback in the global scope
+ */
 global.main = function (opts: string, cbk: string) {
     const callback: (result: IResult) => void = global[cbk];
     const result: IResult = {
@@ -33,17 +69,7 @@ global.main = function (opts: string, cbk: string) {
     try {
         const options: IOptions = JSON.parse(opts);
         try {
-            result.html = renderToString(<StaticRouter location={options.url}>
-                <Page options={opts} uploadForm={options.props.uploadForm} authPayload={options.props.authPayload}>
-                    <Switch>
-                        <Route exact path={"/"} render={() => <HomePage {...options.props}/>}/>
-                        <Route path={"/user/login"} render={() => <LoginPage {...options.props}/>}/>
-                        <Route path={"/user/register"} render={() => <RegisterPage {...options.props}/>}/>
-                        <Route path={"/media/list"} render={() => <UploadListPage {...options.props}/>}/>
-                        <Route render={() => <NotFoundPage {...options.props} />}/>
-                    </Switch>
-                </Page>
-            </StaticRouter>)
+            result.html = renderToString(element(options, opts))
         } catch (err) {
             result.error = err.toString();
         }
@@ -57,15 +83,5 @@ global.main = function (opts: string, cbk: string) {
 // when run in the browser, this will be executed and hydrate the html with the event listeners / etc
 if (global.window !== undefined) {
     const options: any = (window as any).hydrateOptions;
-    hydrate(<StaticRouter location={options.url}>
-        <Page options={null} uploadForm={options.props.uploadForm} authPayload={options.props.authPayload}>
-            <Switch>
-                <Route exact path={"/"} render={() => <HomePage {...options.props}/>}/>
-                <Route path={"/user/login"} render={() => <LoginPage {...options.props}/>}/>
-                <Route path={"/user/register"} render={() => <RegisterPage {...options.props}/>}/>
-                <Route path={"/media/list"} render={() => <UploadListPage {...options.props}/>}/>
-                <Route render={() => <NotFoundPage {...options.props} />}/>
-            </Switch>
-        </Page>
-    </StaticRouter>, document as any)
+    hydrate(element(options, null), document as any)
 }

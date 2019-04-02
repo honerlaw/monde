@@ -15,6 +15,7 @@ func RegisterRoutes(router *gin.Engine) {
 	media.GET("/list", route.List);
 	media.POST("/update", route.Update);
 	media.POST("/publish", route.Publish);
+	media.GET("/view/:id", route.View);
 	router.GET("/", route.Home)
 }
 

@@ -56,7 +56,13 @@ func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.Me
 func GetMediaInfoByVideoID(videoId string) (*model.MediaInfo, error) {
 	var info model.MediaInfo
 
-	repository.DB.Where(model.MediaInfo{VideoID: videoId}).Order("created_at DESC").First(&info)
+	repository.DB.
+		Where(model.MediaInfo{VideoID: videoId}).
+		Order("created_at DESC").
+		Preload("Hashtags").
+		Preload("Medias").
+		Preload("Medias.Tracks").
+		First(&info)
 
 	if repository.DB.Error != nil {
 		log.Print("failed to get media info for user", repository.DB.Error)
