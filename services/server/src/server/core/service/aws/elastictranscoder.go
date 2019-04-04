@@ -72,6 +72,10 @@ func (service *ETService) GetPipelineID(name string) (*string, error) {
 }
 
 func (service *ETService) GetJobStatus(jobId string) (string) {
+	if len(jobId) == 0 {
+		return ETJobStatusError
+	}
+
 	output, err := service.client.ReadJob(&elastictranscoder.ReadJobInput{
 		Id: aws.String(jobId),
 	})

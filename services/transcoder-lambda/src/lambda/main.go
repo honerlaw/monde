@@ -13,8 +13,7 @@ import (
 )
 
 func Handler(ctx context.Context, event events.S3Event) {
-	// @todo we shouldn't need to close everytime, but for now we will
-	defer repository.Connect().Close()
+	repository.Connect()
 
 	for _, record := range event.Records {
 		metadata, err := aws2.GetS3RecordMetadata(record.S3.Bucket.Name, record.S3.Object.Key)
@@ -26,29 +25,28 @@ func Handler(ctx context.Context, event events.S3Event) {
 		mediainfo, err := util.GetMediaInfo(metadata)
 		if err != nil {
 			log.Print("Failed to get media info from file", err)
+			util.RetryInsert(mediainfo, 5)
 			continue;
 		}
 
 		err = util.ValidateMediaInfo(mediainfo)
 		if err != nil {
 			log.Print("Invalid media file", err)
+			util.RetryInsert(mediainfo, 5)
 			continue;
 		}
 
 		job, err := aws2.CreateElasticTranscoderJob(metadata)
 		if err != nil {
 			log.Print("Failed to trigger elastic transcoder job", err)
+			util.RetryInsert(mediainfo, 5)
 			continue;
 		}
 
 		// set the job id so we can look it up later if we need to
 		mediainfo.JobID = *job.Id
 
-		err = util.Insert(mediainfo)
-		if err != nil {
-			log.Print("Failed to insert media and job informations", err)
-			continue
-		}
+		util.RetryInsert(mediainfo, 5)
 	}
 }
 
