@@ -19,13 +19,13 @@ func View(c *gin.Context) {
 		"view": nil,
 	}
 
-	info, err := service.GetMediaInfoByVideoID(id)
+	data, err := service.GetMediaDataByVideoID(id)
 	if err != nil {
 		props["error"] = err.Error()
 	}
 
-	if info != nil {
-		props["view"] = service.ConvertSingleMediaInfo(*info, "", "", nil)
+	if data != nil {
+		props["view"] = service.ConvertSingleMediaInfo(*data, "", "", nil)
 	}
 
 	render.RenderPage(c, http.StatusOK, props);

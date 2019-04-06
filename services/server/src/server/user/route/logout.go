@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"server/user/middleware"
 	"server/core/util"
+	"log"
 )
 
 func Logout(c *gin.Context) {
@@ -13,7 +14,8 @@ func Logout(c *gin.Context) {
 	cookie, err := c.Request.Cookie(cookieName)
 
 	if err != nil {
-		panic(err)
+		log.Printf("Failed to get cookie information for name: %s, err: %s", cookieName, err)
+		return
 	}
 
 	cookie.Name = cookieName

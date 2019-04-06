@@ -1,12 +1,12 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"encoding/xml"
+	"server/core/repository"
 )
 
 type Track struct {
-	gorm.Model
+	repository.Model
 	MediaID      uint
 	XMLName      xml.Name `xml:"track"`
 	Type         string   `xml:"type,attr"`
@@ -18,11 +18,4 @@ type Track struct {
 	VideoCount   string   `xml:"VideoCount"`
 	DataSize     int64    `xml:"DataSize"`
 	FileSize     int64    `xml:"FileSize"`
-}
-
-func (*Track) Migrate(db *gorm.DB, migrate func(model interface{})) {
-	migrate(&Track{})
-
-	// have to do it this way because gorm does not add the foreign key for us
-	db.Model(&Track{}).AddForeignKey("media_id", "media(id)", "CASCADE", "RESTRICT")
 }

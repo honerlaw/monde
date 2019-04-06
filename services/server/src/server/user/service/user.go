@@ -4,7 +4,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"errors"
 	"server/user/model"
-	"server/core/repository"
 )
 
 type VerifyRequest struct {
@@ -18,11 +17,9 @@ type CreateRequest struct {
 }
 
 func Verify(req VerifyRequest) (*model.User, error) {
-	var user model.User
-	repository.DB.Where(model.User{Username: req.Username}).First(&user)
+	user := FindUserByUsername(req.Username)
 
-	// can't check an empty struct, so just make sure their username exists to see if we found it
-	if user.Username == "" {
+	if user != nil {
 		return nil, errors.New("invalid username or password")
 	}
 
@@ -31,7 +28,7 @@ func Verify(req VerifyRequest) (*model.User, error) {
 		return nil, errors.New("invalid username or password")
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func Create(req CreateRequest) (*model.User, error) {
@@ -47,11 +44,10 @@ func Create(req CreateRequest) (*model.User, error) {
 		return nil, errors.New("passwords do not match")
 	}
 
-	var user model.User
-	repository.DB.Where(model.User{Username: req.Username}).First(&user)
+	user := FindUserByUsername(req.Username)
 
 	// check the username since we can't easily compare to an empty struct
-	if user.Username != "" {
+	if user != nil {
 		return nil, errors.New("user already exists")
 	}
 
@@ -60,11 +56,15 @@ func Create(req CreateRequest) (*model.User, error) {
 		return nil, errors.New("something went wrong. please try again")
 	}
 
-	user = model.User{
+	user = &model.User{
 		Username: req.Username,
 		Hash:     string(hash),
 	}
 
-	repository.DB.Save(&user);
-	return &user, nil
+	err = SaveUser(user)
+	if err != nil {
+		return nil, errors.New("something went wrong. please try again")
+	}
+
+	return user, nil
 }

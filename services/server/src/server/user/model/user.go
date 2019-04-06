@@ -1,17 +1,14 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
-	"server/media/model"
+	"server/core/repository"
 )
 
-type User struct {
-	gorm.Model
-	Username   string            `json:"username" gorm:"index;unique;not null"`
-	Hash       string            `json:"hash" gorm:"not null"`
-	MediaInfos []model.MediaInfo `gorm:"foreignkey:UserID"`
-}
+// @todo potentally use reflection for this info? then we can have some generic ways for save / parsing
+var UserColumns = []string{"id", "created_at", "updated_at", "deleted_at", "username", "hash"}
 
-func (*User) Migrate(db *gorm.DB, migrate func(model interface{})) {
-	migrate(&User{});
+type User struct {
+	repository.Model
+	Username string `json:"username"`
+	Hash     string `json:"hash"`
 }

@@ -18,13 +18,13 @@ func List(c *gin.Context) {
 	}
 
 	// fetch requested media info for given page
-	infos, err := service.GetMediaInfoByUserId(payload.ID, util.GetSelectPage(c))
+	data, err := service.GetMediaDataByUserId(payload.ID, util.GetSelectPage(c))
 	if err != nil {
 		render.RenderPage(c, http.StatusInternalServerError, nil)
 		return
 	}
 
-	props := service.GetListMediaResponseProps(c, infos)
+	props := service.GetListMediaResponseProps(c, data)
 
 	render.RenderPage(c, http.StatusOK, props)
 }

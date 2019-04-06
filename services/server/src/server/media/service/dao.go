@@ -6,10 +6,17 @@ import (
 	"errors"
 	"server/core/repository"
 	"server/core/util"
+	"github.com/Masterminds/squirrel"
 )
 
+type MediaData struct {
+	Info   model.MediaInfo
+	Tags   []model.Hashtag
+	Medias []model.Media
+	Tracks []model.Track
+}
 
-func GetMediaInfo(selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
+func GetMediaData(selectPage *util.SelectPage) (*[]MediaData, error) {
 	var infos []model.MediaInfo
 
 	// @todo optimize this? makes 3 queries...
@@ -31,7 +38,7 @@ func GetMediaInfo(selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
 	return &infos, nil
 }
 
-func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.MediaInfo, error) {
+func GetMediaDataByUserId(userId uint, selectPage *util.SelectPage) (*[]MediaData, error) {
 	var infos []model.MediaInfo
 
 	offset := selectPage.Page * selectPage.Count
@@ -53,7 +60,7 @@ func GetMediaInfoByUserId(userId uint, selectPage *util.SelectPage) (*[]model.Me
 	return &infos, nil
 }
 
-func GetMediaInfoByVideoID(videoId string) (*model.MediaInfo, error) {
+func GetMediaDataByVideoID(videoId string) (*MediaData, error) {
 	var info model.MediaInfo
 
 	repository.DB.
@@ -75,7 +82,7 @@ func GetMediaInfoByVideoID(videoId string) (*model.MediaInfo, error) {
 func GetHashTag(tag string) (*model.Hashtag, error) {
 	var hashtag model.Hashtag
 
-	repository.DB.Where(model.Hashtag{ Tag: tag }).First(&hashtag)
+	repository.DB.Where(model.Hashtag{Tag: tag}).First(&hashtag)
 	if repository.DB.Error != nil {
 		log.Printf("failed to find tag for tag: %s, error: %s", tag, repository.DB.Error.Error())
 		return nil, errors.New("failed to find hashtag")
@@ -89,7 +96,7 @@ func GetHashTag(tag string) (*model.Hashtag, error) {
 	return &hashtag, nil
 }
 
-func Save(model interface{}) (error) {
+func Save(data *MediaData) (error) {
 	repository.DB.Save(model)
 	if repository.DB.Error != nil {
 		log.Print("failed to save model", repository.DB.Error)

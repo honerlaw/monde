@@ -20,7 +20,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	log.SetOutput(gin.DefaultWriter)
@@ -28,16 +28,13 @@ func main() {
 	// init aws session
 	err = aws.InitSession()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// connect to the react rendering server
 	goclient.Connect("tcp", "0.0.0.0:9000")
 
-	defer repository.Connect().Close()
-
-	user.Migrate()
-	media.Migrate()
+	defer repository.GetRepository().Migrate().DB().Close()
 
 	router := gin.Default()
 

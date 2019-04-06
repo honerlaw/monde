@@ -3,18 +3,27 @@ package repository
 import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
-	"reflect"
-	"log"
 	"os"
 	"fmt"
 	"encoding/json"
 	"server/core/service/aws"
 	"sync"
 	"strconv"
+	"database/sql"
+	"github.com/golang-migrate/migrate"
+	"log"
+	"time"
 )
 
 var dbOnce sync.Once
-var DB *gorm.DB
+var repoInstance *Repository
+
+type Model struct {
+	ID        uint       `json:"id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+}
 
 type DBCredentials struct {
 	Username string `json:"username"`
@@ -22,12 +31,16 @@ type DBCredentials struct {
 }
 
 type DBInfo struct {
-	creds *DBCredentials
+	creds    *DBCredentials
 	endpoint string
-	dbname string
+	dbname   string
 }
 
-func Connect() *gorm.DB {
+type Repository struct {
+	db *sql.DB
+}
+
+func GetRepository() (*Repository) {
 	dbOnce.Do(func() {
 		info := getDBInfo()
 
@@ -35,53 +48,57 @@ func Connect() *gorm.DB {
 		url := generateDbUrl(info.creds, info.endpoint, nil)
 		err := createDatabaseIfNotExists(url, info.dbname)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		// get the actual db connection
 		url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
-		DB, err = gorm.Open("mysql", url)
+		db, err := sql.Open("mysql", url)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
-		logMode, _ := strconv.ParseBool(os.Getenv("DB_LOG_MODE"))
-
-		// all tables are named singluar, e.g. user instead of users
-		DB.SingularTable(true)
-		DB.LogMode(logMode);
+		repoInstance = &Repository{
+			db: db,
+		}
 	})
-	return DB
+	return repoInstance
 }
 
-func MigrateModel(model interface{}) {
-	shouldMigrate, _ := strconv.ParseBool(os.Getenv("DB_MIGRATE"))
-	if shouldMigrate != true {
-		return;
+func (repo *Repository) DB() (*sql.DB) {
+	return repo.db
+}
+
+func (repo *Repository) Migrate() (*Repository) {
+	shouldMigrate, err := strconv.ParseBool(os.Getenv("DB_MIGRATE"))
+	if !shouldMigrate || err != nil {
+		return repo
 	}
 
-	modelType := reflect.TypeOf(model)
-	log.Printf("Auto Migrating %s\n", modelType)
-
-	db := DB.AutoMigrate(model)
-	if db.Error != nil {
-		log.Printf("%s failed with error %s\n", modelType, db.Error)
-		panic(db.Error)
+	m, err := migrate.NewWithDatabaseInstance("", os.Getenv("DB_NAME"), repo.db)
+	if err != nil {
+		log.Fatal(err)
 	}
-	log.Printf("%s was successfully migrated\n", modelType)
+
+	err = m.Up()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return repo
 }
 
 func getDBInfo() (*DBInfo) {
 	// get the database cluster information
 	cluster, err := aws.GetRDSService().GetCluster()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// get the database credentials secret
 	secret, err := aws.GetSMService().GetSecret(os.Getenv("DB_SECRET_NAME"))
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// secret is stored as json so unmarshal it
@@ -89,9 +106,9 @@ func getDBInfo() (*DBInfo) {
 	json.Unmarshal([]byte(secret.Value), &creds)
 
 	return &DBInfo{
-		creds: &creds,
+		creds:    &creds,
 		endpoint: cluster.Endpoint,
-		dbname: os.Getenv("DB_NAME"),
+		dbname:   os.Getenv("DB_NAME"),
 	}
 }
 
@@ -106,11 +123,11 @@ func createDatabaseIfNotExists(dbUrl string, dbname string) (error) {
 	// attempt to create the database first
 	tempDb, err := gorm.Open("mysql", dbUrl)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	tempDb.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
 	if tempDb.Error != nil {
-		panic(tempDb.Error)
+		log.Fatal(tempDb.Error)
 	}
 	tempDb.Close();
 	return nil

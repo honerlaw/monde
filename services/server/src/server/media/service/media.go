@@ -22,23 +22,28 @@ type PublishRequest struct {
 }
 
 func Update(req UpdateRequest) (error) {
-	tx := repository.DB.Begin()
+	tx, err := repository.GetRepository().DB().Begin()
 
-	info, err := GetMediaInfoByVideoID(req.VideoID)
+	if err != nil {
+		log.Print("failed to start transaction", err)
+		return err
+	}
+
+	data, err := GetMediaDataByVideoID(req.VideoID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	info.Title = req.Title
-	info.Description = req.Description
+	data.Info.Title = req.Title
+	data.Info.Description = req.Description
 
 	// if they remove the description, unpublish the video
-	if len(strings.TrimSpace(info.Description)) == 0 {
-		info.Published = false;
+	if len(strings.TrimSpace(data.Info.Description)) == 0 {
+		data.Info.Published = false;
 	}
 
-	err = Save(info)
+	err = Save(data)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -62,6 +67,7 @@ func Update(req UpdateRequest) (error) {
 		}
 	}
 
+
 	assoc := tx.Model(info).Association("Hashtags").Replace(hashtags)
 	if assoc.Error != nil {
 		tx.Rollback()
@@ -75,21 +81,21 @@ func Update(req UpdateRequest) (error) {
 }
 
 func TogglePublish(req PublishRequest) (error) {
-	info, err := GetMediaInfoByVideoID(req.VideoID)
+	data, err := GetMediaDataByVideoID(req.VideoID)
 	if err != nil {
 		return err
 	}
 
-	if len(strings.TrimSpace(info.Description)) == 0 {
+	if len(strings.TrimSpace(data.Info.Description)) == 0 {
 		return errors.New("a description is required to publish videos")
 	}
 
-	info.Published = !info.Published
-	if info.Published {
-		info.PublishedDate = time.Now()
+	data.Info.Published = !data.Info.Published
+	if data.Info.Published {
+		data.Info.PublishedDate = time.Now()
 	}
 
-	err = Save(info)
+	err = Save(data)
 	if err != nil {
 		return err
 	}
