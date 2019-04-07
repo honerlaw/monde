@@ -1,11 +1,11 @@
 package service
 
 import (
-	"server/core/repository"
+	"services/server/core/repository"
 	"log"
 	"database/sql"
 	"github.com/Masterminds/squirrel"
-	"server/user/model"
+	"services/server/user/model"
 	"strings"
 	"time"
 )

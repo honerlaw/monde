@@ -3,10 +3,10 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/media/service"
-	"server/user/middleware"
-	"server/core/render"
-	"server/core/util"
+	"services/server/media/service"
+	"services/server/user/middleware"
+	"services/server/core/render"
+	"services/server/core/util"
 )
 
 func List(c *gin.Context) {

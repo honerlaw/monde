@@ -1,8 +1,8 @@
 package service
 
 import (
-	"server/media/model"
-	"server/core/util"
+	"services/server/media/model"
+	"services/server/core/util"
 )
 
 type MediaData struct {

@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/user/route"
-	"server/user/middleware"
+	"services/server/user/route"
+	"services/server/user/middleware"
 )
 
 func RegisterRoutes(router *gin.Engine) {

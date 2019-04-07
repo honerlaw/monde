@@ -3,10 +3,10 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/user/service"
-	"server/user/middleware"
-	"server/core/render"
-	"server/core/util"
+	"services/server/user/service"
+	"services/server/user/middleware"
+	"services/server/core/render"
+	"services/server/core/util"
 )
 
 func Register(c *gin.Context) {

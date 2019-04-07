@@ -4,10 +4,10 @@ import (
 	"time"
 	"strings"
 	"regexp"
-	"server/media/model"
+	"services/server/media/model"
 	"errors"
 	"log"
-	"server/core/repository"
+	"services/server/core/repository"
 )
 
 type UpdateRequest struct {

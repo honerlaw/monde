@@ -2,11 +2,11 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/core/util"
+	"services/server/core/util"
 	"fmt"
 	"os"
 	"strings"
-	"server/core/service/aws"
+	"services/server/core/service/aws"
 	"strconv"
 )
 

@@ -3,7 +3,7 @@ package middleware
 import (
 	"sync"
 	"github.com/gin-gonic/gin"
-	"server/core/render"
+	"services/server/core/render"
 )
 
 var reactOnce sync.Once

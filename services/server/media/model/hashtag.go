@@ -1,6 +1,6 @@
 package model
 
-import "server/core/repository"
+import "services/server/core/repository"
 
 type Hashtag struct {
 	repository.Model

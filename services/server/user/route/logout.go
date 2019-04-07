@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"time"
 	"net/http"
-	"server/core/util"
+	"services/server/core/util"
 	"log"
 )
 

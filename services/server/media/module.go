@@ -2,8 +2,8 @@ package media
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/media/route"
-	"server/user/middleware"
+	"services/server/media/route"
+	"services/server/user/middleware"
 )
 
 func RegisterRoutes(router *gin.Engine) {

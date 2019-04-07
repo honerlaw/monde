@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/core/util"
+	"services/server/core/util"
 )
 
 func Authorize() (gin.HandlerFunc) {

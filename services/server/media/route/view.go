@@ -2,10 +2,10 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/core/render"
+	"services/server/core/render"
 	"net/http"
-	"server/core/util"
-	"server/media/service"
+	"services/server/core/util"
+	"services/server/media/service"
 )
 
 func View(c *gin.Context) {

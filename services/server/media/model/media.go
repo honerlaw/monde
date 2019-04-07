@@ -2,7 +2,7 @@ package model
 
 import (
 	"encoding/xml"
-	"server/core/repository"
+	"services/server/core/repository"
 )
 
 type Media struct {

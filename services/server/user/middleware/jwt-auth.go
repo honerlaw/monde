@@ -2,15 +2,15 @@ package middleware
 
 import (
 	"sync"
-	"server/user/service"
+	"services/server/user/service"
 	"github.com/appleboy/gin-jwt"
 	"os"
 	"time"
 	"github.com/gin-gonic/gin"
 	"errors"
 	"net/http"
-	"server/core/render"
-	"server/core/util"
+	"services/server/core/render"
+	"services/server/core/util"
 )
 
 type AuthPayload struct {

@@ -3,7 +3,7 @@ package service
 import (
 	"golang.org/x/crypto/bcrypt"
 	"errors"
-	"server/user/model"
+	"services/server/user/model"
 )
 
 type VerifyRequest struct {

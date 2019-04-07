@@ -2,8 +2,8 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"server/media/service"
-	"server/core/util"
+	"services/server/media/service"
+	"services/server/core/util"
 )
 
 func Publish(c *gin.Context) {

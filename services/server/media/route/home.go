@@ -3,8 +3,8 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/core/render"
-	"server/media/service"
+	"services/server/core/render"
+	"services/server/media/service"
 )
 
 func Home(c *gin.Context) {

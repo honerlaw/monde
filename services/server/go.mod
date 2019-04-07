@@ -1,4 +1,4 @@
-module server
+module services/server
 
 require (
 	github.com/Masterminds/squirrel v1.1.0
@@ -14,7 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/joho/godotenv v1.3.0
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/olebedev/gojax v0.0.0-20170318114811-bb153be84336
 	github.com/pkg/errors v0.8.1 // indirect

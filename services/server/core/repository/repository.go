@@ -8,7 +8,7 @@ import (
 	"os"
 	"fmt"
 	"encoding/json"
-	"server/core/service/aws"
+	"services/server/core/service/aws"
 	"sync"
 	"strconv"
 	"database/sql"

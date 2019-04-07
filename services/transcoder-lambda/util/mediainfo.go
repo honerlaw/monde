@@ -2,14 +2,14 @@ package util
 
 import (
 	"os/exec"
-	"lambda/aws"
+	"services/transcoder-lambda/aws"
 	"encoding/xml"
 	"errors"
-	"server/media/model"
 	"log"
-	serverAWS "server/core/service/aws"
-	"server/core/repository"
+	serverAWS "services/server/core/service/aws"
+	"services/server/core/repository"
 	"fmt"
+	"services/server/media/model"
 )
 
 func GetMediaInfo(metadata *aws.S3RecordMetadata) (*model.MediaInfo, error) {
@@ -86,25 +86,31 @@ func RetryInsert(mediainfo *model.MediaInfo, retries uint) {
 
 func Insert(mediainfo *model.MediaInfo) (error) {
 	// check if there is a db connection, if not create one
-	err := repository.DB.DB().Ping()
+	err := repository.GetRepository().DB().Ping()
 
 	if err != nil {
 		log.Print(err);
 		return err;
 	}
 
-	tx := repository.DB.Begin()
+	tx, err := repository.GetRepository().DB().Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// @todo this is generating an update for the tracks, when we should always insert...
-	tx.Create(mediainfo)
+	/*tx.Create(mediainfo)
 
 	if tx.Error != nil {
 		tx.Rollback()
 		log.Print(tx.Error)
 		return tx.Error
-	}
+	}*/
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return nil
 }

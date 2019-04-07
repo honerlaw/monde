@@ -17,7 +17,7 @@ mediainfo:
 	chmod +x ./bin/mediainfo
 
 build:
-	env GOOS=linux go build -ldflags="-s -w" -o bin/transcoder ./src/lambda/main.go
+	env GOOS=linux go build -ldflags="-s -w" -o bin/transcoder ./main.go
 	$(MAKE) mediainfo
 	zip $(LAMBDA_ZIP_FILE) bin/transcoder bin/mediainfo .env
 

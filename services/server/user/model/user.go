@@ -1,7 +1,7 @@
 package model
 
 import (
-	"server/core/repository"
+	"services/server/core/repository"
 )
 
 // @todo potentally use reflection for this info? then we can have some generic ways for save / parsing

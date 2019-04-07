@@ -5,15 +5,15 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/joho/godotenv"
-	"lambda/util"
+	"services/transcoder-lambda/util"
 	"log"
-	aws2 "lambda/aws"
-	"server/core/service/aws"
-	"server/core/repository"
+	aws2 "services/transcoder-lambda/aws"
+	"services/server/core/service/aws"
+	"services/server/core/repository"
 )
 
 func Handler(ctx context.Context, event events.S3Event) {
-	repository.Connect()
+	repository.GetRepository() // basically initializes the db connnection
 
 	for _, record := range event.Records {
 		metadata, err := aws2.GetS3RecordMetadata(record.S3.Bucket.Name, record.S3.Object.Key)

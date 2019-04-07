@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"time"
 	"strings"
-	"server/core/repository"
+	"services/server/core/repository"
 )
 
 type MediaInfo struct {

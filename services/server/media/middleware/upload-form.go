@@ -6,11 +6,11 @@ import (
 	"os"
 	"time"
 	"encoding/base64"
-	"server/core/util"
+	"services/server/core/util"
 	"encoding/hex"
 	"github.com/satori/go.uuid"
-	"server/user/middleware"
-	"server/core/render"
+	"services/server/user/middleware"
+	"services/server/core/render"
 )
 
 func UploadFormMiddleware() (gin.HandlerFunc) {
