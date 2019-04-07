@@ -1,13 +1,16 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const mode = process.env.NODE_ENV;
+const outputPath = mode === 'production' ? '../assets/' : '../server/assets/';
+
 module.exports = {
     devtool: 'eval-source-map',
-    mode: 'development',
+    mode: mode,
     entry: './typescript/src/main.tsx',
     output: {
         filename: 'js/bundle.js',
-        path: path.resolve(__dirname, '../assets/')
+        path: path.resolve(__dirname, outputPath)
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
@@ -27,12 +30,7 @@ module.exports = {
                 test: /\.scss$/,
                 use: [
                     {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            // you can specify a publicPath here
-                            // by default it use publicPath in webpackOptions.output
-                            publicPath: '../'
-                        }
+                        loader: MiniCssExtractPlugin.loader
                     },
                     'css-loader',
                     'sass-loader'
