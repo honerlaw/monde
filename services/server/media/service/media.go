@@ -68,12 +68,12 @@ func Update(req UpdateRequest) (error) {
 	}
 
 
-	assoc := tx.Model(info).Association("Hashtags").Replace(hashtags)
+	/*assoc := tx.Model(info).Association("Hashtags").Replace(hashtags)
 	if assoc.Error != nil {
 		tx.Rollback()
 		log.Print(assoc.Error)
 		return errors.New("failed to update media")
-	}
+	}*/
 
 	tx.Commit()
 

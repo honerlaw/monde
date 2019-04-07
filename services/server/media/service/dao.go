@@ -2,11 +2,7 @@ package service
 
 import (
 	"server/media/model"
-	"log"
-	"errors"
-	"server/core/repository"
 	"server/core/util"
-	"github.com/Masterminds/squirrel"
 )
 
 type MediaData struct {
@@ -17,7 +13,8 @@ type MediaData struct {
 }
 
 func GetMediaData(selectPage *util.SelectPage) (*[]MediaData, error) {
-	var infos []model.MediaInfo
+	return nil, nil
+	/*var infos []model.MediaInfo
 
 	// @todo optimize this? makes 3 queries...
 	repository.DB.Where(&model.MediaInfo{
@@ -35,10 +32,11 @@ func GetMediaData(selectPage *util.SelectPage) (*[]MediaData, error) {
 		return nil, errors.New("failed to find media information")
 	}
 
-	return &infos, nil
+	return &infos, nil*/
 }
 
 func GetMediaDataByUserId(userId uint, selectPage *util.SelectPage) (*[]MediaData, error) {
+	return nil, nil/*
 	var infos []model.MediaInfo
 
 	offset := selectPage.Page * selectPage.Count
@@ -57,10 +55,11 @@ func GetMediaDataByUserId(userId uint, selectPage *util.SelectPage) (*[]MediaDat
 		return nil, errors.New("failed to find media information")
 	}
 
-	return &infos, nil
+	return &infos, nil*/
 }
 
 func GetMediaDataByVideoID(videoId string) (*MediaData, error) {
+	return nil, nil /*
 	var info model.MediaInfo
 
 	repository.DB.
@@ -76,10 +75,11 @@ func GetMediaDataByVideoID(videoId string) (*MediaData, error) {
 		return nil, errors.New("failed to find media information")
 	}
 
-	return &info, nil
+	return &info, nil*/
 }
 
 func GetHashTag(tag string) (*model.Hashtag, error) {
+	return nil, nil/*
 	var hashtag model.Hashtag
 
 	repository.DB.Where(model.Hashtag{Tag: tag}).First(&hashtag)
@@ -93,14 +93,14 @@ func GetHashTag(tag string) (*model.Hashtag, error) {
 		return nil, nil
 	}
 
-	return &hashtag, nil
+	return &hashtag, nil*/
 }
 
 func Save(data *MediaData) (error) {
-	repository.DB.Save(model)
+	/*repository.DB.Save(model)
 	if repository.DB.Error != nil {
 		log.Print("failed to save model", repository.DB.Error)
 		return errors.New("failed to save information")
-	}
+	}*/
 	return nil
 }

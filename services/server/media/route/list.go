@@ -10,7 +10,7 @@ import (
 )
 
 func List(c *gin.Context) {
-	payload := c.MustGet("JWT_IDENTITY").(*middleware.AuthPayload)
+	payload := c.MustGet("JWT_PAYLOAD").(*middleware.AuthPayload)
 
 	if payload == nil {
 		util.Redirect(c, "/")

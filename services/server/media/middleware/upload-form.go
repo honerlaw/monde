@@ -17,7 +17,7 @@ func UploadFormMiddleware() (gin.HandlerFunc) {
 	return func(c *gin.Context) {
 		c.Next()
 
-		payload, exists := c.Get("JWT_IDENTITY")
+		payload, exists := c.Get("JWT_PAYLOAD")
 		if payload != nil && exists {
 
 			meta, metaExists := c.Get("react-meta")
@@ -29,7 +29,7 @@ func UploadFormMiddleware() (gin.HandlerFunc) {
 }
 
 func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
-	id, _ := uuid.NewV4()
+	id := uuid.NewV4()
 	userId := strconv.FormatUint(uint64(payload.ID), 10)
 	bucket := os.Getenv("AWS_UPLOAD_BUCKET")
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")

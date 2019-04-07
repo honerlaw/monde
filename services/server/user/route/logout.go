@@ -4,13 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"time"
 	"net/http"
-	"server/user/middleware"
 	"server/core/util"
 	"log"
 )
 
+const cookieName = "JWTToken"
+
 func Logout(c *gin.Context) {
-	cookieName := middleware.GetJWTAuth().CookieName
 	cookie, err := c.Request.Cookie(cookieName)
 
 	if err != nil {

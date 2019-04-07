@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/musawirali/preact-rpc/goclient"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -31,14 +30,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// connect to the react rendering server
-	goclient.Connect("tcp", "0.0.0.0:9000")
-
 	defer repository.GetRepository().Migrate().DB().Close()
 
 	router := gin.Default()
 
-	router.Use(middleware.AuthIdentity())
+	router.Use(middleware.GetJWTAuth().MiddlewareFunc())
 	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", false, router))
 	router.Use(mediaMW.UploadFormMiddleware())
 

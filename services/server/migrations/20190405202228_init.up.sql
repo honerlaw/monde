@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `username` (`username`),
   KEY `idx_user_deleted_at` (`deleted_at`),
   KEY `idx_user_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `media_info` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

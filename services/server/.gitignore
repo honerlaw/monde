@@ -8,3 +8,4 @@ assets/gen/
 .env
 bin/
 .terraform/
+pkg/

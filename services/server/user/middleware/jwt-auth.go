@@ -13,45 +13,28 @@ import (
 	"server/core/util"
 )
 
-const identityKey = "ID"
-var unauthorizedUrlToPageMap = gin.H{
-	"/user/login":    "LoginPage",
-	"/user/register": "RegisterPage",
+type AuthPayload struct {
+	ID    uint
+	Roles []string
 }
 
 var jwtAuthSync sync.Once
 var jwtAuth *jwt.GinJWTMiddleware
 
-func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
-	return jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       os.Getenv("JWT_REALM"),
-		Key:         []byte(os.Getenv("JWT_SECRET_KEY")),
-		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
+func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
+	return &jwt.GinJWTMiddleware{
+		Realm:      os.Getenv("JWT_REALM"),
+		Key:        []byte(os.Getenv("JWT_SECRET_KEY")),
+		Timeout:    time.Hour,
+		MaxRefresh: time.Hour,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*AuthPayload); ok {
 				return jwt.MapClaims{
-					identityKey: v.ID,
-					"Roles":     v.Roles,
+					"id":    v.ID,
+					"roles": v.Roles,
 				}
 			}
-			return jwt.MapClaims{}
-		},
-		IdentityHandler: func(c *gin.Context) interface{} {
-			claims := jwt.ExtractClaims(c)
-
-			// convert the Roles to a string array
-			intRoles := claims["Roles"].([]interface{})
-			roles := make([]string, len(intRoles))
-			for i, v := range intRoles {
-				roles[i] = v.(string)
-			}
-
-			return &AuthPayload{
-				ID:    uint(claims[identityKey].(float64)),
-				Roles: roles,
-			}
+			return nil
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var req service.VerifyRequest
@@ -76,13 +59,15 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			var req service.VerifyRequest
 			c.ShouldBind(&req);
-
 			render.RenderPage(c, http.StatusUnauthorized, gin.H{
 				"username": req.Username,
-				"error": message,
+				"error":    message,
 			})
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
+
+			// @todo this should check a lot more than it does
+
 			if v, ok := data.(*AuthPayload); ok {
 				for _, b := range v.Roles {
 					if b == "user" {
@@ -96,12 +81,12 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware, error) {
 		TokenHeadName: "Bearer",
 		TimeFunc:      time.Now,
 		SendCookie:    true,
-	})
+	}
 }
 
 func GetJWTAuth() (*jwt.GinJWTMiddleware) {
 	jwtAuthSync.Do(func() {
-		jwtAuth, _ = createJwtMiddleware()
+		jwtAuth = createJwtMiddleware()
 	})
 	return jwtAuth
 }

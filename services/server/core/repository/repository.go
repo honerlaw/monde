@@ -1,8 +1,10 @@
 package repository
 
 import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/jinzhu/gorm"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/mysql"
+	_ "github.com/golang-migrate/migrate/source/file"
 	"os"
 	"fmt"
 	"encoding/json"
@@ -10,7 +12,6 @@ import (
 	"sync"
 	"strconv"
 	"database/sql"
-	"github.com/golang-migrate/migrate"
 	"log"
 	"time"
 )
@@ -37,7 +38,8 @@ type DBInfo struct {
 }
 
 type Repository struct {
-	db *sql.DB
+	url string
+	db  *sql.DB
 }
 
 func GetRepository() (*Repository) {
@@ -59,7 +61,8 @@ func GetRepository() (*Repository) {
 		}
 
 		repoInstance = &Repository{
-			db: db,
+			url: url,
+			db:  db,
 		}
 	})
 	return repoInstance
@@ -75,7 +78,8 @@ func (repo *Repository) Migrate() (*Repository) {
 		return repo
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("", os.Getenv("DB_NAME"), repo.db)
+	driver, _ := mysql.WithInstance(repo.db, &mysql.Config{})
+	m, err := migrate.NewWithDatabaseInstance("file://./migrations", "mysql", driver)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,21 +118,21 @@ func getDBInfo() (*DBInfo) {
 
 func generateDbUrl(creds *DBCredentials, endpoint string, dbname *string) (string) {
 	if dbname != nil {
-		return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", creds.Username, creds.Password, endpoint, *dbname)
+		return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&multiStatements=true", creds.Username, creds.Password, endpoint, *dbname)
 	}
-	return fmt.Sprintf("%s:%s@tcp(%s)/?parseTime=true", creds.Username, creds.Password, endpoint)
+	return fmt.Sprintf("%s:%s@tcp(%s)/?parseTime=true&multiStatements=true", creds.Username, creds.Password, endpoint)
 }
 
 func createDatabaseIfNotExists(dbUrl string, dbname string) (error) {
 	// attempt to create the database first
-	tempDb, err := gorm.Open("mysql", dbUrl)
+	db, err := sql.Open("mysql", dbUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tempDb.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
-	if tempDb.Error != nil {
-		log.Fatal(tempDb.Error)
+	defer db.Close();
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
+	if err != nil {
+		log.Fatal(err)
 	}
-	tempDb.Close();
 	return nil
 }

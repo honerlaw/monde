@@ -10,7 +10,7 @@ import (
 )
 
 func Register(c *gin.Context) {
-	payload := c.MustGet("JWT_IDENTITY")
+	payload := c.MustGet("JWT_PAYLOAD")
 
 	if payload != nil {
 		util.Redirect(c, "/")
