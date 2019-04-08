@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"services/server/core/render"
 	"services/server/core/util"
+	"github.com/labstack/gommon/log"
 )
 
 type AuthPayload struct {
@@ -27,6 +28,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 		Key:        []byte(os.Getenv("JWT_SECRET_KEY")),
 		Timeout:    time.Hour,
 		MaxRefresh: time.Hour,
+		IdentityKey: "id",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*AuthPayload); ok {
 				return jwt.MapClaims{
@@ -35,6 +37,14 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 				}
 			}
 			return nil
+		},
+		IdentityHandler: func(c *gin.Context) interface{} {
+			claims := jwt.ExtractClaims(c)
+
+			return &AuthPayload{
+				ID: claims["id"].(string),
+				Roles: claims["roles"].([]string),
+			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var req service.VerifyRequest
@@ -65,9 +75,6 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 			})
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-
-			// @todo this should check a lot more than it does
-
 			if v, ok := data.(*AuthPayload); ok {
 				for _, b := range v.Roles {
 					if b == "user" {
@@ -86,7 +93,11 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 
 func GetJWTAuth() (*jwt.GinJWTMiddleware) {
 	jwtAuthSync.Do(func() {
-		jwtAuth = createJwtMiddleware()
+		auth, err := jwt.New(createJwtMiddleware())
+		if err != nil {
+			log.Fatal(err)
+		}
+		jwtAuth = auth
 	})
 	return jwtAuth
 }

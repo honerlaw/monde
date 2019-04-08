@@ -16,8 +16,8 @@ func UploadFormMiddleware() (gin.HandlerFunc) {
 	return func(c *gin.Context) {
 		c.Next()
 
-		payload, exists := c.Get("JWT_PAYLOAD")
-		if payload != nil && exists {
+		payload := c.MustGet("JWT_AUTH_PAYLOAD")
+		if payload != nil {
 
 			meta, metaExists := c.Get("react-meta")
 			if meta != nil && metaExists {

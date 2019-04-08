@@ -10,10 +10,10 @@ import (
 	"services/server/core/service/aws"
 	"services/server/user"
 	"services/server/core"
-	"services/server/user/middleware"
 	mediaMW "services/server/media/middleware"
 	renderMW "services/server/core/render/middleware"
 	"services/server/core/render"
+	"services/server/user/middleware"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(middleware.GetJWTAuth().MiddlewareFunc())
+	router.Use(middleware.AuthIdentity())
 	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", false, router))
 	router.Use(mediaMW.UploadFormMiddleware())
 

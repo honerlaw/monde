@@ -8,7 +8,7 @@ import (
 )
 
 func Login(c *gin.Context) {
-	payload := c.MustGet("JWT_PAYLOAD")
+	payload := c.MustGet("JWT_AUTH_PAYLOAD")
 
 	if payload != nil {
 		util.Redirect(c, "/")

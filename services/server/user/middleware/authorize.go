@@ -8,7 +8,7 @@ import (
 func Authorize() (gin.HandlerFunc) {
 	return func(c *gin.Context) {
 		// if we don't have the payload, just redirect home
-		value, exists := c.Get("JWT_PAYLOAD")
+		value, exists := c.Get("JWT_AUTH_PAYLOAD")
 		if !exists || value == nil {
 			util.Redirect(c, "/")
 			return

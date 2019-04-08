@@ -34,7 +34,7 @@ func RenderPage(c *gin.Context, statusCode int, props gin.H) {
 	}
 
 	// always add the auth payload to the props, whether it exists or not
-	props["authPayload"], _ = c.Get("JWT_PAYLOAD")
+	props["authPayload"], _ = c.Get("JWT_AUTH_PAYLOAD")
 	props["statusCode"] = statusCode
 
 	c.Set("react-meta", ReactMeta{
