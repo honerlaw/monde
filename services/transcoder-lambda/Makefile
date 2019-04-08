@@ -11,7 +11,7 @@ clean:
 	rm -rf ./bin $(LAMBDA_ZIP_FILE)
 
 mediainfo:
-	docker build ./mediainfo -t $(MEDIA_INFO_TAG)
+	docker build . -t $(MEDIA_INFO_TAG)
 	mkdir -p ./bin/
 	docker run --rm $(MEDIA_INFO_TAG):latest cat mediainfo > ./bin/mediainfo
 	chmod +x ./bin/mediainfo
