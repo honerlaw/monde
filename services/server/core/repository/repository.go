@@ -47,28 +47,32 @@ type Repository struct {
 	db  *sql.DB
 }
 
+func NewRepository() (*Repository) {
+	info := getDBInfo()
+
+	// create the db
+	url := generateDbUrl(info.creds, info.endpoint, nil)
+	err := createDatabaseIfNotExists(url, info.dbname)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// get the actual db connection
+	url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
+	db, err := sql.Open("mysql", url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &Repository{
+		url: url,
+		db:  db,
+	}
+}
+
 func GetRepository() (*Repository) {
 	dbOnce.Do(func() {
-		info := getDBInfo()
-
-		// create the db
-		url := generateDbUrl(info.creds, info.endpoint, nil)
-		err := createDatabaseIfNotExists(url, info.dbname)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// get the actual db connection
-		url = generateDbUrl(info.creds, info.endpoint, &info.dbname)
-		db, err := sql.Open("mysql", url)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		repoInstance = &Repository{
-			url: url,
-			db:  db,
-		}
+		repoInstance = NewRepository()
 	})
 	return repoInstance
 }
@@ -84,7 +88,7 @@ func (repo *Repository) Migrate() (*Repository) {
 	}
 
 	driver, _ := mysql.WithInstance(repo.db, &mysql.Config{})
-	m, err := migrate.NewWithDatabaseInstance("file://./migrations", "mysql", driver)
+	m, err := migrate.NewWithDatabaseInstance("file://" + os.Getenv("DB_MIGRATE_PATH"), "mysql", driver)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,9 +101,10 @@ func (repo *Repository) Migrate() (*Repository) {
 	return repo
 }
 
-func (repo *Repository) Parse(modelType reflect.Type, rows *sql.Rows) ([]interface{}) {
+func (repo *Repository) Parse(model interface{}, rows *sql.Rows) ([]interface{}) {
 	defer rows.Close()
 
+	modelType := reflect.TypeOf(model).Elem()
 	models := make([]interface{}, 0)
 
 	for rows.Next() {
@@ -147,7 +152,7 @@ func (repo *Repository) FindByID(id string, model interface{}) (bool, error) {
 		return false, err
 	}
 
-	models := repo.Parse(modelType, rows)
+	models := repo.Parse(model, rows)
 	if len(models) > 0 {
 		m := models[0]
 		model = m
@@ -202,9 +207,13 @@ func (repo *Repository) Insert(model interface{}) (error) {
 	modelType := reflect.TypeOf(model).Elem()
 	modelValue := reflect.ValueOf(model).Elem()
 
-	id := uuid.NewV4().String()
+	// only set a new id if there isn't one passed
+	if len(modelValue.FieldByName("ID").String()) == 0 {
+		id := uuid.NewV4().String()
+		modelValue.FieldByName("ID").SetString(id)
+	}
+
 	t := time.Now()
-	modelValue.FieldByName("ID").SetString(id)
 	modelValue.FieldByName("CreatedAt").Set(reflect.ValueOf(t))
 	modelValue.FieldByName("UpdatedAt").Set(reflect.ValueOf(t))
 
@@ -215,6 +224,26 @@ func (repo *Repository) Insert(model interface{}) (error) {
 	_, err := squirrel.Insert(table).
 		Columns(columns...).
 		Values(values...).
+		RunWith(repo.db).
+		Query()
+
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+
+	return nil
+}
+
+func (repo *Repository) Delete(model interface{}) (error) {
+	modelType := reflect.TypeOf(model).Elem()
+	modelValue := reflect.ValueOf(model).Elem()
+
+	id := modelValue.FieldByName("ID").String()
+	table := repo.Table(modelType)
+
+	_, err := squirrel.Delete(table).
+		Where(squirrel.Eq{"id": id}).
 		RunWith(repo.db).
 		Query()
 

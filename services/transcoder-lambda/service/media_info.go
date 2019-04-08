@@ -102,6 +102,7 @@ func Insert(metadata *aws.S3RecordMetadata, mediainfo *model.MediaInfo, job *ela
 		UserID: metadata.UserID,
 		JobID:  *job.Id,
 	}
+	media.ID = metadata.ID
 
 	err = repository.GetRepository().Insert(media)
 	if err != nil {

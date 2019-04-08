@@ -14,7 +14,8 @@ clean:
 
 test:
 	go clean -testcache
-	go test ./...
+	go test ./core/repository/
+	go test ./user/service/
 
 build:
 	cd ./src/server/ && go get -d -v

@@ -4,6 +4,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"errors"
 	"services/server/user/model"
+	"services/server/core/repository"
 )
 
 type VerifyRequest struct {
@@ -61,7 +62,7 @@ func Create(req CreateRequest) (*model.User, error) {
 		Hash:     string(hash),
 	}
 
-	err = SaveUser(user)
+	err = repository.GetRepository().Save(user)
 	if err != nil {
 		return nil, errors.New("something went wrong. please try again")
 	}

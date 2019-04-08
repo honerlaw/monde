@@ -3,9 +3,9 @@ package repository
 import (
 	"testing"
 	"os"
-	"log"
 	"github.com/joho/godotenv"
 	"services/server/core/service/aws"
+	"log"
 )
 
 type testModel struct {
@@ -18,6 +18,8 @@ func setup() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	os.Setenv("DB_NAME", "vueon_test")
+	os.Setenv("DB_MIGRATE_PATH",  "../../migrations")
 
 	// init aws session
 	err = aws.InitSession()
@@ -25,7 +27,7 @@ func setup() {
 		log.Fatal(err)
 	}
 
-	_, err = GetRepository().DB().Exec(`
+	_, err = GetRepository().Migrate().DB().Exec(`
 CREATE TABLE IF NOT EXISTS ` + "`test_model`" + ` (
   ` + "`id`" + ` varchar(255) NOT NULL,
   ` + "`created_at`" + ` timestamp NULL DEFAULT NULL,
@@ -43,7 +45,7 @@ CREATE TABLE IF NOT EXISTS ` + "`test_model`" + ` (
 }
 
 func teardown() {
-	_, err := GetRepository().DB().Exec("DROP TABLE `test_model`")
+	_, err := GetRepository().DB().Exec("DROP DATABASE " + os.Getenv("DB_NAME"))
 
 	if err != nil {
 		log.Fatal(err)
@@ -134,5 +136,32 @@ func TestSave(t *testing.T) {
 	found, err = GetRepository().FindByID(temp.ID, &temp)
 	if !found || err != nil || temp.TestField != "existing" {
 		t.Error(found, err, temp.TestField)
+	}
+}
+
+func TestDelete(t *testing.T) {
+	temp := testModel{
+		TestField: "some_value",
+	}
+
+	err := GetRepository().Save(&temp)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// verify that the data was updated and exists
+	found, err := GetRepository().FindByID(temp.ID, &temp)
+	if !found || err != nil {
+		t.Error(found, err)
+	}
+
+	err = GetRepository().Delete(&temp)
+	if err != nil {
+		t.Error(err)
+	}
+
+	found, err = GetRepository().FindByID(temp.ID, &temp)
+	if found || err != nil {
+		t.Error(found, err)
 	}
 }
