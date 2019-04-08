@@ -3,39 +3,39 @@ package service
 import (
 	"services/server/media/model"
 	"services/server/core/util"
+	"log"
+	"github.com/Masterminds/squirrel"
+	"services/server/core/repository"
+	"errors"
 )
 
 type MediaData struct {
-	Info   model.MediaInfo
-	Tags   []model.Hashtag
-	Medias []model.Media
+	Media   model.Media
 	Tracks []model.Track
+	Tags   []model.Hashtag
 }
 
 func GetMediaData(selectPage *util.SelectPage) (*[]MediaData, error) {
-	return nil, nil
-	/*var infos []model.MediaInfo
+	var medias []MediaData
 
-	// @todo optimize this? makes 3 queries...
-	repository.DB.Where(&model.MediaInfo{
-		Published: true,
-	}).Order("created_at DESC").
-		Offset(selectPage.Page).
-		Limit(selectPage.Count).
-		Preload("Hashtags").
-		Preload("Medias").
-		Preload("Medias.Tracks").
-		Find(&infos)
+	_, err := squirrel.Select("*").
+		From("media_info mi").
+		LeftJoin("media m ON mi.id = m.media_info_id").
+		LeftJoin("track t ON m.id = t.media_id").
+		Join("media_info_hashtag mih ON ht.media_info_id = mi.id").
+		Join("hashtag h ON h.id = mih.hashtag_id").
+		RunWith(repository.GetRepository().DB()).
+		Query()
 
-	if repository.DB.Error != nil {
-		log.Print("failed to get media info for user", repository.DB.Error)
+	if err != nil {
+		log.Print("failed to get media info for user", err)
 		return nil, errors.New("failed to find media information")
 	}
 
-	return &infos, nil*/
+	return &medias, nil
 }
 
-func GetMediaDataByUserId(userId uint, selectPage *util.SelectPage) (*[]MediaData, error) {
+func GetMediaDataByUserId(userId string, selectPage *util.SelectPage) (*[]MediaData, error) {
 	return nil, nil/*
 	var infos []model.MediaInfo
 
@@ -96,11 +96,17 @@ func GetHashTag(tag string) (*model.Hashtag, error) {
 	return &hashtag, nil*/
 }
 
-func Save(data *MediaData) (error) {
-	/*repository.DB.Save(model)
-	if repository.DB.Error != nil {
-		log.Print("failed to save model", repository.DB.Error)
-		return errors.New("failed to save information")
-	}*/
+func Save(media *MediaData) (error) {
+	tx, err := repository.GetRepository().DB().Begin()
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		log.Print(err)
+		return err
+	}
 	return nil
 }

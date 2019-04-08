@@ -8,6 +8,7 @@ import (
 	"services/server/user/model"
 	"strings"
 	"time"
+	"github.com/satori/go.uuid"
 )
 
 func FindUserByUsername(username string) (*model.User) {
@@ -32,7 +33,7 @@ func FindUserByUsername(username string) (*model.User) {
 	return &users[0]
 }
 
-func FindUserByID(id uint) (*model.User) {
+func FindUserByID(id string) (*model.User) {
 	rows, err := squirrel.
 		Select(strings.Join(model.UserColumns, ",")).
 		From("user").
@@ -58,12 +59,13 @@ func SaveUser(user *model.User) (error) {
 	found := FindUserByID(user.ID)
 	if found == nil {
 
+		user.ID = uuid.NewV4().String()
 		user.CreatedAt = time.Now()
 		user.UpdatedAt = user.CreatedAt
 
 		_, err := squirrel.Insert("user").
-			Columns("created_at", "updated_at", "username", "hash").
-			Values(user.CreatedAt, user.UpdatedAt, user.Username, user.Hash).
+			Columns("id", "created_at", "updated_at", "username", "hash").
+			Values(user.ID, user.CreatedAt, user.UpdatedAt, user.Username, user.Hash).
 			RunWith(repository.GetRepository().DB()).
 			Query()
 

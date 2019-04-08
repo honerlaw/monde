@@ -14,7 +14,7 @@ import (
 )
 
 type AuthPayload struct {
-	ID    uint
+	ID    string
 	Roles []string
 }
 

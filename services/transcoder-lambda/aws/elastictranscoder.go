@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/elastictranscoder"
 	"github.com/aws/aws-sdk-go/aws"
-	"strconv"
 	"strings"
 	aws2 "services/server/core/service/aws"
 	"os"
@@ -87,7 +86,7 @@ func CreateElasticTranscoderJob(metadata *S3RecordMetadata) (*elastictranscoder.
 			Interlaced:  aws.String("auto"),
 			Resolution:  aws.String("auto"),
 		},
-		OutputKeyPrefix: aws.String(strconv.FormatUint(uint64(metadata.UserId), 10) + "/" + metadata.VideoId + "/"),
+		OutputKeyPrefix: aws.String(metadata.UserID + "/" + metadata.ID + "/"),
 		Outputs:         outputs,
 		Playlists: []*elastictranscoder.CreateJobPlaylist{
 			{

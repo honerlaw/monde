@@ -5,11 +5,11 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/joho/godotenv"
-	"services/transcoder-lambda/util"
 	"log"
 	aws2 "services/transcoder-lambda/aws"
 	"services/server/core/service/aws"
 	"services/server/core/repository"
+	"services/transcoder-lambda/service"
 )
 
 func Handler(ctx context.Context, event events.S3Event) {
@@ -22,43 +22,40 @@ func Handler(ctx context.Context, event events.S3Event) {
 			continue
 		}
 
-		mediainfo, err := util.GetMediaInfo(metadata)
+		mediainfo, err := service.GetMediaInfo(metadata)
 		if err != nil {
 			log.Print("Failed to get media info from file", err)
-			util.RetryInsert(mediainfo, 5)
+			service.RetryInsert(metadata, mediainfo, nil, 5)
 			continue;
 		}
 
-		err = util.ValidateMediaInfo(mediainfo)
+		err = service.ValidateMediaInfo(mediainfo)
 		if err != nil {
 			log.Print("Invalid media file", err)
-			util.RetryInsert(mediainfo, 5)
+			service.RetryInsert(metadata, mediainfo, nil, 5)
 			continue;
 		}
 
 		job, err := aws2.CreateElasticTranscoderJob(metadata)
 		if err != nil {
 			log.Print("Failed to trigger elastic transcoder job", err)
-			util.RetryInsert(mediainfo, 5)
+			service.RetryInsert(metadata, mediainfo, nil, 5)
 			continue;
 		}
 
-		// set the job id so we can look it up later if we need to
-		mediainfo.JobID = *job.Id
-
-		util.RetryInsert(mediainfo, 5)
+		service.RetryInsert(metadata, mediainfo, job, 5)
 	}
 }
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	err = aws.InitSession()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	lambda.Start(Handler)

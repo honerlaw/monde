@@ -2,12 +2,10 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"services/server/core/util"
 	"fmt"
 	"os"
 	"strings"
 	"services/server/core/service/aws"
-	"strconv"
 )
 
 type MediaVideoResponse struct {
@@ -30,7 +28,7 @@ type MediaResponse struct {
 }
 
 func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
-	data, err := GetMediaData(util.GetSelectPage(c))
+	/*infos, err := GetMediaInfo(util.GetSelectPage(c))
 
 	var props = gin.H{
 		"error": err,
@@ -38,10 +36,11 @@ func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
 	}
 
 	if err == nil {
-		props["media"] = ConvertMediaData(data, nil)
+		props["media"] = ConvertMediaData(infos, nil)
 	}
 
-	return props
+	return props*/
+	return nil
 }
 
 func GetListMediaResponseProps(c *gin.Context, data *[]MediaData) (gin.H) {
@@ -55,9 +54,9 @@ func GetListMediaResponseProps(c *gin.Context, data *[]MediaData) (gin.H) {
 	}
 
 	uploads = append(uploads, *ConvertMediaData(data, func(datum *MediaData, resp *MediaResponse) {
-		resp.TranscodingStatus = aws.GetETService().GetJobStatus(datum.Info.JobID)
-		resp.CanPublish = datum.Info.CanPublish()
-		resp.IsPublished = datum.Info.Published
+		resp.TranscodingStatus = aws.GetETService().GetJobStatus(datum.Media.JobID)
+		resp.CanPublish = datum.Media.CanPublish()
+		resp.IsPublished = datum.Media.Published
 	})...)
 
 	return gin.H{
@@ -95,8 +94,8 @@ func ConvertSingleMediaInfo(data MediaData, baseUrl string, thumbBaseUrl string,
 		hashtags = append(hashtags, hashtag.Tag)
 	}
 
-	userId := strconv.FormatUint(uint64(data.Info.UserID), 10)
-	videoId := data.Info.VideoID
+	userId := data.Media.UserID
+	videoId := data.Media.ID
 
 	videos := []MediaVideoResponse{}
 	for _, track := range data.Tracks {
@@ -122,9 +121,9 @@ func ConvertSingleMediaInfo(data MediaData, baseUrl string, thumbBaseUrl string,
 	}
 
 	resp := MediaResponse{
-		ID:          data.Info.VideoID,
-		Title:       data.Info.Title,
-		Description: data.Info.Description,
+		ID:          data.Media.ID,
+		Title:       data.Media.Title,
+		Description: data.Media.Description,
 		Hashtags:    hashtags,
 		Thumbnails: []string{
 			fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, userId, videoId),
@@ -152,7 +151,7 @@ func getPendingUploadIfNeeded(c *gin.Context, data *[]MediaData) (*MediaResponse
 	if okBucket && okKey {
 		pieces := strings.Split(key[0], "/")
 		videoId := pieces[len(pieces)-1]
-		canAddPending := len(*data) == 0 || (*data)[0].Info.VideoID != videoId
+		canAddPending := len(*data) == 0 || (*data)[0].Media.ID != videoId
 
 		// basically, we don't have the latest info from the trannscoder, but the file was definitely uploaded
 		// so we should append the info anyways...

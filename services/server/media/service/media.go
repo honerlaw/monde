@@ -35,12 +35,12 @@ func Update(req UpdateRequest) (error) {
 		return err
 	}
 
-	data.Info.Title = req.Title
-	data.Info.Description = req.Description
+	data.Media.Title = req.Title
+	data.Media.Description = req.Description
 
 	// if they remove the description, unpublish the video
-	if len(strings.TrimSpace(data.Info.Description)) == 0 {
-		data.Info.Published = false;
+	if len(strings.TrimSpace(data.Media.Description)) == 0 {
+		data.Media.Published = false;
 	}
 
 	err = Save(data)
@@ -86,13 +86,13 @@ func TogglePublish(req PublishRequest) (error) {
 		return err
 	}
 
-	if len(strings.TrimSpace(data.Info.Description)) == 0 {
+	if len(strings.TrimSpace(data.Media.Description)) == 0 {
 		return errors.New("a description is required to publish videos")
 	}
 
-	data.Info.Published = !data.Info.Published
-	if data.Info.Published {
-		data.Info.PublishedDate = time.Now()
+	data.Media.Published = !data.Media.Published
+	if data.Media.Published {
+		data.Media.PublishedDate = time.Now()
 	}
 
 	err = Save(data)

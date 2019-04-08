@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"strconv"
 	"os"
 	"time"
 	"encoding/base64"
@@ -30,7 +29,7 @@ func UploadFormMiddleware() (gin.HandlerFunc) {
 
 func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 	id := uuid.NewV4()
-	userId := strconv.FormatUint(uint64(payload.ID), 10)
+	userId := payload.ID
 	bucket := os.Getenv("AWS_UPLOAD_BUCKET")
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
@@ -76,7 +75,7 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 			"key":                     userId + "/" + id.String(),
 			"success_action_redirect": redirect,
 			"x-amz-meta-user-id":      userId,
-			"x-amz-meta-video-id":     id.String(),
+			"x-amz-meta-id":           id.String(),
 			"policy":                  policyBase64,
 			"x-amz-algorithm":         algorithm,
 			"x-amz-credential":        credential,

@@ -1,4 +1,4 @@
-.PHONY: build docker clean deploy destroy docker-deploy
+.PHONY: build docker clean deploy destroy docker-deploy test
 
 TERRAFORM_SRC_PATH=../../terraform/src/server/
 TERRAFORM_VAR_FILE=../../terraform/env/server/example.tfvars
@@ -11,6 +11,10 @@ LATEST_URL=106480132517.dkr.ecr.us-east-1.amazonaws.com/vueon:$(LATEST_TAG)
 
 clean:
 	rm -rf bin
+
+test:
+	go clean -testcache
+	go test ./...
 
 build:
 	cd ./src/server/ && go get -d -v

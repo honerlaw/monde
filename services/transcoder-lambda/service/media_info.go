@@ -1,4 +1,4 @@
-package util
+package service
 
 import (
 	"os/exec"
@@ -9,13 +9,12 @@ import (
 	serverAWS "services/server/core/service/aws"
 	"services/server/core/repository"
 	"fmt"
-	"services/server/media/model"
+	"services/transcoder-lambda/model"
+	"github.com/aws/aws-sdk-go/service/elastictranscoder"
 )
 
 func GetMediaInfo(metadata *aws.S3RecordMetadata) (*model.MediaInfo, error) {
 	info := model.MediaInfo{}
-	info.UserID = metadata.UserId
-	info.VideoID = metadata.VideoId
 
 	url, err := serverAWS.GetS3Service().GetSignedUrl(metadata.Bucket, metadata.Key)
 
@@ -70,7 +69,7 @@ func ValidateMediaInfo(mediainfo *model.MediaInfo) (error) {
 	return nil
 }
 
-func RetryInsert(mediainfo *model.MediaInfo, retries uint) {
+func RetryInsert(metadata *aws.S3RecordMetadata, mediainfo *model.MediaInfo, job *elastictranscoder.Job, retries uint) {
 	log.Printf("attempting to insert media info, retries left: %d", retries)
 	if retries <= 0 {
 		return
@@ -80,7 +79,7 @@ func RetryInsert(mediainfo *model.MediaInfo, retries uint) {
 
 	if err != nil {
 		log.Print("Failed to insert media and job information", err)
-		RetryInsert(mediainfo, retries - 1)
+		RetryInsert(metadata, mediainfo, job, retries - 1)
 	}
 }
 
