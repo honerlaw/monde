@@ -6,6 +6,9 @@ import (
 	"github.com/joho/godotenv"
 	"services/server/core/service/aws"
 	"log"
+	"github.com/Masterminds/squirrel"
+	"reflect"
+	"github.com/gin-gonic/gin/json"
 )
 
 type testModel struct {
@@ -72,7 +75,7 @@ func TestInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	found, err := GetRepository().FindByID(temp.ID, &temp)
+	found, err := GetRepository().FindByID(temp.ID, &testModel{})
 	if !found || err != nil {
 		t.Error(found, err)
 	}
@@ -164,4 +167,34 @@ func TestDelete(t *testing.T) {
 	if found || err != nil {
 		t.Error(found, err)
 	}
+}
+
+func TestParse(t *testing.T) {
+	temp := testModel{
+		TestField: "some_value",
+	}
+
+	err := GetRepository().Insert(&temp)
+	if err != nil {
+		t.Error(err)
+	}
+
+	table := GetRepository().Table(reflect.TypeOf(&temp).Elem())
+
+	rows, err := squirrel.Select("*").
+		From(table).
+		Where(squirrel.Eq{"id": temp.ID}).
+		RunWith(GetRepository().DB()).
+		Query()
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	models := GetRepository().Parse(&temp, rows)
+
+	data, _ := json.Marshal(models)
+
+	panic("HERE: " + string(data))
+
 }

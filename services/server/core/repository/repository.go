@@ -105,23 +105,45 @@ func (repo *Repository) Parse(model interface{}, rows *sql.Rows) ([]interface{})
 	defer rows.Close()
 
 	modelType := reflect.TypeOf(model).Elem()
+	modelValue := reflect.ValueOf(model).Elem()
+	fields := repo.Fields(modelType, modelValue)
 	models := make([]interface{}, 0)
 
 	for rows.Next() {
-		newModel := reflect.Zero(modelType).Interface()
+		newModel := reflect.Zero(reflect.StructOf(fields)).Interface()
 		modelValue := reflect.ValueOf(newModel)
-		pointers := repo.Values(modelValue)
 
-		for i := 0; i < len(pointers); i++ {
+		pointers := repo.Values(modelValue)
+		// pointers := make([]interface{}, 0) // repo.Values(modelValue)
+
+		log.Print(len(pointers))
+
+		for i := 0; i < modelValue.NumField(); i++ {
+			field := modelValue.Field(i)
+			ft := modelType.Field(i)
+
+			log.Print(ft.Name)
+
+			if field.Kind() == reflect.Struct && strings.Contains(field.Type().Name(), "Model") {
+
+			} else {
+				log.Print(field.CanAddr(), field.Kind())
+			}
+		}
+
+		// basically
+
+		/*for i := 0; i < len(pointers); i++ {
 			pointer := pointers[i]
 			if reflect.TypeOf(pointer).Kind() != reflect.Ptr {
 				pointers[i] = &pointer;
 			}
-		}
+		}*/
 
 		// set the values
 		err := rows.Scan(pointers...)
 		if err != nil {
+			panic(err)
 			log.Fatal(err)
 		}
 
@@ -261,7 +283,7 @@ func (repo *Repository) Columns(modelType reflect.Type) ([]string) {
 	for i := 0; i < modelType.NumField(); i++ {
 		field := modelType.Field(i)
 
-		if field.Type.Kind() == reflect.Struct && strings.Contains(field.Type.String(), "repository.Model") {
+		if field.Type.Kind() == reflect.Struct && strings.Contains(field.Type.String(), "Model") {
 			columns = append(columns, repo.Columns(field.Type)...)
 		} else {
 			columns = append(columns, field.Tag.Get("column"))
@@ -276,14 +298,32 @@ func (repo *Repository) Values(modelValue reflect.Value) ([]interface{}) {
 
 	for i := 0; i < modelValue.NumField(); i++ {
 		field := modelValue.Field(i)
-		if field.Kind() == reflect.Struct && strings.Contains(field.String(), "repository.Model") {
+
+		if field.Kind() == reflect.Struct && strings.Contains(field.String(), "Model") {
 			values = append(values, repo.Values(field)...)
 		} else {
-			values = append(values, field.Interface())
+			values = append(values, field.Addr().Interface())
 		}
 	}
 
 	return values
+}
+
+func (repo * Repository) Fields(modelType reflect.Type, modelValue reflect.Value) ([]reflect.StructField) {
+	fields := make([]reflect.StructField, 0)
+
+	for i := 0; i < modelType.NumField(); i++ {
+		fv := modelValue.Field(i)
+		field := modelType.Field(i)
+
+		if fv.Kind() == reflect.Struct && strings.Contains(fv.String(), "Model") {
+			fields = append(fields, repo.Fields(reflect.TypeOf(fv.Interface()), reflect.ValueOf(fv.Interface()))...)
+		} else {
+			fields = append(fields, field)
+		}
+	}
+
+	return fields
 }
 
 func (repo *Repository) Table(modelType reflect.Type) (string) {

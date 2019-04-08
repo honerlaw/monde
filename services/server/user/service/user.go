@@ -5,6 +5,7 @@ import (
 	"errors"
 	"services/server/user/model"
 	"services/server/core/repository"
+	"github.com/labstack/gommon/log"
 )
 
 type VerifyRequest struct {
@@ -20,7 +21,9 @@ type CreateRequest struct {
 func Verify(req VerifyRequest) (*model.User, error) {
 	user := FindUserByUsername(req.Username)
 
-	if user != nil {
+	log.Print(user)
+
+	if user == nil {
 		return nil, errors.New("invalid username or password")
 	}
 
@@ -46,8 +49,6 @@ func Create(req CreateRequest) (*model.User, error) {
 	}
 
 	user := FindUserByUsername(req.Username)
-
-	// check the username since we can't easily compare to an empty struct
 	if user != nil {
 		return nil, errors.New("user already exists")
 	}
