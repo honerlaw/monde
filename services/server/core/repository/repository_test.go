@@ -8,7 +8,6 @@ import (
 	"log"
 	"github.com/Masterminds/squirrel"
 	"reflect"
-	"github.com/gin-gonic/gin/json"
 )
 
 type testModel struct {
@@ -193,8 +192,13 @@ func TestParse(t *testing.T) {
 
 	models := GetRepository().Parse(&temp, rows)
 
-	data, _ := json.Marshal(models)
+	if len(models) == 0 {
+		t.Error("one model should be found")
+	}
 
-	panic("HERE: " + string(data))
+	model := models[0].(testModel)
 
+	if len(model.ID) == 0 {
+		t.Error("Failed to properly parse and store information into new object")
+	}
 }
