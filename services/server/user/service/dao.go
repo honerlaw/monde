@@ -5,8 +5,6 @@ import (
 	"log"
 	"github.com/Masterminds/squirrel"
 	"services/server/user/model"
-	"github.com/gin-gonic/gin/json"
-	"fmt"
 )
 
 func FindUserByUsername(username string) (*model.User) {
@@ -28,10 +26,6 @@ func FindUserByUsername(username string) (*model.User) {
 		return nil
 	}
 	user = users[0].(model.User)
-
-	data, _ := json.Marshal(user)
-
-	fmt.Print(string(data))
 
 	return &user
 }

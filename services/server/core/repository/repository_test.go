@@ -57,6 +57,13 @@ func teardown() {
 func TestMain(m *testing.M) {
 	setup()
 
+	// make sure to teardown on panic
+	defer func() {
+		if r := recover(); r != nil {
+			teardown()
+		}
+	}()
+
 	code := m.Run()
 
 	teardown()
