@@ -41,9 +41,16 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 
+			// so roles is an interface array, only why to convert is by converting it individual value
+			roles := claims["roles"].([]interface{})
+			stringRoles := make([]string, 0);
+			for _, role := range roles {
+				stringRoles = append(stringRoles, role.(string))
+			}
+
 			return &AuthPayload{
 				ID: claims["id"].(string),
-				Roles: claims["roles"].([]string),
+				Roles: stringRoles,
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {

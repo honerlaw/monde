@@ -19,11 +19,10 @@ func GetMediaData(selectPage *util.SelectPage) (*[]MediaData, error) {
 	var medias []MediaData
 
 	_, err := squirrel.Select("*").
-		From("media_info mi").
-		LeftJoin("media m ON mi.id = m.media_info_id").
+		From("media m").
 		LeftJoin("track t ON m.id = t.media_id").
-		Join("media_info_hashtag mih ON ht.media_info_id = mi.id").
-		Join("hashtag h ON h.id = mih.hashtag_id").
+		Join("media_hashtag mh ON mh.media_id = m.id").
+		Join("hashtag h ON h.id = mh.hashtag_id").
 		RunWith(repository.GetRepository().DB()).
 		Query()
 

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"services/server/core/service/aws"
+	"services/server/core/util"
 )
 
 type MediaVideoResponse struct {
@@ -28,7 +29,7 @@ type MediaResponse struct {
 }
 
 func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
-	/*infos, err := GetMediaInfo(util.GetSelectPage(c))
+	infos, err := GetMediaData(util.GetSelectPage(c))
 
 	var props = gin.H{
 		"error": err,
@@ -39,7 +40,7 @@ func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
 		props["media"] = ConvertMediaData(infos, nil)
 	}
 
-	return props*/
+	return props
 	return nil
 }
 
