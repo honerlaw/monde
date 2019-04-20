@@ -83,22 +83,20 @@ func (service *CommentService) GetByID(id string) (*model.Comment, error) {
 }
 
 func (service *CommentService) Create(id string, userID string, req CommentRequest) (error) {
-	var parentCommentId *string
-	if len(strings.TrimSpace(req.ParentCommentID)) == 0 {
-		parentCommentId = nil
-	} else {
-		comment, _ := service.GetByID(*parentCommentId)
+	comment := model.Comment{
+		MediaID:         id,
+		UserID:          userID,
+		Comment:         req.Comment,
+	}
+
+	if len(strings.TrimSpace(req.ParentCommentID)) != 0 {
+		comment, _ := service.GetByID(strings.TrimSpace(req.ParentCommentID))
 		if comment != nil {
-			parentCommentId = &comment.ID
+			comment.ParentCommentID = comment.ID
 		}
 	}
 
-	return service.Save(&model.Comment{
-		MediaID:         id,
-		UserID:          userID,
-		ParentCommentID: *parentCommentId,
-		Comment:         req.Comment,
-	})
+	return service.Save(&comment)
 }
 
 func (service *CommentService) Save(comment *model.Comment) (error) {

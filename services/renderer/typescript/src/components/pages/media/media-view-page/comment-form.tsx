@@ -13,6 +13,7 @@ export class CommentForm extends React.Component<IProps, {}> {
         return <form className={"comment-form"} method={"POST"} action={`/media/comment/${this.props.mediaId}`}>
             {this.props.parentCommentId ? <input type={"hidden"} name={"parent_comment_id"} value={this.props.parentCommentId}/> : null}
             <TextareaGroup name={"comment"} placeholder={"add a comment"}/>
+            <button type={"submit"}>post</button>
         </form>;
     }
 }
