@@ -8,7 +8,19 @@ import (
 	"services/server/media/service"
 )
 
-func View(c *gin.Context) {
+type ViewRoute struct {
+	mediaService *service.MediaService
+	commentService *service.CommentService
+}
+
+func NewViewRoute(mediaService *service.MediaService, commentService *service.CommentService) (*ViewRoute) {
+	return &ViewRoute{
+		mediaService: mediaService,
+		commentService: commentService,
+	}
+}
+
+func (route *ViewRoute) Get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
 		util.Redirect(c, "/");
@@ -19,14 +31,16 @@ func View(c *gin.Context) {
 		"view": nil,
 	}
 
-	data, err := service.GetMediaDataByVideoID(id)
+	data, err := route.mediaService.GetByVideoID(id)
 	if err != nil {
 		props["error"] = err.Error()
 	}
 
 	if data != nil {
-		props["view"] = service.ConvertSingleMediaInfo(*data, "", "", nil)
+		props["view"] = route.mediaService.ConvertSingleMediaInfo(*data, "", "", nil)
 	}
+
+	props["comments"], err = route.commentService.GetByMediaID(id)
 
 	render.RenderPage(c, http.StatusOK, props);
 }

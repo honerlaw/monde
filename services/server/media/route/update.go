@@ -6,7 +6,17 @@ import (
 	"services/server/core/util"
 )
 
-func Update(c *gin.Context) {
+type UpdateRoute struct {
+	mediaService *service.MediaService
+}
+
+func NewUpdateRoute(mediaService *service.MediaService) (*UpdateRoute) {
+	return &UpdateRoute{
+		mediaService: mediaService,
+	}
+}
+
+func (route *UpdateRoute) Post(c *gin.Context) {
 	var req service.UpdateRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.Set("error", err.Error())
@@ -14,7 +24,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	err := service.Update(req)
+	err := route.mediaService.Update(req)
 	if err != nil {
 		c.Set("error", err.Error())
 		util.Redirect(c, "/media/list")

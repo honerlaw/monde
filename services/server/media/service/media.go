@@ -6,8 +6,10 @@ import (
 	"regexp"
 	"services/server/media/model"
 	"errors"
-	"log"
-	"services/server/core/repository"
+	"services/server/media/repository"
+	"fmt"
+	"os"
+	"services/server/core/util"
 )
 
 type UpdateRequest struct {
@@ -21,17 +23,54 @@ type PublishRequest struct {
 	VideoID string `form:"video_id" binding:"required"`
 }
 
-func Update(req UpdateRequest) (error) {
-	tx, err := repository.GetRepository().DB().Begin()
+type MediaVideoResponse struct {
+	Type   string `json:"type"`
+	Url    string `json:"url"`
+	Width  int64  `json:"width"`
+	Height int64  `json:"height"`
+}
 
-	if err != nil {
-		log.Print("failed to start transaction", err)
-		return err
+type MediaResponse struct {
+	ID                string               `json:"id"`
+	Title             string               `json:"title"`
+	Description       string               `json:"description"`
+	Hashtags          []string             `json:"hashtags"`
+	Thumbnails        []string             `json:"thumbnails"`
+	Videos            []MediaVideoResponse `json:"videos"`
+	TranscodingStatus string               `json:"transcoding_status"`
+	CanPublish        bool                 `json:"can_publish"`
+	IsPublished       bool                 `json:"is_published"`
+}
+
+type ConvertMediaCallback func(data *repository.MediaData, mediaResponse *MediaResponse);
+
+type MediaService struct {
+	mediaRepository *repository.MediaRepository
+	hashtagRepository *repository.HashtagRepository
+}
+
+func NewMediaService(mediaRepository *repository.MediaRepository, hashtagRepository *repository.HashtagRepository) (*MediaService) {
+	return &MediaService{
+		mediaRepository: mediaRepository,
+		hashtagRepository: hashtagRepository,
 	}
+}
 
-	data, err := GetMediaDataByVideoID(req.VideoID)
+func (service *MediaService) List(selectPage *util.SelectPage) ([]repository.MediaData, error) {
+	return service.mediaRepository.List(selectPage, nil)
+}
+
+func (service *MediaService) GetByUserID(userID string, selectPage *util.SelectPage) ([]repository.MediaData, error) {
+	return service.mediaRepository.GetByUserID(userID, selectPage)
+}
+
+func (service *MediaService) GetByVideoID(videoID string) (*repository.MediaData, error) {
+	return service.mediaRepository.GetByVideoID(videoID)
+}
+
+func (service *MediaService) Update(req UpdateRequest) (error) {
+	data, err := service.mediaRepository.GetByVideoID(req.VideoID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -50,7 +89,7 @@ func Update(req UpdateRequest) (error) {
 		trimmedTag := strings.TrimSpace(tag)
 		if regex.MatchString(trimmedTag) && len(trimmedTag) < 75 && len(trimmedTag) > 1 {
 			// fetch the existing hashtag if it exists
-			hashtag, err := GetHashTag(trimmedTag)
+			hashtag, err := service.hashtagRepository.Get(trimmedTag)
 			if hashtag == nil || err != nil {
 				hashtag = &model.Hashtag{
 					Tag: trimmedTag,
@@ -62,19 +101,16 @@ func Update(req UpdateRequest) (error) {
 	}
 	data.Tags = hashtags
 
-	err = Save(data)
+	err = service.mediaRepository.Save(data)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
 
 	return nil
 }
 
-func TogglePublish(req PublishRequest) (error) {
-	data, err := GetMediaDataByVideoID(req.VideoID)
+func (service *MediaService) TogglePublish(req PublishRequest) (error) {
+	data, err := service.mediaRepository.GetByVideoID(req.VideoID)
 	if err != nil {
 		return err
 	}
@@ -88,10 +124,88 @@ func TogglePublish(req PublishRequest) (error) {
 		data.Media.PublishedDate = time.Now()
 	}
 
-	err = Save(data)
+	err = service.mediaRepository.Save(data)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (service *MediaService) ConvertMediaData(data []repository.MediaData, callback ConvertMediaCallback) ([]MediaResponse) {
+	media := []MediaResponse{}
+
+	baseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_PROCESSED_BUCKET"))
+	thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_THUMBNAIL_BUCKET"))
+
+	for _, datum := range data {
+		resp := service.ConvertSingleMediaInfo(datum, baseUrl, thumbBaseUrl, callback)
+
+		media = append(media, resp)
+	}
+
+	return media
+}
+
+func (service *MediaService) ConvertSingleMediaInfo(data repository.MediaData, baseUrl string, thumbBaseUrl string, callback ConvertMediaCallback) (MediaResponse) {
+	if baseUrl == "" {
+		baseUrl = fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_PROCESSED_BUCKET"))
+	}
+	if thumbBaseUrl == "" {
+		thumbBaseUrl = fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_THUMBNAIL_BUCKET"))
+	}
+
+	hashtags := make([]string, 0)
+	for _, hashtag := range data.Tags {
+		hashtags = append(hashtags, hashtag.Tag)
+	}
+
+	userId := data.Media.UserID
+	videoId := data.Media.ID
+
+	videos := []MediaVideoResponse{}
+	for _, track := range data.Tracks {
+		if track.Type == "Video" {
+			// @todo
+			// we need post processing information about the videos (e.g. we need to store the types of videos
+			// associated files, genenral video information, etc
+			videos = append(videos, []MediaVideoResponse{
+				{
+					Type:   "hls",
+					Width:  track.Width,
+					Height: track.Height,
+					Url:    fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, userId, videoId),
+				},
+				{
+					Type:   "mp4",
+					Width:  track.Width,
+					Height: track.Height,
+					Url:    fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, userId, videoId),
+				},
+			}...)
+		}
+	}
+
+	resp := MediaResponse{
+		ID:          data.Media.ID,
+		Title:       data.Media.Title,
+		Description: data.Media.Description,
+		Hashtags:    hashtags,
+		Thumbnails: []string{
+			fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, userId, videoId),
+		},
+		Videos: videos,
+	}
+
+	// optionally allow additional data to be added to the info
+	if callback != nil {
+		callback(&data, &resp)
+	}
+
+	return resp;
 }

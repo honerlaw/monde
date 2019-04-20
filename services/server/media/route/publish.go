@@ -6,7 +6,17 @@ import (
 	"services/server/core/util"
 )
 
-func Publish(c *gin.Context) {
+type PublishRoute struct {
+	mediaService *service.MediaService
+}
+
+func NewPublishRoute(mediaService *service.MediaService) (*PublishRoute) {
+	return &PublishRoute{
+		mediaService: mediaService,
+	}
+}
+
+func (route *PublishRoute) Post(c *gin.Context) {
 	var req service.PublishRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.Set("error", err)
@@ -14,7 +24,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	err := service.TogglePublish(req)
+	err := route.mediaService.TogglePublish(req)
 	if err != nil {
 		c.Set("error", err)
 		util.Redirect(c, "/media/list")

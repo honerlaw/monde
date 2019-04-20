@@ -73,3 +73,17 @@ CREATE TABLE IF NOT EXISTS `media_hashtag` (
   CONSTRAINT `media_hashtag_media_id_foreign` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE,
   CONSTRAINT `media_hashtag_hashtag_id_foreign` FOREIGN KEY (`hashtag_id`) REFERENCES `hashtag` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `comment` (
+  `id` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `parent_comment_id` varchar(255) NULL DEFAULT NULL,
+  `media_id` varchar(255) NOT NULL,
+  `comment` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_media_deleted_at` (`deleted_at`),
+  KEY `comment_media_id_foreign` (`media_id`),
+  CONSTRAINT `comment_media_id_foreign` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
