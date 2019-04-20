@@ -4,6 +4,7 @@ import (
 	"services/server/media/repository"
 	"services/server/media/model"
 	"strings"
+	"time"
 )
 
 type CommentRequest struct {
@@ -12,8 +13,13 @@ type CommentRequest struct {
 }
 
 type CommentResponse struct {
-	model.Comment
-	Children []CommentResponse `json:"children"`
+	ID              string            `json:"id"`
+	UserID          string            `json:"user_id"`
+	MediaID         string            `json:"media_id"`
+	ParentCommentID string            `json:"parent_comment_id"`
+	Comment         string            `json:"comment"`
+	CreatedAt       time.Time         `json:"created_at"`
+	Children        []CommentResponse `json:"children"`
 }
 
 type CommentService struct {
@@ -44,11 +50,10 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 			}
 			resp.ID = comment.ID
 			resp.CreatedAt = comment.CreatedAt
-			resp.UpdatedAt = comment.UpdatedAt
-			resp.DeletedAt = comment.DeletedAt
+			resp.UserID = comment.UserID
 			resp.ParentCommentID = comment.ParentCommentID
-			resp.MediaID = resp.MediaID
-			resp.Comment = resp.Comment
+			resp.MediaID = comment.MediaID
+			resp.Comment = comment.Comment
 		}
 	}
 
