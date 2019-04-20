@@ -81,9 +81,12 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   `parent_comment_id` varchar(255) NULL DEFAULT NULL,
   `media_id` varchar(255) NOT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
   `comment` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_media_deleted_at` (`deleted_at`),
   KEY `comment_media_id_foreign` (`media_id`),
-  CONSTRAINT `comment_media_id_foreign` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE
+  KEY `comment_user_id_foreign` (`user_id`),
+  CONSTRAINT `comment_media_id_foreign` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `comment_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

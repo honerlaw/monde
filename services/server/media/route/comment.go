@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"services/server/media/service"
 	"services/server/core/util"
+	"services/server/user/middleware"
 )
 
 type CommentRoute struct {
@@ -26,14 +27,21 @@ func (route *CommentRoute) Post(c *gin.Context) {
 	var req service.CommentRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.Set("error", err.Error())
-		util.Redirect(c, "/media/view/" + id)
+		util.Redirect(c, "/media/view/"+id)
 		return
 	}
 
-	err := route.commentService.Create(id, req)
+	payload := c.MustGet("JWT_AUTH_PAYLOAD")
+	if payload == nil {
+		util.Redirect(c, "/")
+		return
+	}
+	auth := payload.(*middleware.AuthPayload)
+
+	err := route.commentService.Create(id, auth.ID, req)
 	if err != nil {
 		c.Set("error", err.Error())
 	}
 
-	util.Redirect(c, "/media/view/" + id)
+	util.Redirect(c, "/media/view/"+id)
 }

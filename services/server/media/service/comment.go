@@ -26,6 +26,7 @@ func NewCommentService(commentRepository *repository.CommentRepository) (*Commen
 	}
 }
 
+// @todo we need to fetch user info from the user id
 func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error) {
 	comments, err := service.commentRepository.GetByMediaID(id)
 	if err != nil {
@@ -76,7 +77,7 @@ func (service *CommentService) GetByID(id string) (*model.Comment, error) {
 	return service.commentRepository.GetByID(id)
 }
 
-func (service *CommentService) Create(id string, req CommentRequest) (error) {
+func (service *CommentService) Create(id string, userID string, req CommentRequest) (error) {
 	var parentCommentId *string
 	if len(strings.TrimSpace(req.ParentCommentID)) == 0 {
 		parentCommentId = nil
@@ -89,6 +90,7 @@ func (service *CommentService) Create(id string, req CommentRequest) (error) {
 
 	return service.Save(&model.Comment{
 		MediaID:         id,
+		UserID:          userID,
 		ParentCommentID: *parentCommentId,
 		Comment:         req.Comment,
 	})
