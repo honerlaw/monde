@@ -24,7 +24,7 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 	}
 
 	rawUserID, foundUserId := head.Metadata["User-Id"];
-	rawID, foundVideoId := head.Metadata["Id"];
+	rawID, foundVideoId := head.Metadata["Video-Id"];
 	if !foundUserId || !foundVideoId {
 		return nil, errors.New("could not find required data in s3 user metadata")
 	}

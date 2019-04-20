@@ -101,22 +101,12 @@ func (repo *Repository) Migrate() (*Repository) {
 	return repo
 }
 
-/*func (repo *Repository) FieldReferences(modelValue reflect.Value) []interface{} {
-	refs := make([]interface{}, 0)
-
-	// we create a new struct
-	// they all point to their zero values
-	// we need them to all pointer to a new value instead?
-	values := repo.Values(modelValue)
-
-	for _, value := range values {
-		fieldType := reflect.TypeOf(value)
-		fieldValue := reflect.ValueOf(&value)
-
+func (repo *Repository) Assert(target []interface{}, source []interface{}) {
+	for _, s := range source {
+		target = append(target, s)
 	}
 
-	return refs
-}*/
+}
 
 func (repo *Repository) Parse(model interface{}, rows *sql.Rows) ([]interface{}) {
 	defer rows.Close()

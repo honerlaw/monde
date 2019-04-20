@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-const cookieName = "JWTToken"
+const cookieName = "jwt"
 
 func Logout(c *gin.Context) {
 	cookie, err := c.Request.Cookie(cookieName)

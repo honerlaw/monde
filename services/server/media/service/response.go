@@ -29,7 +29,7 @@ type MediaResponse struct {
 }
 
 func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
-	infos, err := GetMediaData(util.GetSelectPage(c))
+	infos, err := GetMediaData(util.GetSelectPage(c), nil)
 
 	var props = gin.H{
 		"error": err,
@@ -44,7 +44,7 @@ func GetHomeMediaResponseProps(c *gin.Context) (gin.H) {
 	return nil
 }
 
-func GetListMediaResponseProps(c *gin.Context, data *[]MediaData) (gin.H) {
+func GetListMediaResponseProps(c *gin.Context, data []MediaData) (gin.H) {
 	uploads := []MediaResponse{}
 
 	// there is a chance that the lambda has not started the job processing yet, so the media info won't exist
@@ -54,7 +54,7 @@ func GetListMediaResponseProps(c *gin.Context, data *[]MediaData) (gin.H) {
 		uploads = append(uploads, *pending)
 	}
 
-	uploads = append(uploads, *ConvertMediaData(data, func(datum *MediaData, resp *MediaResponse) {
+	uploads = append(uploads, ConvertMediaData(data, func(datum *MediaData, resp *MediaResponse) {
 		resp.TranscodingStatus = aws.GetETService().GetJobStatus(datum.Media.JobID)
 		resp.CanPublish = datum.Media.CanPublish()
 		resp.IsPublished = datum.Media.Published
@@ -67,19 +67,19 @@ func GetListMediaResponseProps(c *gin.Context, data *[]MediaData) (gin.H) {
 
 type ConvertMediaCallback func(data *MediaData, mediaResponse *MediaResponse);
 
-func ConvertMediaData(data *[]MediaData, callback ConvertMediaCallback) (*[]MediaResponse) {
+func ConvertMediaData(data []MediaData, callback ConvertMediaCallback) ([]MediaResponse) {
 	media := []MediaResponse{}
 
 	baseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_PROCESSED_BUCKET"))
 	thumbBaseUrl := fmt.Sprintf("https://s3.amazonaws.com/%s", os.Getenv("AWS_THUMBNAIL_BUCKET"))
 
-	for _, data := range *data {
-		resp := ConvertSingleMediaInfo(data, baseUrl, thumbBaseUrl, callback)
+	for _, datum := range data {
+		resp := ConvertSingleMediaInfo(datum, baseUrl, thumbBaseUrl, callback)
 
 		media = append(media, resp)
 	}
 
-	return &media
+	return media
 }
 
 func ConvertSingleMediaInfo(data MediaData, baseUrl string, thumbBaseUrl string, callback ConvertMediaCallback) (MediaResponse) {
@@ -145,14 +145,14 @@ func ConvertSingleMediaInfo(data MediaData, baseUrl string, thumbBaseUrl string,
 	return resp;
 }
 
-func getPendingUploadIfNeeded(c *gin.Context, data *[]MediaData) (*MediaResponse) {
+func getPendingUploadIfNeeded(c *gin.Context, data []MediaData) (*MediaResponse) {
 	params := c.Request.URL.Query()
 	bucket, okBucket := params["bucket"]
 	key, okKey := params["key"]
 	if okBucket && okKey {
 		pieces := strings.Split(key[0], "/")
 		videoId := pieces[len(pieces)-1]
-		canAddPending := len(*data) == 0 || (*data)[0].Media.ID != videoId
+		canAddPending := len(data) == 0 || data[0].Media.ID != videoId
 
 		// basically, we don't have the latest info from the trannscoder, but the file was definitely uploaded
 		// so we should append the info anyways...

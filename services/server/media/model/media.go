@@ -8,12 +8,12 @@ import (
 
 type Media struct {
 	repository.Model
-	UserID        string
-	JobID         string
-	Title         string
-	Description   string
-	Published     bool
-	PublishedDate time.Time
+	UserID        string    `json:"user_id" column:"user_id"`
+	JobID         string    `json:"job_id" column:"job_id"`
+	Title         string    `json:"title" column:"title"`
+	Description   string    `json:"description" column:"description"`
+	Published     bool      `json:"published" column:"published"`
+	PublishedDate time.Time `json:"published_date" column:"published_date"`
 }
 
 func (info *Media) CanPublish() (bool) {

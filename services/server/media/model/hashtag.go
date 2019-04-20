@@ -4,5 +4,5 @@ import "services/server/core/repository"
 
 type Hashtag struct {
 	repository.Model
-	Tag        string
+	Tag        string `json:"tag" column:"tag"`
 }

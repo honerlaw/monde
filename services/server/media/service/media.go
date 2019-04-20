@@ -43,12 +43,6 @@ func Update(req UpdateRequest) (error) {
 		data.Media.Published = false;
 	}
 
-	err = Save(data)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
 	var hashtags []model.Hashtag
 	regex, _ := regexp.Compile("^#\\w+")
 	tags := strings.Split(req.Hashtags, " ")
@@ -66,14 +60,13 @@ func Update(req UpdateRequest) (error) {
 			hashtags = append(hashtags, *hashtag)
 		}
 	}
+	data.Tags = hashtags
 
-
-	/*assoc := tx.Model(info).Association("Hashtags").Replace(hashtags)
-	if assoc.Error != nil {
+	err = Save(data)
+	if err != nil {
 		tx.Rollback()
-		log.Print(assoc.Error)
-		return errors.New("failed to update media")
-	}*/
+		return err
+	}
 
 	tx.Commit()
 

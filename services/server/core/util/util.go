@@ -10,8 +10,8 @@ import (
 )
 
 type SelectPage struct {
-	Page int
-	Count int
+	Page uint
+	Count uint
 }
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
@@ -26,15 +26,15 @@ func GetSelectPage(c *gin.Context) (*SelectPage) {
 	}
 
 	if page, ok := params["page"]; ok {
-		parsed, err := strconv.ParseInt(page[0], 10, 32)
+		parsed, err := strconv.ParseUint(page[0], 10, 32)
 		if err == nil {
-			selectPage.Page = int(parsed)
+			selectPage.Page = uint(parsed)
 		}
 	}
 	if count, ok := params["count"]; ok {
-		parsed, err := strconv.ParseInt(count[0], 10, 32)
+		parsed, err := strconv.ParseUint(count[0], 10, 32)
 		if err == nil {
-			selectPage.Count = int(parsed)
+			selectPage.Count = uint(parsed)
 		}
 	}
 

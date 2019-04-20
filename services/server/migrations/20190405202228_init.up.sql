@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `media` (
   `title` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `published` bool DEFAULT FALSE,
-  `published_data` timestamp NULL default NULL,
+  `published_date` timestamp NULL default NULL,
   PRIMARY KEY (`id`),
   KEY `idx_media_deleted_at` (`deleted_at`),
   KEY `media_user_id_user_id_foreign` (`user_id`),
@@ -54,15 +54,20 @@ CREATE TABLE IF NOT EXISTS `hashtag` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `tag` tinytext NOT NULL,
+  `tag` varchar(255) NOT NULL UNIQUE,
   PRIMARY KEY (`id`),
   KEY `idx_media_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `media_hashtag` (
+  `id` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `media_id` varchar(255) NOT NULL,
   `hashtag_id` varchar(255) NOT NULL,
   PRIMARY KEY (`media_id`, `hashtag_id`),
+  KEY `idx_media_hashtag_deleted_at` (`deleted_at`),
   KEY `media_hashtag_media_id_foreign` (`media_id`),
   KEY `media_hashtag_hashtag_id_foreign` (`hashtag_id`),
   CONSTRAINT `media_hashtag_media_id_foreign` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE,

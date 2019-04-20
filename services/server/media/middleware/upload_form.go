@@ -75,7 +75,7 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 			"key":                     userId + "/" + id.String(),
 			"success_action_redirect": redirect,
 			"x-amz-meta-user-id":      userId,
-			"x-amz-meta-id":           id.String(),
+			"x-amz-meta-video-id":     id.String(),
 			"policy":                  policyBase64,
 			"x-amz-algorithm":         algorithm,
 			"x-amz-credential":        credential,
