@@ -1,5 +1,39 @@
+@import "~bootstrap/scss/bootstrap";
+
 #media-view-page {
   video {
     width: 100%;
+  }
+
+  #comment-list {
+    .comment {
+      .comment-view {
+        padding: 10px;
+        .comment-view-header {
+          font-size: .85rem;
+          .username {
+            color: $blue;
+            margin-right: 10px;
+          }
+          .created {
+            color: $gray-500;
+          }
+        }
+        .comment-view-text {
+          padding: 5px 0;
+        }
+        .comment-view-footer {
+          font-size: .85rem;
+          color: $gray-600;
+        }
+      }
+      .comment-form {
+        display: none;
+      }
+      .comment-children {
+        border-left: 1px solid $gray-500;
+        margin-left: 10px;
+      }
+    }
   }
 }

@@ -32,7 +32,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/olebedev/gojax v0.0.0-20170318114811-bb153be84336
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tidwall/gjson v1.2.1 // indirect

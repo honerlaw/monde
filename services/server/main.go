@@ -35,7 +35,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(middleware.AuthIdentity())
-	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", false, router))
+	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", os.Getenv("REACT_POOL_TYPE") == "on_demand", router))
 	router.Use(mediaMW.UploadFormMiddleware())
 
 	router.Static("/css/", "./assets/css/")

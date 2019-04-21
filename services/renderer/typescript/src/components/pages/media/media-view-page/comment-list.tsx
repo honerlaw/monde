@@ -9,7 +9,7 @@ interface IProps {
 export class CommentList extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <div id={"comment-container"}>
+        return <div id={"comment-list"}>
             {this.props.comments.map((comment: ICommentResponse): JSX.Element => {
                 return <CommentItem comment={comment}/>
             })}

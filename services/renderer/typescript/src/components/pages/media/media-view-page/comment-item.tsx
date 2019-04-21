@@ -11,7 +11,16 @@ export class CommentItem extends React.Component<IProps, {}> {
     public render(): JSX.Element {
         return <div className={"comment"}>
             <div className={"comment-view"}>
-                {this.props.comment.comment}
+                <div className={"comment-view-header"}>
+                    <span className={"username"}>{this.props.comment.user_id}</span>
+                    <span className={"created"}>{this.props.comment.created_at}</span>
+                </div>
+                <div className={"comment-view-text"}>
+                    {this.props.comment.comment}
+                </div>
+                <div className={"comment-view-footer"}>
+                    <span>reply</span>
+                </div>
             </div>
             <CommentForm mediaId={this.props.comment.media_id} parentCommentId={this.props.comment.id}/>
             {this.renderChildren()}

@@ -33,6 +33,7 @@ func (repo *CommentRepository) GetByMediaID(mediaID string) ([]model.Comment, er
 	rows, err := squirrel.Select("*").
 		From("comment").
 		Where(squirrel.Eq{"media_id": mediaID}).
+		OrderBy("created_at DESC").
 		RunWith(repo.repo.DB()).
 		Query()
 

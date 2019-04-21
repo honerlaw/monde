@@ -5,6 +5,7 @@ import (
 	"services/server/media/model"
 	"strings"
 	"time"
+	"github.com/pkg/errors"
 )
 
 type CommentRequest struct {
@@ -39,6 +40,7 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 		return nil, err;
 	}
 
+	// @todo this does not keep order
 	resultMap := make(map[string]*CommentResponse)
 
 	for _, comment := range comments {
@@ -95,6 +97,10 @@ func (service *CommentService) Create(id string, userID string, req *CommentRequ
 		if parentComment != nil {
 			comment.ParentCommentID = parentComment.ID
 		}
+	}
+
+	if len(strings.TrimSpace(req.Comment)) == 0 {
+		return errors.New("comment can not be empty")
 	}
 
 	return service.Save(&comment)

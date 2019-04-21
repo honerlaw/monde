@@ -5,6 +5,7 @@ import {IMediaResponse} from "./media-list-page";
 import {Video} from "../../media/video";
 import {CommentList} from "./media-view-page/comment-list";
 import {CommentForm} from "./media-view-page/comment-form";
+import {AlertMessage} from "../../bootstrap/alert-message";
 
 export interface ICommentResponse {
     id: string;
@@ -25,6 +26,7 @@ export class MediaViewPage extends React.Component<IProps, {}> {
 
     public render(): JSX.Element | null {
         return <div id={"media-view-page"}>
+            <AlertMessage type={"danger"} message={this.props.error} />
             <div className={"row"}>
                 <div className={"col-sm-8 offset-sm-2"}>
                     <Video media={this.props.view}/>
