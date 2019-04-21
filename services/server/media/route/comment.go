@@ -38,7 +38,7 @@ func (route *CommentRoute) Post(c *gin.Context) {
 	}
 	auth := payload.(*middleware.AuthPayload)
 
-	err := route.commentService.Create(id, auth.ID, req)
+	err := route.commentService.Create(id, auth.ID, &req)
 	if err != nil {
 		c.Set("error", err.Error())
 	}

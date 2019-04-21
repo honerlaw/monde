@@ -12,7 +12,7 @@ export interface ICommentResponse {
     media_id: string;
     parent_comment_id: string;
     comment: string;
-    created_at: any;
+    created_at: string;
     children: ICommentResponse[];
 }
 

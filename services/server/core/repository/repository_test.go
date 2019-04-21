@@ -87,6 +87,23 @@ func TestInsert(t *testing.T) {
 	}
 }
 
+func TestFindByID(t *testing.T) {
+	temp := testModel{
+		TestField: "some_value",
+	}
+
+	err := GetRepository().Insert(&temp)
+	if err != nil {
+		t.Error(err)
+	}
+
+	var model testModel
+	found, err := GetRepository().FindByID(temp.ID, &model)
+	if !found || err != nil || len(model.ID) == 0 {
+		t.Error(found, err)
+	}
+}
+
 func TestUpdate(t *testing.T) {
 	temp := testModel{
 		TestField: "some_value",

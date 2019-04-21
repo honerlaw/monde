@@ -137,8 +137,9 @@ func (repo *Repository) Parse(model interface{}, rows *sql.Rows) ([]interface{})
 	return models;
 }
 
-func (repo *Repository) FindByID(id string, model interface{}) (bool, error) {
-	modelType := reflect.Indirect(reflect.ValueOf(model)).Type()
+func (repo *Repository) ExistsByID(id string, model interface{}) (bool, error) {
+	modelValue := reflect.Indirect(reflect.ValueOf(model))
+	modelType := modelValue.Type()
 	table := repo.Table(modelType)
 
 	rows, err := squirrel.Select("*").
@@ -154,8 +155,30 @@ func (repo *Repository) FindByID(id string, model interface{}) (bool, error) {
 
 	models := repo.Parse(model, rows)
 	if len(models) > 0 {
-		m := models[0]
-		model = m
+		return true, nil
+	}
+	return false, nil
+}
+
+func (repo *Repository) FindByID(id string, model interface{}) (bool, error) {
+	modelValue := reflect.Indirect(reflect.ValueOf(model))
+	modelType := modelValue.Type()
+	table := repo.Table(modelType)
+
+	rows, err := squirrel.Select("*").
+		From(table).
+		Where(squirrel.Eq{"id": id}).
+		RunWith(repo.db).
+		Query()
+
+	if err != nil {
+		log.Print(err)
+		return false, err
+	}
+
+	models := repo.Parse(model, rows)
+	if len(models) > 0 {
+		modelValue.Set(reflect.ValueOf(models[0]))
 		return true, nil
 	}
 	return false, nil
@@ -165,7 +188,7 @@ func (repo *Repository) Save(model interface{}) (error) {
 	modelValue := reflect.Indirect(reflect.ValueOf(model))
 	id := modelValue.FieldByName("ID").String()
 
-	found, err := repo.FindByID(id, model)
+	found, err := repo.ExistsByID(id, model)
 	if err != nil {
 		return err
 	}

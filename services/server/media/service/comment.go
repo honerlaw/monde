@@ -39,7 +39,7 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 		return nil, err;
 	}
 
-	resultMap := make(map[string]CommentResponse)
+	resultMap := make(map[string]*CommentResponse)
 
 	for _, comment := range comments {
 
@@ -54,14 +54,15 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 			resp.ParentCommentID = comment.ParentCommentID
 			resp.MediaID = comment.MediaID
 			resp.Comment = comment.Comment
+
+			resultMap[comment.ID] = &resp
 		}
 	}
 
-	// build the hierarchy
 	for _, pcom := range comments {
 		comment, _ := resultMap[pcom.ID]
 		if parentComment, ok := resultMap[pcom.ParentCommentID]; ok {
-			parentComment.Children = append(parentComment.Children, comment)
+			parentComment.Children = append(parentComment.Children, *comment)
 
 			// this comment, became a child, so remove it from the map entirely
 			// this basically leaves only the "roots" that don't have parents in the map
@@ -70,9 +71,9 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 	}
 
 	// convert the map to an array of values
-	roots := make([]CommentResponse, len(resultMap))
+	roots := make([]CommentResponse, 0)
 	for _, resp := range resultMap {
-		roots = append(roots, resp)
+		roots = append(roots, *resp)
 	}
 
 	return roots, nil
@@ -82,17 +83,17 @@ func (service *CommentService) GetByID(id string) (*model.Comment, error) {
 	return service.commentRepository.GetByID(id)
 }
 
-func (service *CommentService) Create(id string, userID string, req CommentRequest) (error) {
+func (service *CommentService) Create(id string, userID string, req *CommentRequest) (error) {
 	comment := model.Comment{
-		MediaID:         id,
-		UserID:          userID,
-		Comment:         req.Comment,
+		MediaID: id,
+		UserID:  userID,
+		Comment: req.Comment,
 	}
 
 	if len(strings.TrimSpace(req.ParentCommentID)) != 0 {
-		comment, _ := service.GetByID(strings.TrimSpace(req.ParentCommentID))
-		if comment != nil {
-			comment.ParentCommentID = comment.ID
+		parentComment, _ := service.GetByID(strings.TrimSpace(req.ParentCommentID))
+		if parentComment != nil {
+			comment.ParentCommentID = parentComment.ID
 		}
 	}
 
