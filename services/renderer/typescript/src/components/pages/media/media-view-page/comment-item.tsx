@@ -1,9 +1,10 @@
 import * as React from "react";
 import {ICommentResponse} from "../media-view-page";
 import {CommentForm} from "./comment-form";
+import {CheckboxButton} from "../../../common/checkbox-button";
 
 interface IProps {
-    comment: ICommentResponse
+    comment: ICommentResponse;
 }
 
 export class CommentItem extends React.Component<IProps, {}> {
@@ -19,10 +20,11 @@ export class CommentItem extends React.Component<IProps, {}> {
                     {this.props.comment.comment}
                 </div>
                 <div className={"comment-view-footer"}>
-                    <span>reply</span>
+                    <CheckboxButton id={this.props.comment.id} label={"reply"}>
+                        <CommentForm mediaId={this.props.comment.media_id} parentCommentId={this.props.comment.id} hidden={false}/>
+                    </CheckboxButton>
                 </div>
             </div>
-            <CommentForm mediaId={this.props.comment.media_id} parentCommentId={this.props.comment.id}/>
             {this.renderChildren()}
         </div>;
     }

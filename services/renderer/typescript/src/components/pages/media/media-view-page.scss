@@ -5,6 +5,12 @@
     width: 100%;
   }
 
+  .comment-form {
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+
   #comment-list {
     .comment {
       .comment-view {
@@ -26,9 +32,6 @@
           font-size: .85rem;
           color: $gray-600;
         }
-      }
-      .comment-form {
-        display: none;
       }
       .comment-children {
         border-left: 1px solid $gray-500;

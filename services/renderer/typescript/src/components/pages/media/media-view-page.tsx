@@ -30,7 +30,14 @@ export class MediaViewPage extends React.Component<IProps, {}> {
             <div className={"row"}>
                 <div className={"col-sm-8 offset-sm-2"}>
                     <Video media={this.props.view}/>
-                    <CommentForm mediaId={this.props.view.id}/>
+
+                    <div className={"metadata"}>
+                        <div>{this.props.view.title}</div>
+                        <div>{this.props.view.description}</div>
+                        <div>{this.props.view.hashtags.join(' ')}</div>
+                    </div>
+
+                    <CommentForm mediaId={this.props.view.id} hidden={false}/>
                     <CommentList comments={this.props.comments}/>
                 </div>
             </div>

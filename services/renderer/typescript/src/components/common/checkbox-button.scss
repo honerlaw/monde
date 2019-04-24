@@ -1,0 +1,14 @@
+.checkbox-button {
+  label {
+    cursor: pointer;
+  }
+  input[type="checkbox"] {
+    opacity: 0;
+  }
+  .content {
+    display: none;
+  }
+  input[type="checkbox"]:checked ~ .content {
+    display: block;
+  }
+}

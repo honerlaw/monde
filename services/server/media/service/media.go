@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"services/server/core/util"
+	"github.com/Masterminds/squirrel"
 )
 
 type UpdateRequest struct {
@@ -57,7 +58,9 @@ func NewMediaService(mediaRepository *repository.MediaRepository, hashtagReposit
 }
 
 func (service *MediaService) List(selectPage *util.SelectPage) ([]repository.MediaData, error) {
-	return service.mediaRepository.List(selectPage, nil)
+	return service.mediaRepository.List(selectPage, squirrel.Eq{
+		"published": true,
+	})
 }
 
 func (service *MediaService) GetByUserID(userID string, selectPage *util.SelectPage) ([]repository.MediaData, error) {

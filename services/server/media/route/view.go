@@ -37,6 +37,11 @@ func (route *ViewRoute) Get(c *gin.Context) {
 	}
 
 	if data != nil {
+		if !data.Media.Published {
+			util.Redirect(c, "/404");
+			return;
+		}
+
 		props["view"] = route.mediaService.ConvertSingleMediaInfo(*data, "", "", nil)
 	}
 

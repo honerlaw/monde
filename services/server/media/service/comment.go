@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 	"github.com/pkg/errors"
+	"sort"
 )
 
 type CommentRequest struct {
@@ -34,13 +35,13 @@ func NewCommentService(commentRepository *repository.CommentRepository) (*Commen
 }
 
 // @todo we need to fetch user info from the user id
+// @todo we should figure out how to paginate this... (may mean going entirely sql at some point)
 func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error) {
 	comments, err := service.commentRepository.GetByMediaID(id)
 	if err != nil {
 		return nil, err;
 	}
 
-	// @todo this does not keep order
 	resultMap := make(map[string]*CommentResponse)
 
 	for _, comment := range comments {
@@ -78,7 +79,23 @@ func (service *CommentService) GetByMediaID(id string) ([]CommentResponse, error
 		roots = append(roots, *resp)
 	}
 
-	return roots, nil
+	return service.sortComments(roots), nil
+}
+
+func (service *CommentService) sortComments(comments []CommentResponse) ([]CommentResponse) {
+	sort.Slice(comments, func(i int, j int) (bool) {
+		first := comments[i]
+		second := comments[j]
+		return first.CreatedAt.After(second.CreatedAt)
+	})
+
+	for i := 0; i < len(comments); i++ {
+		if len(comments[i].Children) > 0 {
+			service.sortComments(comments[i].Children)
+		}
+	}
+
+	return comments;
 }
 
 func (service *CommentService) GetByID(id string) (*model.Comment, error) {
