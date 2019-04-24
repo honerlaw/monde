@@ -1,4 +1,5 @@
 bin/
+transcoder-lambda
 transcoder-lambda.zip
 .terraform/
 .env

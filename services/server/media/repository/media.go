@@ -98,9 +98,9 @@ func (repo *MediaRepository) List(selectPage *util.SelectPage, where map[string]
 	return data, nil
 }
 
-func (repo *MediaRepository) GetByUserID(userId string, selectPage *util.SelectPage) ([]MediaData, error) {
+func (repo *MediaRepository) GetByChannelID(channelID string, selectPage *util.SelectPage) ([]MediaData, error) {
 	return repo.List(selectPage, squirrel.Eq{
-		"user_id": userId,
+		"channel_id": channelID,
 	})
 }
 

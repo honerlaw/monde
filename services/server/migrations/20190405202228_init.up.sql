@@ -11,12 +11,27 @@ CREATE TABLE IF NOT EXISTS `user` (
   KEY `idx_user_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `media` (
+CREATE TABLE IF NOT EXISTS `channel` (
   `id` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `user_id` varchar(255) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `idx_media_deleted_at` (`deleted_at`),
+  KEY `comment_user_id_foreign` (`user_id`),
+  CONSTRAINT `comment_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `media` (
+  `id` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `channel_id` varchar(255) DEFAULT NULL,
   `job_id` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
@@ -24,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `media` (
   `published_date` timestamp NULL default NULL,
   PRIMARY KEY (`id`),
   KEY `idx_media_deleted_at` (`deleted_at`),
-  KEY `media_user_id_user_id_foreign` (`user_id`),
-  CONSTRAINT `media_user_id_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+  KEY `media_channel_id_foreign` (`channel_id`),
+  CONSTRAINT `media_channel_id_foreign` FOREIGN KEY (`channel_id`) REFERENCES `channel` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `track` (

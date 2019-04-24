@@ -10,7 +10,15 @@ import (
 
 const cookieName = "jwt"
 
-func Logout(c *gin.Context) {
+type LogoutRoute struct {
+
+}
+
+func NewLogoutRoute() (*LogoutRoute) {
+	return &LogoutRoute{}
+}
+
+func (route *LogoutRoute) Get(c *gin.Context) {
 	cookie, err := c.Request.Cookie(cookieName)
 
 	if err != nil {

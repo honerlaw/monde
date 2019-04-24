@@ -22,7 +22,17 @@ type AuthPayload struct {
 var jwtAuthSync sync.Once
 var jwtAuth *jwt.GinJWTMiddleware
 
-func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
+func InitJWTAuth(userService *service.UserService) {
+	jwtAuthSync.Do(func() {
+		auth, err := jwt.New(createJwtMiddleware(userService))
+		if err != nil {
+			log.Fatal(err)
+		}
+		jwtAuth = auth
+	})
+}
+
+func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddleware) {
 	return &jwt.GinJWTMiddleware{
 		Realm:      os.Getenv("JWT_REALM"),
 		Key:        []byte(os.Getenv("JWT_SECRET_KEY")),
@@ -60,7 +70,7 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 				return nil, errors.New("all fields are requred")
 			}
 
-			verifiedUser, err := service.Verify(req)
+			verifiedUser, err := userService.Verify(req)
 			if err != nil {
 				return nil, err
 			}
@@ -99,12 +109,5 @@ func createJwtMiddleware() (*jwt.GinJWTMiddleware) {
 }
 
 func GetJWTAuth() (*jwt.GinJWTMiddleware) {
-	jwtAuthSync.Do(func() {
-		auth, err := jwt.New(createJwtMiddleware())
-		if err != nil {
-			log.Fatal(err)
-		}
-		jwtAuth = auth
-	})
 	return jwtAuth
 }

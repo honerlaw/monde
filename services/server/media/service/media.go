@@ -63,8 +63,8 @@ func (service *MediaService) List(selectPage *util.SelectPage) ([]repository.Med
 	})
 }
 
-func (service *MediaService) GetByUserID(userID string, selectPage *util.SelectPage) ([]repository.MediaData, error) {
-	return service.mediaRepository.GetByUserID(userID, selectPage)
+func (service *MediaService) GetByChannelID(channelID string, selectPage *util.SelectPage) ([]repository.MediaData, error) {
+	return service.mediaRepository.GetByChannelID(channelID, selectPage)
 }
 
 func (service *MediaService) GetByVideoID(videoID string) (*repository.MediaData, error) {
@@ -163,7 +163,7 @@ func (service *MediaService) ConvertSingleMediaInfo(data repository.MediaData, b
 		hashtags = append(hashtags, hashtag.Tag)
 	}
 
-	userId := data.Media.UserID
+	channelId := data.Media.ChannelID
 	videoId := data.Media.ID
 
 	videos := []MediaVideoResponse{}
@@ -177,13 +177,13 @@ func (service *MediaService) ConvertSingleMediaInfo(data repository.MediaData, b
 					Type:   "hls",
 					Width:  track.Width,
 					Height: track.Height,
-					Url:    fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, userId, videoId),
+					Url:    fmt.Sprintf("%s/%s/%s/playlist.m3u8", baseUrl, channelId, videoId),
 				},
 				{
 					Type:   "mp4",
 					Width:  track.Width,
 					Height: track.Height,
-					Url:    fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, userId, videoId),
+					Url:    fmt.Sprintf("%s/%s/%s/g-720p.mp4", baseUrl, channelId, videoId),
 				},
 			}...)
 		}
@@ -195,12 +195,12 @@ func (service *MediaService) ConvertSingleMediaInfo(data repository.MediaData, b
 		Description: data.Media.Description,
 		Hashtags:    hashtags,
 		Thumbnails: []string{
-			fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, userId, videoId),
-			fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, userId, videoId),
-			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, videoId),
-			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, userId, videoId),
-			fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, userId, videoId),
-			fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, userId, videoId),
+			fmt.Sprintf("%s/%s/%s/g-720p.mp4-00001.png", thumbBaseUrl, channelId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1-5m-00001.png", thumbBaseUrl, channelId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, channelId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-1m-00001.png", thumbBaseUrl, channelId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-400k-00001.png", thumbBaseUrl, channelId, videoId),
+			fmt.Sprintf("%s/%s/%s/hls-v-600k-00001.png", thumbBaseUrl, channelId, videoId),
 		},
 		Videos: videos,
 	}

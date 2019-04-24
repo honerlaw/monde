@@ -1,4 +1,4 @@
-package service
+package repository
 
 import (
 	"testing"
@@ -26,6 +26,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestFindUserByUsername(t *testing.T) {
+	repo := NewUserRepository(repository.GetRepository())
+
 	user := &model.User{
 		Username: "testing",
 		Hash: "test-hash",
@@ -36,7 +38,7 @@ func TestFindUserByUsername(t *testing.T) {
 		t.Error(err)
 	}
 
-	foundUser := FindUserByUsername("testing")
+	foundUser := repo.FindByUsername("testing")
 
 	if foundUser == nil {
 		t.Error("expected user not found")

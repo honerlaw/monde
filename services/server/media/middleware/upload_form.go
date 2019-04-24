@@ -10,9 +10,10 @@ import (
 	"github.com/satori/go.uuid"
 	"services/server/user/middleware"
 	"services/server/core/render"
+	"services/server/user/service"
 )
 
-func UploadFormMiddleware() (gin.HandlerFunc) {
+func UploadFormMiddleware(channelService *service.ChannelService) (gin.HandlerFunc) {
 	return func(c *gin.Context) {
 		c.Next()
 
@@ -21,15 +22,17 @@ func UploadFormMiddleware() (gin.HandlerFunc) {
 
 			meta, metaExists := c.Get("react-meta")
 			if meta != nil && metaExists {
-				meta.(render.ReactMeta).Props["uploadForm"] = getUploadFormProps(payload.(*middleware.AuthPayload))
+				meta.(render.ReactMeta).Props["uploadForm"] = getUploadFormProps(payload.(*middleware.AuthPayload), channelService)
 			}
 		}
 	}
 }
 
-func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
+func getUploadFormProps(payload *middleware.AuthPayload, channelService *service.ChannelService) (*gin.H) {
+	channel, _ := channelService.GetByUserID(payload.ID, nil)
+
 	id := uuid.NewV4()
-	userId := payload.ID
+	channelId := channel.ID
 	bucket := os.Getenv("AWS_UPLOAD_BUCKET")
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
@@ -39,8 +42,8 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 	currentTime := time.Now()
 	dateIso8601 := currentTime.Format("20060102T150405Z")
 	shortTime := currentTime.Format("20060102")
-	service := "s3"
-	credential := accessKey + "/" + shortTime + "/" + region + "/" + service + "/aws4_request"
+	serviceName := "s3"
+	credential := accessKey + "/" + shortTime + "/" + region + "/" + serviceName + "/aws4_request"
 	redirect := os.Getenv("UPLOAD_REDIRECT_DOMAIN") + "/media/list"
 
 	policy := []byte(`{
@@ -49,12 +52,12 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 			{"acl": "` + acl + `"},
 			{"bucket": "` + bucket + `"},
 			{"success_action_redirect": "` + redirect + `"},
-			{"x-amz-meta-user-id": "` + userId + `"},
+			{"x-amz-meta-channel-id": "` + channelId + `"},
 			{"x-amz-meta-video-id": "` + id.String() + `"},
 			{"x-amz-algorithm": "` + algorithm + `"},
 			{"x-amz-credential": "` + credential + `"},
 			{"x-amz-date": "` + dateIso8601 + `"},
-			["starts-with", "$key", "` + userId + `/"]
+			["starts-with", "$key", "` + channelId + `/"]
 		]
 	}`)
 
@@ -63,7 +66,7 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 	// generate the signature
 	dateKey := util.MakeHmac([]byte("AWS4"+secretKey), []byte(shortTime))
 	regionKey := util.MakeHmac(dateKey, []byte(region))
-	serviceKey := util.MakeHmac(regionKey, []byte(service))
+	serviceKey := util.MakeHmac(regionKey, []byte(serviceName))
 	credentialKey := util.MakeHmac(serviceKey, []byte("aws4_request"))
 	signatureHmac := util.MakeHmac(credentialKey, []byte(policyBase64))
 	signature := hex.EncodeToString(signatureHmac)
@@ -72,9 +75,9 @@ func getUploadFormProps(payload *middleware.AuthPayload) (*gin.H) {
 		"uploadBucketUrl": "http://" + os.Getenv("AWS_UPLOAD_BUCKET") + ".s3.amazonaws.com/",
 		"uploadParams": gin.H{
 			"acl":                     acl,
-			"key":                     userId + "/" + id.String(),
+			"key":                     channelId + "/" + id.String(),
 			"success_action_redirect": redirect,
-			"x-amz-meta-user-id":      userId,
+			"x-amz-meta-channel-id":   channelId,
 			"x-amz-meta-video-id":     id.String(),
 			"policy":                  policyBase64,
 			"x-amz-algorithm":         algorithm,

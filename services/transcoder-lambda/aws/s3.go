@@ -10,7 +10,7 @@ import (
 type S3RecordMetadata struct {
 	Bucket string
 	Key    string
-	UserID string
+	ChannelID string
 	ID     string
 }
 
@@ -23,7 +23,7 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 		return nil, err
 	}
 
-	rawUserID, foundUserId := head.Metadata["User-Id"];
+	rawChannelID, foundUserId := head.Metadata["Channel-Id"];
 	rawID, foundVideoId := head.Metadata["Video-Id"];
 	if !foundUserId || !foundVideoId {
 		return nil, errors.New("could not find required data in s3 user metadata")
@@ -32,7 +32,7 @@ func GetS3RecordMetadata(bucket string, key string) (*S3RecordMetadata, error) {
 	return &S3RecordMetadata{
 		Bucket: bucket,
 		Key:    key,
-		UserID: *rawUserID,
+		ChannelID: *rawChannelID,
 		ID:     *rawID,
 	}, nil
 }

@@ -10,15 +10,18 @@ import (
 	"services/server/core/service/aws"
 	"services/server/media/repository"
 	"strings"
+	service2 "services/server/user/service"
 )
 
 type ListRoute struct {
-	mediaService *service.MediaService
+	mediaService   *service.MediaService
+	channelService *service2.ChannelService
 }
 
-func NewListRoute(mediaService *service.MediaService) (*ListRoute) {
+func NewListRoute(mediaService *service.MediaService, channelService *service2.ChannelService) (*ListRoute) {
 	return &ListRoute{
-		mediaService: mediaService,
+		mediaService:   mediaService,
+		channelService: channelService,
 	}
 }
 
@@ -32,8 +35,15 @@ func (route *ListRoute) Get(c *gin.Context) {
 
 	uploads := []service.MediaResponse{}
 
+	// get the given channel for the user so we know what media to load
+	channel, err := route.channelService.GetByUserID(payload.(*middleware.AuthPayload).ID, nil)
+	if err != nil {
+		render.RenderPage(c, http.StatusInternalServerError, nil)
+		return
+	}
+
 	// fetch requested media info for given page
-	data, err := route.mediaService.GetByUserID(payload.(*middleware.AuthPayload).ID, util.GetSelectPage(c))
+	data, err := route.mediaService.GetByChannelID(channel.ID, util.GetSelectPage(c))
 	if err != nil {
 		render.RenderPage(c, http.StatusInternalServerError, nil)
 		return
@@ -58,7 +68,6 @@ func (route *ListRoute) Get(c *gin.Context) {
 
 	render.RenderPage(c, http.StatusOK, props)
 }
-
 
 func (route *ListRoute) getPendingUploadIfNeeded(c *gin.Context, data []repository.MediaData) (*service.MediaResponse) {
 	params := c.Request.URL.Query()

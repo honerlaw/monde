@@ -1,13 +1,23 @@
-package service
+package repository
 
 import (
 	"services/server/core/repository"
-	"log"
-	"github.com/Masterminds/squirrel"
 	"services/server/user/model"
+	"github.com/Masterminds/squirrel"
+	"log"
 )
 
-func FindUserByUsername(username string) (*model.User) {
+type UserRepository struct {
+	repo *repository.Repository
+}
+
+func NewUserRepository(repo *repository.Repository) (*UserRepository) {
+	return &UserRepository{
+		repo: repo,
+	}
+}
+
+func (repo *UserRepository) FindByUsername(username string) (*model.User) {
 	rows, err := squirrel.
 		Select("*").
 		From("user").
@@ -28,4 +38,8 @@ func FindUserByUsername(username string) (*model.User) {
 	user = users[0].(model.User)
 
 	return &user
+}
+
+func (repo *UserRepository) Save(user *model.User) (error) {
+	return repo.repo.Save(user)
 }

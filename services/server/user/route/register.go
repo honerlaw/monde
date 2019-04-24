@@ -9,7 +9,17 @@ import (
 	"services/server/core/util"
 )
 
-func Register(c *gin.Context) {
+type RegisterRoute struct {
+	userService *service.UserService
+}
+
+func NewRegisterRoute(userService *service.UserService) (*RegisterRoute) {
+	return &RegisterRoute{
+		userService: userService,
+	}
+}
+
+func (route *RegisterRoute) Get(c *gin.Context) {
 	payload := c.MustGet("JWT_AUTH_PAYLOAD")
 
 	if payload != nil {
@@ -20,23 +30,23 @@ func Register(c *gin.Context) {
 	render.RenderPage(c, http.StatusOK, nil)
 }
 
-func RegisterPost(c *gin.Context) {
+func (route *RegisterRoute) Post(c *gin.Context) {
 	var req service.CreateRequest
 
 	if err := c.ShouldBind(&req); err != nil {
 		render.RenderPage(c, http.StatusBadRequest, gin.H{
 			"usernname": req.Username,
-			"error": "all fields are required",
+			"error":     "all fields are required",
 		})
 		return
 	}
 
-	_, err := service.Create(req)
+	_, err := route.userService.Create(req)
 
 	if err != nil {
 		render.RenderPage(c, http.StatusBadRequest, gin.H{
 			"usernname": req.Username,
-			"error": err.Error(),
+			"error":     err.Error(),
 		})
 		return
 	}

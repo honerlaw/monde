@@ -32,11 +32,19 @@ func main() {
 
 	defer repository.GetRepository().Migrate().DB().Close()
 
+	// initialize each module
+	userModule := user.Init()
+	mediaModule := media.Init(userModule.ChannelService)
+
+	// initialize the jwt auth middleware
+	middleware.InitJWTAuth(userModule.UserService)
+
+	// start setting up routes
 	router := gin.Default()
 
 	router.Use(middleware.AuthIdentity())
 	router.Use(renderMW.ReactRenderMiddleware("./assets/js/bundle.js", os.Getenv("REACT_POOL_TYPE") == "on_demand", router))
-	router.Use(mediaMW.UploadFormMiddleware())
+	router.Use(mediaMW.UploadFormMiddleware(userModule.ChannelService))
 
 	router.Static("/css/", "./assets/css/")
 	router.Static("/js/", "./assets/js/")
@@ -44,9 +52,10 @@ func main() {
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	router.NoRoute(render.RenderNoRoute)
 
-	user.RegisterRoutes(router)
+	// register the module specific routes last
+	userModule.RegisterRoutes(router)
 	core.RegisterRoutes(router)
-	media.RegisterRoutes(router)
+	mediaModule.RegisterRoutes(router)
 
 	router.Run("0.0.0.0:" + os.Getenv("PORT"))
 }

@@ -3,13 +3,24 @@ package media
 import (
 	"github.com/gin-gonic/gin"
 	"services/server/media/route"
-	"services/server/media/repository"
-	repository2 "services/server/core/repository"
-	"services/server/media/service"
 	"services/server/user/middleware"
+	"services/server/media/repository"
+	"services/server/media/service"
+	repository2 "services/server/core/repository"
+	service2 "services/server/user/service"
 )
 
-func RegisterRoutes(router *gin.Engine) {
+type MediaModule struct {
+	channelService *service2.ChannelService
+
+	mediaRepository   *repository.MediaRepository
+	hashtagRepository *repository.HashtagRepository
+	commentRepository *repository.CommentRepository
+	MediaService      *service.MediaService
+	CommentService    *service.CommentService
+}
+
+func Init(channelService *service2.ChannelService) (*MediaModule) {
 	// repositories
 	mediaRepository := repository.NewMediaRepository(repository2.GetRepository())
 	hashtagRepository := repository.NewHashtagRepository(repository2.GetRepository())
@@ -19,13 +30,28 @@ func RegisterRoutes(router *gin.Engine) {
 	mediaService := service.NewMediaService(mediaRepository, hashtagRepository)
 	commentService := service.NewCommentService(commentRepository)
 
-	// routes
-	homeRoute := route.NewHomeRoute(mediaService)
-	updateRoute := route.NewUpdateRoute(mediaService)
-	publishRoute := route.NewPublishRoute(mediaService)
-	viewRoute := route.NewViewRoute(mediaService, commentService)
-	listRoute := route.NewListRoute(mediaService)
-	commentRoute := route.NewCommentRoute(commentService)
+	return &MediaModule{
+		// external services
+		channelService: channelService,
+
+		// repositories
+		mediaRepository:   mediaRepository,
+		hashtagRepository: hashtagRepository,
+		commentRepository: commentRepository,
+
+		// services
+		MediaService:   mediaService,
+		CommentService: commentService,
+	}
+}
+
+func (module *MediaModule) RegisterRoutes(router *gin.Engine) {
+	homeRoute := route.NewHomeRoute(module.MediaService)
+	updateRoute := route.NewUpdateRoute(module.MediaService)
+	publishRoute := route.NewPublishRoute(module.MediaService)
+	viewRoute := route.NewViewRoute(module.MediaService, module.CommentService)
+	listRoute := route.NewListRoute(module.MediaService, module.channelService)
+	commentRoute := route.NewCommentRoute(module.CommentService)
 
 	media := router.Group("/media")
 	media.Use(middleware.Authorize())

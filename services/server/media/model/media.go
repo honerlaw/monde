@@ -8,7 +8,7 @@ import (
 
 type Media struct {
 	repository.Model
-	UserID        string    `json:"user_id" column:"user_id"`
+	ChannelID     string    `json:"channel_id" column:"channel_id"`
 	JobID         string    `json:"job_id" column:"job_id"`
 	Title         string    `json:"title" column:"title"`
 	Description   string    `json:"description" column:"description"`

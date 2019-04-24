@@ -99,7 +99,7 @@ func Insert(metadata *aws.S3RecordMetadata, mediainfo *model.MediaInfo, job *ela
 	}
 
 	media := &mediaModel.Media{
-		UserID: metadata.UserID,
+		ChannelID: metadata.ChannelID,
 		JobID:  *job.Id,
 	}
 	media.ID = metadata.ID
