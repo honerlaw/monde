@@ -18,12 +18,11 @@ CREATE TABLE IF NOT EXISTS `channel` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   `user_id` varchar(255) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL UNIQUE,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `slug` (`slug`),
   KEY `idx_media_deleted_at` (`deleted_at`),
-  KEY `comment_user_id_foreign` (`user_id`),
-  CONSTRAINT `comment_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+  KEY `channel_user_id_foreign` (`user_id`),
+  CONSTRAINT `channel_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `media` (

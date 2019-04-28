@@ -20,6 +20,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/gosimple/slug v1.5.0
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
@@ -33,6 +34,7 @@ require (
 	github.com/olebedev/gojax v0.0.0-20170318114811-bb153be84336
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tidwall/gjson v1.2.1 // indirect

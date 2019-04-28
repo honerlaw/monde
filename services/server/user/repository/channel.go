@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
+	"reflect"
 )
 
 type ChannelRepository struct {
@@ -18,9 +19,13 @@ func NewChannelRepository(repo *repository.Repository) (*ChannelRepository) {
 	}
 }
 
+func (repo *ChannelRepository) tableName() (string) {
+	return repo.repo.Table(reflect.TypeOf(&model.Channel{}))
+}
+
 func (repo *ChannelRepository) GetNewest(userID string) (*model.Channel, error) {
 	rows, err := squirrel.Select("*").
-		From("channel").
+		From(repo.tableName()).
 		Where(squirrel.Eq{"user_id": userID}).
 		OrderBy("created_at DESC").
 		Limit(1).
@@ -40,6 +45,27 @@ func (repo *ChannelRepository) GetNewest(userID string) (*model.Channel, error) 
 
 	channel := parsed[0].(model.Channel)
 
+	return &channel, nil
+}
+
+func (repo *ChannelRepository) GetBySlug(slug string) (*model.Channel, error) {
+	rows, err := squirrel.Select("*").
+		From(repo.tableName()).
+		Where(squirrel.Eq{"slug": slug}).
+		RunWith(repo.repo.DB()).
+		Query()
+
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+
+	parsed := repo.repo.Parse(&model.Channel{}, rows)
+	if len(parsed) != 1 {
+		return nil, nil
+	}
+
+	channel := parsed[0].(model.Channel)
 	return &channel, nil
 }
 
