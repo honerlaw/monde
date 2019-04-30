@@ -14,6 +14,7 @@ import (
 	renderMW "services/server/core/render/middleware"
 	"services/server/core/render"
 	"services/server/user/middleware"
+	"services/server/payment"
 )
 
 func main() {
@@ -34,7 +35,9 @@ func main() {
 
 	// initialize each module
 	userModule := user.Init()
+	coreModule := core.Init()
 	mediaModule := media.Init(userModule.ChannelService)
+	paymentModule := payment.Init()
 
 	// initialize the jwt auth middleware
 	middleware.InitJWTAuth(userModule.UserService)
@@ -54,8 +57,9 @@ func main() {
 
 	// register the module specific routes last
 	userModule.RegisterRoutes(router)
-	core.RegisterRoutes(router)
+	coreModule.RegisterRoutes(router)
 	mediaModule.RegisterRoutes(router)
+	paymentModule.RegisterRoutes(router)
 
 	router.Run("0.0.0.0:" + os.Getenv("PORT"))
 }
