@@ -4,6 +4,12 @@ deploy: deploy-core deploy-lambda deploy-server
 
 destroy: destroy-server destroy-lambda destroy-core
 
+deploy-dns:
+	cd terraform/src/dns/; terraform init; terraform apply -auto-approve -var-file=../../env/dns/example.tfvars
+
+destroy-dns:
+	cd terraform/src/dns/; terraform init; terraform destroy -auto-approve -var-file=../../env/dns/example.tfvars
+
 deploy-core:
 	cd terraform/src/core/; terraform init; terraform apply -auto-approve -var-file=../../env/core/example.tfvars
 

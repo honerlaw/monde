@@ -1,6 +1,8 @@
 src/core/.terraform
+src/dns/.terraform
 src/server/.terraform
 src/transcoder/.terraform
 env/core/prod.tfvars
+env/dns/prod.tfvars
 env/server/prod.tfvars
 env/transcoder/prod.tfvars
