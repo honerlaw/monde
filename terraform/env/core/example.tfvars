@@ -1,3 +1,5 @@
 region = "us-east-1"
 dbuser = "testuser"
 dbpass = "testpass"
+domain_zone = "vueon.co"
+email_domain = "mail.vueon.co"
