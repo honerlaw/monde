@@ -21,6 +21,7 @@ module "core_route53" {
 
 module "core_ses" {
   source = "./ses"
+  region = "${var.region}"
   zone_id = "${module.core_route53.route53_zone_id}"
   domain = "${var.email_domain}"
 }

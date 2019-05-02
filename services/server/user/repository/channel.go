@@ -20,7 +20,9 @@ func NewChannelRepository(repo *repository.Repository) (*ChannelRepository) {
 }
 
 func (repo *ChannelRepository) tableName() (string) {
-	return repo.repo.Table(reflect.TypeOf(&model.Channel{}))
+	modelValue := reflect.Indirect(reflect.ValueOf(&model.Channel{}))
+	modelType := modelValue.Type()
+	return repo.repo.Table(modelType)
 }
 
 func (repo *ChannelRepository) GetNewest(userID string) (*model.Channel, error) {

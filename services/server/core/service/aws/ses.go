@@ -44,8 +44,13 @@ func (service *SESService) SendEmail(to string, subject string, message string) 
 					Charset: aws.String("UTF-8"),
 					Data: aws.String(message),
 				},
+				Text: &ses.Content{
+					Charset: aws.String("UTF-8"),
+					Data: aws.String(message),
+				},
 			},
 		},
+		ReturnPath: aws.String(os.Getenv("EMAIL")),
 	})
 
 	if err != nil {

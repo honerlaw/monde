@@ -54,7 +54,7 @@ func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
 }
 
 func (service *UserService) Create(req CreateRequest) (*model.User, error) {
-	if service.emailRegex.MatchString(req.Email) {
+	if !service.emailRegex.MatchString(req.Email) {
 		return nil, errors.New("invalid email address")
 	}
 
