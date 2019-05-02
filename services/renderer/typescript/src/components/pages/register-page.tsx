@@ -5,7 +5,7 @@ import {IGlobalProps} from "../../global-props";
 import "./register-page.scss";
 
 interface IProps extends IGlobalProps {
-    username?: string;
+    email?: string;
 }
 
 export class RegisterPage extends React.Component<IProps, {}> {
@@ -17,7 +17,7 @@ export class RegisterPage extends React.Component<IProps, {}> {
                     <h1 className={"text-center"}>register</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
                     <form method={"POST"} action={"/user/register"}>
-                        <InputGroup name={"username"} type={"text"} value={this.props.username} placeholder={"username"}/>
+                        <InputGroup name={"email"} type={"text"} value={this.props.email} placeholder={"email"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
                         <InputGroup name={"verify_password"} type={"password"} placeholder={"verify password"}/>
                         <button className="btn btn-primary btn-block" type="submit">register</button>

@@ -3,12 +3,14 @@ CREATE TABLE IF NOT EXISTS `user` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `hash` varchar(255) NOT NULL,
+  `verified_email` bool DEFAULT FALSE,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`),
   KEY `idx_user_deleted_at` (`deleted_at`),
-  KEY `idx_user_username` (`username`)
+  KEY `idx_user_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `channel` (

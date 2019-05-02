@@ -25,11 +25,11 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestFindUserByUsername(t *testing.T) {
+func TestFindUserByEmail(t *testing.T) {
 	repo := NewUserRepository(repository.GetRepository())
 
 	user := &model.User{
-		Username: "testing",
+		Email: "testing",
 		Hash: "test-hash",
 	}
 
@@ -38,7 +38,7 @@ func TestFindUserByUsername(t *testing.T) {
 		t.Error(err)
 	}
 
-	foundUser := repo.FindByUsername("testing")
+	foundUser := repo.FindByEmail("testing")
 
 	if foundUser == nil {
 		t.Error("expected user not found")

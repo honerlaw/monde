@@ -34,10 +34,10 @@ func InitJWTAuth(userService *service.UserService) {
 
 func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddleware) {
 	return &jwt.GinJWTMiddleware{
-		Realm:      os.Getenv("JWT_REALM"),
-		Key:        []byte(os.Getenv("JWT_SECRET_KEY")),
-		Timeout:    time.Hour,
-		MaxRefresh: time.Hour,
+		Realm:       os.Getenv("JWT_REALM"),
+		Key:         []byte(os.Getenv("JWT_SECRET_KEY")),
+		Timeout:     time.Hour,
+		MaxRefresh:  time.Hour,
 		IdentityKey: "id",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*AuthPayload); ok {
@@ -59,7 +59,7 @@ func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddlewar
 			}
 
 			return &AuthPayload{
-				ID: claims["id"].(string),
+				ID:    claims["id"].(string),
 				Roles: stringRoles,
 			}
 		},
@@ -87,8 +87,8 @@ func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddlewar
 			var req service.VerifyRequest
 			c.ShouldBind(&req);
 			render.RenderPage(c, http.StatusUnauthorized, gin.H{
-				"username": req.Username,
-				"error":    message,
+				"email": req.Email,
+				"error": message,
 			})
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {

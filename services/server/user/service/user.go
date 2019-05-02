@@ -7,10 +7,13 @@ import (
 	"services/server/user/repository"
 	repository2 "services/server/core/repository"
 	"github.com/labstack/gommon/log"
+	"regexp"
+	"strings"
+	"services/server/core/service/aws"
 )
 
 type VerifyRequest struct {
-	Username string `form:"username" binding:"required"`
+	Email    string `form:"email" binding:"required"`
 	Password string `form:"password" binding:"required"`
 }
 
@@ -22,33 +25,37 @@ type CreateRequest struct {
 type UserService struct {
 	channelService *ChannelService
 	userRepository *repository.UserRepository
+	emailRegex     *regexp.Regexp
 }
 
 func NewUserService(channelService *ChannelService, userRepository *repository.UserRepository) (*UserService) {
+	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
 	return &UserService{
 		channelService: channelService,
 		userRepository: userRepository,
+		emailRegex: emailRegex,
 	}
 }
 
 func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
-	user := service.userRepository.FindByUsername(req.Username)
+	user := service.userRepository.FindByEmail(req.Email)
 
 	if user == nil {
-		return nil, errors.New("invalid username or password")
+		return nil, errors.New("invalid email or password")
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Hash), []byte(req.Password))
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, errors.New("invalid email or password")
 	}
 
 	return user, nil
 }
 
 func (service *UserService) Create(req CreateRequest) (*model.User, error) {
-	if len(req.Username) < 6 {
-		return nil, errors.New("username must be at least 6 characters in length")
+	if service.emailRegex.MatchString(req.Email) {
+		return nil, errors.New("invalid email address")
 	}
 
 	if len(req.Password) < 6 {
@@ -59,17 +66,18 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 		return nil, errors.New("passwords do not match")
 	}
 
-	user := service.userRepository.FindByUsername(req.Username)
+	user := service.userRepository.FindByEmail(req.Email)
 	if user != nil {
 		return nil, errors.New("user already exists")
 	}
 
+	// generic error to use for several scenarios
+	genericError := errors.New("something went wrong. please try again")
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.MinCost)
 	if err != nil {
-		return nil, errors.New("something went wrong. please try again")
+		return nil, genericError
 	}
-
-	genericError := errors.New("something went wrong. please try again")
 
 	tx, err := repository2.GetRepository().DB().Begin()
 	if err != nil {
@@ -77,9 +85,13 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 		return nil, genericError
 	}
 
+	// usernname is the first portion before the @sign
+	username := strings.Split(req.Email, "@")[0]
+
 	user = &model.User{
-		Username: req.Username,
-		Hash:     string(hash),
+		Email: req.Email,
+		Username: username,
+		Hash:  string(hash),
 	}
 
 	err = service.userRepository.Save(user)
@@ -89,6 +101,12 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 	}
 
 	_, err = service.channelService.Create(user.ID, user.Username)
+	if err != nil {
+		tx.Rollback()
+		return nil, genericError
+	}
+
+	err = aws.GetSESService().SendEmail(req.Email, "Testing", "Testing!")
 	if err != nil {
 		tx.Rollback()
 		return nil, genericError

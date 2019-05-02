@@ -17,11 +17,11 @@ func NewUserRepository(repo *repository.Repository) (*UserRepository) {
 	}
 }
 
-func (repo *UserRepository) FindByUsername(username string) (*model.User) {
+func (repo *UserRepository) FindByEmail(email string) (*model.User) {
 	rows, err := squirrel.
 		Select("*").
 		From("user").
-		Where(squirrel.Eq{"username": username}).
+		Where(squirrel.Eq{"email": email}).
 		RunWith(repository.GetRepository().DB()).
 		Query()
 

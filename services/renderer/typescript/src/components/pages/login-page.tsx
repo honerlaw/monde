@@ -5,7 +5,7 @@ import {IGlobalProps} from "../../global-props";
 import "./login-page.scss";
 
 interface IProps extends IGlobalProps {
-    username?: string;
+    email?: string;
 }
 
 export class LoginPage extends React.Component<IProps, {}> {
@@ -17,7 +17,7 @@ export class LoginPage extends React.Component<IProps, {}> {
                     <h1 className={"text-center"}>login</h1>
                     <AlertMessage type={"danger"} message={this.props.error} />
                     <form method={"POST"} action={"/user/login"}>
-                        <InputGroup name={"username"} type={"text"} value={this.props.username} placeholder={"username"}/>
+                        <InputGroup name={"email"} type={"text"} value={this.props.email} placeholder={"email"}/>
                         <InputGroup name={"password"} type={"password"} placeholder={"password"}/>
                         <button className="btn btn-primary btn-block" type="submit">login</button>
                     </form>

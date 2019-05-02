@@ -35,8 +35,8 @@ func (route *RegisterRoute) Post(c *gin.Context) {
 
 	if err := c.ShouldBind(&req); err != nil {
 		render.RenderPage(c, http.StatusBadRequest, gin.H{
-			"usernname": req.Username,
-			"error":     "all fields are required",
+			"email": req.Email,
+			"error": "all fields are required",
 		})
 		return
 	}
@@ -45,8 +45,8 @@ func (route *RegisterRoute) Post(c *gin.Context) {
 
 	if err != nil {
 		render.RenderPage(c, http.StatusBadRequest, gin.H{
-			"usernname": req.Username,
-			"error":     err.Error(),
+			"email": req.Email,
+			"error": err.Error(),
 		})
 		return
 	}
