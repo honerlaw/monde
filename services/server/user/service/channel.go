@@ -35,6 +35,10 @@ func (service *ChannelService) GetByID(channelID string) (*model.Channel, error)
 func (service *ChannelService) Create(userID string, title string) (*model.Channel, error) {
 	s := slug.Make(title)
 
+	if len(s) <= 0 {
+		return nil, errors.New("invalid channel title slug")
+	}
+
 	// @todo we should attempt to generate a slug multiple times if we need to
 	found, err := service.GetBySlug(s)
 	if err != nil {

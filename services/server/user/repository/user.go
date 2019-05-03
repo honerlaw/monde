@@ -3,8 +3,6 @@ package repository
 import (
 	"services/server/core/repository"
 	"services/server/user/model"
-	"github.com/Masterminds/squirrel"
-	"log"
 )
 
 type UserRepository struct {
@@ -17,27 +15,13 @@ func NewUserRepository(repo *repository.Repository) (*UserRepository) {
 	}
 }
 
-func (repo *UserRepository) FindByEmail(email string) (*model.User) {
-	rows, err := squirrel.
-		Select("*").
-		From("user").
-		Where(squirrel.Eq{"email": email}).
-		RunWith(repository.GetRepository().DB()).
-		Query()
-
-	if err != nil {
-		log.Print(err)
+func (repo *UserRepository) FindByID(id string) (*model.User) {
+	user := &model.User{}
+	found, err := repo.repo.FindByID(id, user)
+	if !found || err != nil {
 		return nil
 	}
-
-	var user model.User
-	users := repository.GetRepository().Parse(&user, rows)
-	if len(users) == 0 {
-		return nil
-	}
-	user = users[0].(model.User)
-
-	return &user
+	return user;
 }
 
 func (repo *UserRepository) Save(user *model.User) (error) {

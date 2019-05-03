@@ -7,9 +7,7 @@ import (
 	"services/server/user/repository"
 	repository2 "services/server/core/repository"
 	"github.com/labstack/gommon/log"
-	"regexp"
 	"strings"
-	"services/server/core/service/aws"
 )
 
 type VerifyRequest struct {
@@ -23,24 +21,36 @@ type CreateRequest struct {
 }
 
 type UserService struct {
+	contactService *ContactService
 	channelService *ChannelService
 	userRepository *repository.UserRepository
-	emailRegex     *regexp.Regexp
 }
 
-func NewUserService(channelService *ChannelService, userRepository *repository.UserRepository) (*UserService) {
-	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-
+func NewUserService(contactService *ContactService, channelService *ChannelService, userRepository *repository.UserRepository) (*UserService) {
 	return &UserService{
+		contactService: contactService,
 		channelService: channelService,
 		userRepository: userRepository,
-		emailRegex: emailRegex,
 	}
 }
 
-func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
-	user := service.userRepository.FindByEmail(req.Email)
+func (service *UserService) FindUserByEmail(email string) (*model.User) {
+	contact, err := service.contactService.FindByEmail(email)
 
+	if contact == nil || err != nil {
+		return nil
+	}
+
+	user := service.userRepository.FindByID(contact.UserID)
+	if user == nil {
+		return nil
+	}
+
+	return user
+}
+
+func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
+	user := service.FindUserByEmail(req.Email)
 	if user == nil {
 		return nil, errors.New("invalid email or password")
 	}
@@ -54,7 +64,7 @@ func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
 }
 
 func (service *UserService) Create(req CreateRequest) (*model.User, error) {
-	if !service.emailRegex.MatchString(req.Email) {
+	if !service.contactService.IsPotentiallyValidContact(req.Email, "email") {
 		return nil, errors.New("invalid email address")
 	}
 
@@ -66,7 +76,7 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 		return nil, errors.New("passwords do not match")
 	}
 
-	user := service.userRepository.FindByEmail(req.Email)
+	user := service.FindUserByEmail(req.Email)
 	if user != nil {
 		return nil, errors.New("user already exists")
 	}
@@ -85,13 +95,8 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 		return nil, genericError
 	}
 
-	// usernname is the first portion before the @sign
-	username := strings.Split(req.Email, "@")[0]
-
 	user = &model.User{
-		Email: req.Email,
-		Username: username,
-		Hash:  string(hash),
+		Hash:     string(hash),
 	}
 
 	err = service.userRepository.Save(user)
@@ -100,13 +105,15 @@ func (service *UserService) Create(req CreateRequest) (*model.User, error) {
 		return nil, genericError
 	}
 
-	_, err = service.channelService.Create(user.ID, user.Username)
+	// the default channel will just be the portion of the email before the @ sign
+	title := strings.Split(req.Email, "@")[0]
+	_, err = service.channelService.Create(user.ID, title)
 	if err != nil {
 		tx.Rollback()
 		return nil, genericError
 	}
 
-	err = aws.GetSESService().SendEmail(req.Email, "Testing", "Testing!")
+	_, err = service.contactService.Create(user.ID, req.Email, "email")
 	if err != nil {
 		tx.Rollback()
 		return nil, genericError

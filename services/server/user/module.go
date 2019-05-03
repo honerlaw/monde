@@ -9,21 +9,27 @@ import (
 )
 
 type UserModule struct {
+	ContactRepository *repository.ContactRepository
 	channelRepository *repository.ChannelRepository
 	userRepository    *repository.UserRepository
+	ContactService    *service.ContactService
 	ChannelService    *service.ChannelService
 	UserService       *service.UserService
 }
 
 func Init() (*UserModule) {
+	contactRepository := repository.NewContactRepository(repository2.GetRepository())
 	channelRepository := repository.NewChannelRepository(repository2.GetRepository())
 	userRepository := repository.NewUserRepository(repository2.GetRepository())
+	contactService := service.NewContactService(contactRepository)
 	channelService := service.NewChannelService(channelRepository)
-	userService := service.NewUserService(channelService, userRepository)
+	userService := service.NewUserService(contactService, channelService, userRepository)
 
 	return &UserModule{
+		ContactRepository: contactRepository,
 		channelRepository: channelRepository,
 		userRepository:    userRepository,
+		ContactService:    contactService,
 		ChannelService:    channelService,
 		UserService:       userService,
 	}

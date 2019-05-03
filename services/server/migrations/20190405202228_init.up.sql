@@ -3,14 +3,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
   `hash` varchar(255) NOT NULL,
-  `verified_email` bool DEFAULT FALSE,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  KEY `idx_user_deleted_at` (`deleted_at`),
-  KEY `idx_user_email` (`email`)
+  KEY `idx_user_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `channel` (
@@ -25,6 +20,23 @@ CREATE TABLE IF NOT EXISTS `channel` (
   KEY `idx_media_deleted_at` (`deleted_at`),
   KEY `channel_user_id_foreign` (`user_id`),
   CONSTRAINT `channel_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `contact` (
+  `id` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `contact` varchar(255) DEFAULT NULL UNIQUE,
+  `type` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `verified` bool DEFAULT FALSE,
+  PRIMARY KEY (`id`),
+  KEY `idx_media_deleted_at` (`deleted_at`),
+  KEY `contact_user_id_foreign` (`user_id`),
+  KEY `idx_contact_contact` (`contact`)
+  CONSTRAINT `contact_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `media` (

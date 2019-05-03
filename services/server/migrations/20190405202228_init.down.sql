@@ -4,4 +4,5 @@ DROP TABLE `hashtag`;
 DROP TABLE `track`;
 DROP TABLE `media`;
 DROP TABLE `channel`;
+DROP TABLE `contact`;
 DROP TABLE `user`;
