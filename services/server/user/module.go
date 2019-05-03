@@ -39,12 +39,15 @@ func (module *UserModule) RegisterRoutes(router *gin.Engine) {
 	login := route.NewLoginRoute(module.UserService)
 	register := route.NewRegisterRoute(module.UserService)
 	logout := route.NewLogoutRoute()
+	verifyContact := route.NewVerifyContactRoute(module.ContactService)
 
 	user := router.Group("/user")
-
 	user.GET("/login", login.Get)
 	user.POST("/login", login.Post)
 	user.GET("/register", register.Get)
 	user.POST("/register", register.Post)
 	user.GET("/logout", logout.Get)
+
+	contact := router.Group("/contact")
+	contact.GET("/verify/:data", verifyContact.Get)
 }

@@ -8,7 +8,17 @@ import (
 	"regexp"
 	"services/server/core/service/aws"
 	"math/rand"
+	"encoding/base64"
+	"github.com/gin-gonic/gin/json"
+	"time"
+	"os"
 )
+
+type VerifyContactPayload struct {
+	Contact   string    `json:"contact" binding:"required"`
+	Code      string    `json:"code" binding:"required"`
+	Timestamp time.Time `json:"timestamp" binding:"required"`
+}
 
 type ContactService struct {
 	contactRepository *repository.ContactRepository
@@ -41,6 +51,10 @@ func (service *ContactService) IsPotentiallyValidContact(contact string, contact
 	return service.emailRegex.MatchString(contact)
 }
 
+func (service *ContactService) FindByContact(contact string) (*model.Contact, error) {
+	return service.contactRepository.FindByContact(contact)
+}
+
 func (service *ContactService) FindByEmail(contact string) (*model.Contact, error) {
 	contact = service.NormalizeContact(contact, "email")
 	return service.contactRepository.FindByContact(contact)
@@ -63,10 +77,10 @@ func (service *ContactService) Create(userID string, contact string, contactType
 	}
 
 	contactModel := &model.Contact{
-		UserID: userID,
-		Contact: contact,
-		Type: contactType,
-		Code: service.generateCode(),
+		UserID:   userID,
+		Contact:  contact,
+		Type:     contactType,
+		Code:     service.generateCode(),
 		Verified: false,
 	}
 
@@ -75,9 +89,18 @@ func (service *ContactService) Create(userID string, contact string, contactType
 		return nil, errors.New("something went wrong")
 	}
 
+	// @todo we should sign this
+	data, _ := json.Marshal(VerifyContactPayload{
+		Contact:   contactModel.Contact,
+		Code:      contactModel.Code,
+		Timestamp: time.Now(),
+	})
+	url := os.Getenv("DOMAIN") + "/contact/verify/" + base64.StdEncoding.EncodeToString(data)
+
 	// send email notificationn
-	// @todo send out a verification link
-	err = aws.GetSESService().SendEmail(contactModel.Contact, "Testing", "Testing!")
+	err = aws.GetSESService().SendEmail(contactModel.Contact,
+		"Vueon - Email Verification Request",
+		"<a href=\""+url+"\">verify email</a>")
 	if err != nil {
 		return nil, errors.New("something went wrong")
 	}
@@ -85,11 +108,30 @@ func (service *ContactService) Create(userID string, contact string, contactType
 	return contactModel, nil
 }
 
+func (service *ContactService) Verify(payload *VerifyContactPayload) (error) {
+	contact, err := service.FindByContact(payload.Contact)
+	if contact == nil || err != nil {
+		return errors.New("could not find contact");
+	}
+
+	if contact.Code != payload.Code {
+		return errors.New("incorrect code")
+	}
+
+	contact.Verified = true;
+	err = service.contactRepository.Save(contact)
+	if err != nil {
+		return errors.New("something went wrong")
+	}
+
+	return nil
+}
+
 func (service *ContactService) generateCode() string {
 	length := 6
 	bytes := make([]byte, length)
 	for i := 0; i < length; i++ {
-		bytes[i] = byte(65 + rand.Intn(25))  //A=65 and Z = 65+25
+		bytes[i] = byte(65 + rand.Intn(25)) //A=65 and Z = 65+25
 	}
 	return string(bytes)
 }
