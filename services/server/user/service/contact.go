@@ -114,10 +114,16 @@ func (service *ContactService) Verify(payload *VerifyContactPayload) (error) {
 		return errors.New("could not find contact");
 	}
 
+	// already verified
+	if contact.Verified || len(contact.Code) == 0 {
+		return nil
+	}
+
 	if contact.Code != payload.Code {
 		return errors.New("incorrect code")
 	}
 
+	contact.Code = "";
 	contact.Verified = true;
 	err = service.contactRepository.Save(contact)
 	if err != nil {

@@ -30,12 +30,12 @@ CREATE TABLE IF NOT EXISTS `contact` (
   `user_id` varchar(255) DEFAULT NULL,
   `contact` varchar(255) DEFAULT NULL UNIQUE,
   `type` varchar(255) NOT NULL,
-  `code` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
   `verified` bool DEFAULT FALSE,
   PRIMARY KEY (`id`),
   KEY `idx_media_deleted_at` (`deleted_at`),
   KEY `contact_user_id_foreign` (`user_id`),
-  KEY `idx_contact_contact` (`contact`)
+  KEY `idx_contact_contact` (`contact`),
   CONSTRAINT `contact_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
