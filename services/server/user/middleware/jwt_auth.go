@@ -64,7 +64,7 @@ func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddlewar
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var req service.VerifyRequest
+			var req service.UserVerifyRequest
 
 			if err := c.ShouldBind(&req); err != nil {
 				return nil, errors.New("all fields are requred")
@@ -84,7 +84,7 @@ func createJwtMiddleware(userService *service.UserService) (*jwt.GinJWTMiddlewar
 			util.Redirect(c, "/")
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			var req service.VerifyRequest
+			var req service.UserVerifyRequest
 			c.ShouldBind(&req);
 			render.RenderPage(c, http.StatusUnauthorized, gin.H{
 				"email": req.Email,

@@ -10,13 +10,13 @@ import (
 	"strings"
 )
 
-type VerifyRequest struct {
+type UserVerifyRequest struct {
 	Email    string `form:"email" binding:"required"`
 	Password string `form:"password" binding:"required"`
 }
 
-type CreateRequest struct {
-	VerifyRequest
+type UserCreateRequest struct {
+	UserVerifyRequest
 	VerifyPassword string `form:"verify_password" binding:"required"`
 }
 
@@ -49,7 +49,7 @@ func (service *UserService) FindUserByEmail(email string) (*model.User) {
 	return user
 }
 
-func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
+func (service *UserService) Verify(req UserVerifyRequest) (*model.User, error) {
 	user := service.FindUserByEmail(req.Email)
 	if user == nil {
 		return nil, errors.New("invalid email or password")
@@ -63,7 +63,7 @@ func (service *UserService) Verify(req VerifyRequest) (*model.User, error) {
 	return user, nil
 }
 
-func (service *UserService) Create(req CreateRequest) (*model.User, error) {
+func (service *UserService) Create(req UserCreateRequest) (*model.User, error) {
 	if !service.contactService.IsPotentiallyValidContact(req.Email, "email") {
 		return nil, errors.New("invalid email address")
 	}

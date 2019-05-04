@@ -14,7 +14,7 @@ import (
 	"os"
 )
 
-type VerifyContactPayload struct {
+type ContactVerifyPayload struct {
 	Contact   string    `json:"contact" binding:"required"`
 	Code      string    `json:"code" binding:"required"`
 	Timestamp time.Time `json:"timestamp" binding:"required"`
@@ -90,7 +90,7 @@ func (service *ContactService) Create(userID string, contact string, contactType
 	}
 
 	// @todo we should sign this
-	data, _ := json.Marshal(VerifyContactPayload{
+	data, _ := json.Marshal(ContactVerifyPayload{
 		Contact:   contactModel.Contact,
 		Code:      contactModel.Code,
 		Timestamp: time.Now(),
@@ -108,7 +108,7 @@ func (service *ContactService) Create(userID string, contact string, contactType
 	return contactModel, nil
 }
 
-func (service *ContactService) Verify(payload *VerifyContactPayload) (error) {
+func (service *ContactService) Verify(payload *ContactVerifyPayload) (error) {
 	contact, err := service.FindByContact(payload.Contact)
 	if contact == nil || err != nil {
 		return errors.New("could not find contact");

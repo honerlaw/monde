@@ -39,6 +39,25 @@ CREATE TABLE IF NOT EXISTS `contact` (
   CONSTRAINT `contact_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `address` (
+  `id` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `type` varchar(255) NOT NULL,
+  `line_one` varchar(255) NOT NULL,
+  `line_two` varchar(255) DEFAULT NULL,
+  `city` varchar(255) NOT NULL,
+  `state` varchar(255) NOT NULL,
+  `zip_code` varchar(10) NOT NULL,
+  `country` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_media_deleted_at` (`deleted_at`),
+  KEY `address_user_id_foreign` (`user_id`),
+  CONSTRAINT `address_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `media` (
   `id` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,

@@ -47,20 +47,28 @@ func GetSelectPage(c *gin.Context) (*SelectPage) {
 }
 
 func Redirect(c *gin.Context, path string) {
+	statusCode := http.StatusFound
+
 	// append an error if we set one so it can be picked up and parsed in the next route
-	if err, ok := c.Get("error"); ok {
+	if val, ok := c.Get("error"); ok {
 		if strings.Index(path, "?") == -1 {
-			path = fmt.Sprintf("%s?error=%s", path, err)
+			path = fmt.Sprintf("%s?error=%s", path, val)
 		} else {
-			path = fmt.Sprintf("%s&error=%s", path, err)
+			path = fmt.Sprintf("%s&error=%s", path, val)
 		}
 	}
 
-	c.Redirect(http.StatusFound, path)
+
+	if code, ok := c.Get("statusCode"); ok {
+		statusCode = code.(int)
+	}
+
+	c.Redirect(statusCode, path)
 	c.Abort()
 }
 
-func RedirectWithError(c *gin.Context, path string, error string) {
+func RedirectWithError(c *gin.Context, path string, code int, error string) {
+	c.Set("statusCode", code)
 	c.Set("error", error)
 	Redirect(c, path)
 }

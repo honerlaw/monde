@@ -31,7 +31,7 @@ func (route *RegisterRoute) Get(c *gin.Context) {
 }
 
 func (route *RegisterRoute) Post(c *gin.Context) {
-	var req service.CreateRequest
+	var req service.UserCreateRequest
 
 	if err := c.ShouldBind(&req); err != nil {
 		render.RenderPage(c, http.StatusBadRequest, gin.H{
