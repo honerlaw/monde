@@ -1,0 +1,27 @@
+@import "~bootstrap/scss/bootstrap";
+
+#user-page {
+  form {
+    .form-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin: 0 0 3px 0;
+      padding: 0;
+      label, input {
+        font-size: 1rem !important;
+        display: block;
+        margin: 0;
+        padding: 0 10px;
+      }
+      label {
+        color: $gray-800;
+        flex: 1.5;
+        padding-left: 0;
+      }
+      input {
+        flex: 8;
+      }
+    }
+  }
+}

@@ -46,19 +46,20 @@ func (module *UserModule) RegisterRoutes(router *gin.Engine) {
 	logout := route.NewLogoutRoute()
 	contactVerify := route.NewContactVerifyRoute(module.ContactService)
 	address := route.NewAddressCreateRoute(module.addressService)
+	user := route.NewUserRoute(module.addressService)
 
-	user := router.Group("/user")
-	user.GET("/login", login.Get)
-	user.POST("/login", login.Post)
-	user.GET("/register", register.Get)
-	user.POST("/register", register.Post)
-	user.GET("/logout", logout.Get)
+	userGroup := router.Group("/user")
+	userGroup.GET("/login", login.Get)
+	userGroup.POST("/login", login.Post)
+	userGroup.GET("/register", register.Get)
+	userGroup.POST("/register", register.Post)
+	userGroup.GET("/logout", logout.Get)
+	userGroup.GET("", user.Get)
 
 	contact := router.Group("/contact")
 	contact.GET("/verify/:data", contactVerify.Get)
 
 	addressGroup := router.Group("/address")
-	addressGroup.GET("/", address.Get)         // list all addresses / main address page
-	addressGroup.POST("/create", address.Post) // create a new address
-	addressGroup.PUT("/update", address.Put) // update an existing address
+	addressGroup.POST("/create", address.Post)
+	addressGroup.PUT("/update", address.Put)
 }

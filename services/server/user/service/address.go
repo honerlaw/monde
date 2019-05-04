@@ -30,12 +30,13 @@ func NewAddressService(addressRepository *repository.AddressRepository) (*Addres
 	}
 }
 
-func (service *AddressService) GetAddressDataByUserID(userID string) (*AddressData) {
-	addresses := service.addressRepository.FindByUserID(userID)
-
-	return &AddressData{
-		addresses: addresses,
+func (service *AddressService) GetAddressesByUserID(userID string) ([]model.Address) {
+	addresses, err := service.addressRepository.FindByUserID(userID)
+	if err != nil {
+		return nil
 	}
+
+	return addresses
 }
 
 func (service *AddressService) Create(userID string, req *AddressCreateRequest) (*model.Address, error) {

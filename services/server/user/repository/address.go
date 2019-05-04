@@ -19,7 +19,7 @@ func NewAddressRepository(repo *repository.Repository) (*AddressRepository) {
 }
 
 func (repo *AddressRepository) tableName() (string) {
-	modelValue := reflect.Indirect(reflect.ValueOf(&model.Channel{}))
+	modelValue := reflect.Indirect(reflect.ValueOf(&model.Address{}))
 	modelType := modelValue.Type()
 	return repo.repo.Table(modelType)
 }
@@ -37,9 +37,12 @@ func (repo *AddressRepository) FindByUserID(userID  string) ([]model.Address, er
 	}
 
 	parsed := repo.repo.Parse(&model.Address{}, rows)
-	// @todo convert everything
+	models := make([]model.Address, len(parsed))
+	for i := 0; i < len(parsed); i++ {
+		models[i] = parsed[i].(model.Address);
+	}
 
-	return nil, nil
+	return models, nil
 }
 
 func (repo *AddressRepository) Save(model *model.Address) (error) {

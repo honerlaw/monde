@@ -12,6 +12,7 @@ import {hydrate} from "react-dom";
 import {MediaListPage} from "./components/pages/media/media-list-page";
 import {ComponentClass} from "react";
 import {MediaViewPage} from "./components/pages/media/media-view-page";
+import {UserPage} from "./components/pages/user-page";
 
 declare const global: any;
 
@@ -44,11 +45,12 @@ function element(options: IOptions, opts: string | null): JSX.Element {
         <Page options={opts} uploadForm={options.props.uploadForm} authPayload={options.props.authPayload}>
             <Switch>
                 <Route exact path={"/"} render={renderRoute(HomePage, options.props)}/>
+                <Route exact path={"/user"} render={renderRoute(UserPage, options.props)}/>
                 <Route path={"/user/login"} render={renderRoute(LoginPage, options.props)}/>
                 <Route path={"/user/register"} render={renderRoute(RegisterPage, options.props)}/>
                 <Route path={"/media/list"} render={renderRoute(MediaListPage, options.props)}/>
                 <Route path={"/media/view/:mediaId"} render={renderRoute(MediaViewPage, options.props)}/>
-                <Route render={renderRoute(NotFoundPage, options.props)} />
+                <Route render={renderRoute(NotFoundPage, options.props)}/>
             </Switch>
         </Page>
     </StaticRouter>;
