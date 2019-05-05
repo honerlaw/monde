@@ -18,10 +18,6 @@ func NewAddressCreateRoute(addressService *service.AddressService) (*AddressRout
 	}
 }
 
-func (route *AddressRoute) Put(c *gin.Context) {
-	// @todo should simply update everything
-}
-
 func (route *AddressRoute) Post(c *gin.Context) {
 	payload := c.MustGet("JWT_AUTH_PAYLOAD").(*middleware.AuthPayload)
 
@@ -31,7 +27,7 @@ func (route *AddressRoute) Post(c *gin.Context) {
 		return
 	}
 
-	_, err := route.addressService.Create(payload.ID, &req)
+	_, err := route.addressService.CreateOrUpdate(payload.ID, &req)
 	if err != nil {
 		util.RedirectWithError(c, "/user", http.StatusInternalServerError, err.Error())
 		return

@@ -24,6 +24,28 @@ func (repo *ContactRepository) tableName() (string) {
 	return repo.repo.Table(modelType)
 }
 
+func (repo *ContactRepository) FindByUserID(userID string) ([]model.Contact, error) {
+
+	rows, err := squirrel.Select("*").
+		From(repo.tableName()).
+		Where(squirrel.Eq{"user_id": userID}).
+		RunWith(repo.repo.DB()).
+		Query()
+
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+
+	parsed := repo.repo.Parse(&model.Contact{}, rows)
+	models := make([]model.Contact, len(parsed))
+	for i := 0; i < len(parsed); i++ {
+		models[i] = parsed[i].(model.Contact)
+	}
+
+	return models, nil
+}
+
 func (repo *ContactRepository) FindByContact(contact string) (*model.Contact, error) {
 
 	// we assume that contact has been normalized by the time it has gotten here

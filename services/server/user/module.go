@@ -6,6 +6,7 @@ import (
 	"services/server/user/repository"
 	"services/server/user/service"
 	repository2 "services/server/core/repository"
+	"services/server/user/middleware"
 )
 
 type UserModule struct {
@@ -46,7 +47,7 @@ func (module *UserModule) RegisterRoutes(router *gin.Engine) {
 	logout := route.NewLogoutRoute()
 	contactVerify := route.NewContactVerifyRoute(module.ContactService)
 	address := route.NewAddressCreateRoute(module.addressService)
-	user := route.NewUserRoute(module.addressService)
+	user := route.NewUserRoute(module.ContactService, module.addressService)
 
 	userGroup := router.Group("/user")
 	userGroup.GET("/login", login.Get)
@@ -54,12 +55,11 @@ func (module *UserModule) RegisterRoutes(router *gin.Engine) {
 	userGroup.GET("/register", register.Get)
 	userGroup.POST("/register", register.Post)
 	userGroup.GET("/logout", logout.Get)
-	userGroup.GET("", user.Get)
+	userGroup.GET("", middleware.Authorize(), user.Get)
 
 	contact := router.Group("/contact")
-	contact.GET("/verify/:data", contactVerify.Get)
+	contact.GET("/verify/:data", middleware.Authorize(), contactVerify.Get)
 
 	addressGroup := router.Group("/address")
-	addressGroup.POST("/create", address.Post)
-	addressGroup.PUT("/update", address.Put)
+	addressGroup.POST("", middleware.Authorize(), address.Post)
 }

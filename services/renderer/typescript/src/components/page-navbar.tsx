@@ -34,6 +34,9 @@ export class PageNavbar extends React.Component<IPageNavbarProps, {}> {
                 <a className="nav-link" href="/media/list">my videos</a>
             </li>
             <li className="nav-item">
+                <a className="nav-link" href="/user">account</a>
+            </li>
+            <li className="nav-item">
                 <a className="nav-link" href="/user/logout">logout</a>
             </li>
         </ul>;

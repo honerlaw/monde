@@ -7,6 +7,6 @@ type Contact struct {
 	UserID   string `json:"user_id" column:"user_id"`
 	Contact  string `json:"contact" column:"contact"`
 	Type     string `json:"type" column:"type"`
-	Code     string `json:"code" column:"code"`
+	Code     string `json:"-" column:"code"`
 	Verified bool   `json:"verified" column:"verified"`
 }

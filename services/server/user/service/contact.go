@@ -34,6 +34,14 @@ func NewContactService(contactRepository *repository.ContactRepository) (*Contac
 	}
 }
 
+func (service *ContactService) GetContactDataByUserID(userID string) ([]model.Contact) {
+	contacts, err := service.contactRepository.FindByUserID(userID)
+	if err != nil {
+		return nil
+	}
+	return contacts;
+}
+
 func (service *ContactService) NormalizeContact(contact string, contactType string) (string) {
 	if contactType == "sms" {
 		// basically only leave the numbers

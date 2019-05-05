@@ -1,0 +1,10 @@
+@import "~bootstrap/scss/bootstrap";
+
+#address-list {
+  h3 {
+    .checkbox-button-label {
+      font-size: 10px;
+      color: $gray-600;
+    }
+  }
+}

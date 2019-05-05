@@ -1,6 +1,7 @@
 import * as React from "react";
 import {IAddress} from "../user-page";
 import {InputGroup} from "../../bootstrap/input-group";
+import "./address-form.scss";
 
 interface IProps {
     address: IAddress | null;
@@ -9,7 +10,7 @@ interface IProps {
 export class AddressForm extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <form method={"POST"} action={`/address/${this.props.address ? "update" : "create"}`}>
+        return <form className={"address-form"} method={"POST"} action={`/address/${this.props.address ? "update" : "create"}`}>
             {this.renderID()}
             <InputGroup label={"type"}
                         name={"type"}

@@ -11,6 +11,7 @@ type AddressData struct {
 }
 
 type AddressCreateRequest struct {
+	ID      string `form:"id" json:"id"`
 	Type    string `form:"type" json:"type" binding:"required"`
 	LineOne string `form:"line_one" json:"line_one" binding:"required"`
 	LineTwo string `form:"line_two" json:"line_two"`
@@ -39,12 +40,11 @@ func (service *AddressService) GetAddressesByUserID(userID string) ([]model.Addr
 	return addresses
 }
 
-func (service *AddressService) Create(userID string, req *AddressCreateRequest) (*model.Address, error) {
+func (service *AddressService) CreateOrUpdate(userID string, req *AddressCreateRequest) (*model.Address, error) {
 	if req.Type != "home" && req.Type != "business" {
 		return nil, errors.New("invalid address type")
 	}
 
-	// @todo we should verify these fields in some capacity
 	address := &model.Address{
 		UserID:  userID,
 		Type:    req.Type,
@@ -54,6 +54,18 @@ func (service *AddressService) Create(userID string, req *AddressCreateRequest) 
 		State:   req.State,
 		ZipCode: req.ZipCode,
 		Country: req.Country,
+	}
+
+	isUpdate := len(req.ID) != 0
+	if isUpdate {
+		address, err := service.addressRepository.FindByID(req.ID)
+		if err != nil {
+			return nil, errors.New("something went wrong")
+		}
+
+		if address.UserID != userID {
+			return nil, errors.New("something went wrong")
+		}
 	}
 
 	err := service.addressRepository.Save(address)

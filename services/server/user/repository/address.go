@@ -24,6 +24,21 @@ func (repo *AddressRepository) tableName() (string) {
 	return repo.repo.Table(modelType)
 }
 
+func (repo *AddressRepository) FindByID(id string) (*model.Address, error) {
+	address := &model.Address{}
+	found, err := repo.repo.FindByID(id, address)
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+
+	if !found {
+		return nil, nil
+	}
+
+	return address, nil
+}
+
 func (repo *AddressRepository) FindByUserID(userID  string) ([]model.Address, error) {
 	rows, err := squirrel.Select("*").
 		From(repo.tableName()).
