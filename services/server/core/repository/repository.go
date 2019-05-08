@@ -101,13 +101,6 @@ func (repo *Repository) Migrate() (*Repository) {
 	return repo
 }
 
-func (repo *Repository) Assert(target []interface{}, source []interface{}) {
-	for _, s := range source {
-		target = append(target, s)
-	}
-
-}
-
 func (repo *Repository) Parse(model interface{}, rows *sql.Rows) ([]interface{}) {
 	defer rows.Close()
 

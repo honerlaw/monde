@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `hash` varchar(255) NOT NULL,
+  `stripe_account_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_user_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

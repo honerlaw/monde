@@ -29,21 +29,7 @@ func Setup(rootPath string) {
 		log.Fatal(err)
 	}
 
-	_, err = repository.GetRepository().Migrate().DB().Exec(`
-CREATE TABLE IF NOT EXISTS ` + "`test_model`" + ` (
-  ` + "`id`" + ` varchar(255) NOT NULL,
-  ` + "`created_at`" + ` timestamp NULL DEFAULT NULL,
-  ` + "`updated_at`" + ` timestamp NULL DEFAULT NULL,
-  ` + "`deleted_at`" + ` timestamp NULL DEFAULT NULL,
-  ` + "`test_field`" + ` varchar(255) NOT NULL,
-  PRIMARY KEY (` + "`id`" + `),
-  KEY ` + "`idx_media_deleted_at`" + ` (` + "`deleted_at`" + `)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	repository.GetRepository().Migrate()
 }
 
 func Teardown() {
