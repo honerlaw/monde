@@ -63,3 +63,7 @@ func (repo *AddressRepository) FindByUserID(userID  string) ([]model.Address, er
 func (repo *AddressRepository) Save(model *model.Address) (error) {
 	return repo.repo.Save(model)
 }
+
+func (repo *AddressRepository) Delete(model *model.Address) (error) {
+	return repo.repo.Delete(model)
+}

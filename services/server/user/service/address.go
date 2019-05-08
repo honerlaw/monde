@@ -41,6 +41,15 @@ func (service *AddressService) GetAddressesByUserID(userID string) ([]model.Addr
 }
 
 func (service *AddressService) CreateOrUpdate(userID string, req *AddressCreateRequest) (*model.Address, error) {
+	isUpdate := len(req.ID) != 0
+	if isUpdate {
+		return service.Update(userID, req)
+	}
+
+	return service.Create(userID, req)
+}
+
+func (service *AddressService) Create(userID string, req *AddressCreateRequest) (*model.Address, error) {
 	if req.Type != "home" && req.Type != "business" {
 		return nil, errors.New("invalid address type")
 	}
@@ -56,21 +65,55 @@ func (service *AddressService) CreateOrUpdate(userID string, req *AddressCreateR
 		Country: req.Country,
 	}
 
-	isUpdate := len(req.ID) != 0
-	if isUpdate {
-		address, err := service.addressRepository.FindByID(req.ID)
-		if err != nil {
-			return nil, errors.New("something went wrong")
-		}
-
-		if address.UserID != userID {
-			return nil, errors.New("something went wrong")
-		}
-	}
-
 	err := service.addressRepository.Save(address)
 	if err != nil {
 		return nil, errors.New("something went wrong")
 	}
 	return address, nil
+}
+
+func (service *AddressService) Update(userID string, req *AddressCreateRequest) (*model.Address, error) {
+	if req.Type != "home" && req.Type != "business" {
+		return nil, errors.New("invalid address type")
+	}
+
+	address, err := service.addressRepository.FindByID(req.ID)
+	if address == nil || err != nil {
+		return nil, errors.New("something went wrong")
+	}
+
+	if address.UserID != userID {
+		return nil, errors.New("something went wrong")
+	}
+
+	address.Type = req.Type
+	address.LineOne = req.LineOne
+	address.LineTwo = req.LineTwo
+	address.City = req.City
+	address.State = req.State
+	address.ZipCode = req.ZipCode
+	address.Country = req.Country
+
+	err = service.addressRepository.Save(address)
+	if err != nil {
+		return nil, errors.New("something went wrong")
+	}
+	return address, nil
+}
+
+func (service *AddressService) Delete(userID string, id string) (error) {
+	address, err := service.addressRepository.FindByID(id)
+	if address == nil || err != nil {
+		return nil
+	}
+
+	if address.UserID != userID {
+		return errors.New("something went wrong")
+	}
+
+	err = service.addressRepository.Delete(address)
+	if err != nil {
+		return errors.New("something went wrong")
+	}
+	return nil
 }

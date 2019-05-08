@@ -35,3 +35,16 @@ func (route *AddressRoute) Post(c *gin.Context) {
 
 	util.Redirect(c, "/user")
 }
+
+func (route *AddressRoute) Delete(c *gin.Context) {
+	payload := c.MustGet("JWT_AUTH_PAYLOAD").(*middleware.AuthPayload)
+	id := c.Param("id")
+
+	err := route.addressService.Delete(payload.ID, id)
+	if err != nil {
+		util.RedirectWithError(c, "/user", http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	util.Redirect(c, "/user")
+}

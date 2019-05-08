@@ -10,7 +10,7 @@ interface IProps {
 export class AddressForm extends React.Component<IProps, {}> {
 
     public render(): JSX.Element {
-        return <form className={"address-form"} method={"POST"} action={`/address/${this.props.address ? "update" : "create"}`}>
+        return <form className={"address-form"} method={"POST"} action={"/address"}>
             {this.renderID()}
             <InputGroup label={"type"}
                         name={"type"}

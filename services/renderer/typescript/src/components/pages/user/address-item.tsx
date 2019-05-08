@@ -17,7 +17,7 @@ export class AddressItem extends React.Component<IProps, {}> {
     public render(): JSX.Element {
         return <div className={"shadow-box address-item"}>
             <h4>{this.props.address.type} address</h4>
-            <CheckboxButton id={this.props.address.id} label={"modify"}>
+            <a href={`/address/remove/${this.props.address.id}`}>delete</a><CheckboxButton id={this.props.address.id} label={"modify"}>
                 <AddressForm address={this.props.address}/>
                 <div id={"address-info"}>
                     {Object.keys(this.props.address)

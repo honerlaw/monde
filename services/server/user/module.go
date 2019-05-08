@@ -62,4 +62,5 @@ func (module *UserModule) RegisterRoutes(router *gin.Engine) {
 
 	addressGroup := router.Group("/address")
 	addressGroup.POST("", middleware.Authorize(), address.Post)
+	addressGroup.GET("/remove/:id", middleware.Authorize(), address.Delete)
 }
