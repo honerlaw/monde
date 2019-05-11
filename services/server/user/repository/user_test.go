@@ -9,18 +9,18 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	test.Setup("../../")
+	test.Setup("../../", true)
 
 	// make sure to teardown on panic
 	defer func() {
 		if r := recover(); r != nil {
-			test.Teardown()
+			test.Teardown(true)
 		}
 	}()
 
 	code := m.Run()
 
-	test.Teardown()
+	test.Teardown(true)
 
 	os.Exit(code)
 }

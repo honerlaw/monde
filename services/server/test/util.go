@@ -15,7 +15,7 @@ type TestModel struct {
 	TestField string `json:"test_field" column:"test_field"`
 }
 
-func Setup(rootPath string) {
+func Setup(rootPath string, initDb bool) {
 	err := godotenv.Load(rootPath + "/.env")
 	if err != nil {
 		log.Fatal(err)
@@ -29,10 +29,16 @@ func Setup(rootPath string) {
 		log.Fatal(err)
 	}
 
-	repository.GetRepository().Migrate()
+	if initDb {
+		repository.GetRepository().Migrate()
+	}
 }
 
-func Teardown() {
+func Teardown(dropDb bool) {
+	if !dropDb {
+		return
+	}
+
 	_, err := repository.GetRepository().DB().Exec("DROP DATABASE " + os.Getenv("DB_NAME"))
 
 	if err != nil {

@@ -5,43 +5,53 @@ import (
 	"os"
 	"github.com/stripe/stripe-go"
 	"log"
+	"time"
 )
+
+type BankAccountSaveRequest struct {
+	BankAccountID *string
+	AccountID string
+}
 
 type CardSaveRequest struct {
 	CardID    *string
 	AccountID string
 }
 
+type PaymentDOB struct {
+	Day   int64
+	Month int64
+	Year  int64
+}
+
+type PaymentAddress struct {
+	LineOne    string
+	LineTwo    string
+	City       string
+	State      string
+	Country    string
+	PostalCode string
+}
 type AccountSaveRequest struct {
 	AccountID *string
+	IPAddress string
 	FirstName string
 	LastName  string
 	Email     string
 	Country   string
 	Currency  string
-	SSNLast4  string
-	DOB       struct {
-		Day   int64
-		Month int64
-		Year  int64
-	}
-	Address struct {
-		LineOne    string
-		LineTwo    string
-		City       string
-		State      string
-		Country    string
-		PostalCode string
-	}
+	SSN       string
+	DOB       *PaymentDOB
+	Address   *PaymentAddress
 }
 
 type PaymentService struct {
-	client           *client.API
+	client *client.API
 }
 
 func NewPaymentService() (*PaymentService) {
 	return &PaymentService{
-		client:           client.New(os.Getenv("STRIPE_SECRET_KEY"), nil),
+		client: client.New(os.Getenv("STRIPE_SECRET_KEY"), nil),
 	}
 }
 
@@ -57,7 +67,15 @@ func (service *PaymentService) SaveAccount(req *AccountSaveRequest) (*string, er
 			"platform_payments",
 		}),
 		BusinessType: stripe.String("individual"),
+		BusinessProfile: &stripe.AccountBusinessProfileParams{
+			ProductDescription: stripe.String("The user agreed to terms in order to sell content on our platform."),
+		},
+		TOSAcceptance: &stripe.AccountTOSAcceptanceParams{
+			Date: stripe.Int64(time.Now().Unix()),
+			IP:   stripe.String(req.IPAddress),
+		},
 		Individual: &stripe.PersonParams{
+			IDNumber:  stripe.String(req.SSN),
 			FirstName: stripe.String(req.FirstName),
 			LastName:  stripe.String(req.LastName),
 			Address: &stripe.AccountAddressParams{
@@ -73,7 +91,7 @@ func (service *PaymentService) SaveAccount(req *AccountSaveRequest) (*string, er
 				Month: stripe.Int64(req.DOB.Month),
 				Year:  stripe.Int64(req.DOB.Year),
 			},
-			SSNLast4: stripe.String(req.SSNLast4),
+			SSNLast4: stripe.String(string(req.SSN[len(req.SSN)-4:])),
 		},
 	}
 
@@ -98,6 +116,26 @@ func (service *PaymentService) GetAccount(accountID string) (*stripe.Account) {
 		return nil
 	}
 	return account
+}
+
+func (service *PaymentService) SaveBankAccount(req *BankAccountSaveRequest) (error) {
+	params := &stripe.BankAccountParams{
+		Account: stripe.String(req.AccountID),
+	}
+
+	var err error
+	if req.BankAccountID != nil {
+		_, err = service.client.BankAccounts.Update(*req.BankAccountID, params)
+	} else {
+		_, err = service.client.BankAccounts.New(params)
+	}
+
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+
+	return nil
 }
 
 func (service *PaymentService) SaveCard(req *CardSaveRequest) (error) {
