@@ -4,9 +4,10 @@ import (
 	"testing"
 	"services/server/test"
 	"os"
+	service2 "services/server/core/service"
 )
 
-var service *PaymentService
+var paymentService *PaymentService
 
 func TestMain(m *testing.M) {
 	test.Setup("../../", false)
@@ -18,7 +19,8 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	service = NewPaymentService()
+	countryService := service2.NewCountryService("../../assets/data/country.json")
+	paymentService = NewPaymentService(countryService)
 
 	code := m.Run()
 
@@ -27,14 +29,16 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+// @todo write a test that basically creates an account, adds a bank account, fetches the account
+// @todo and checks that the account doesn't have anything in the requirements
+
 func TestSaveAccount(t *testing.T) {
-	id, err := service.SaveAccount(&AccountSaveRequest{
+	id, err := paymentService.SaveAccount(&AccountSaveRequest{
 		IPAddress: "1.2.3.4",
 		FirstName: "Billy",
 		LastName: "Fitzgerald",
 		Email: "billy.fitzgerald@gmail.com",
 		Country: "US",
-		Currency: "USD",
 		SSN: "123451234",
 		DOB: &PaymentDOB{
 			Day: 1,

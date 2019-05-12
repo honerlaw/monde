@@ -35,9 +35,9 @@ func main() {
 
 	// initialize each module
 	userModule := user.Init()
-	coreModule := core.Init()
+	coreModule := core.Init("./assets/data/country.json")
 	mediaModule := media.Init(userModule.ChannelService)
-	paymentModule := payment.Init()
+	paymentModule := payment.Init(coreModule.CountryService)
 
 	// initialize the jwt auth middleware
 	middleware.InitJWTAuth(userModule.UserService)

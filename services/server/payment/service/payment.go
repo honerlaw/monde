@@ -6,11 +6,17 @@ import (
 	"github.com/stripe/stripe-go"
 	"log"
 	"time"
+	"services/server/core/service"
+	"github.com/pkg/errors"
 )
 
 type BankAccountSaveRequest struct {
 	BankAccountID *string
 	AccountID string
+	Country string
+	AccountHolderName string
+	AccountNumber string
+	AccountRoutingNumber string
 }
 
 type CardSaveRequest struct {
@@ -39,7 +45,6 @@ type AccountSaveRequest struct {
 	LastName  string
 	Email     string
 	Country   string
-	Currency  string
 	SSN       string
 	DOB       *PaymentDOB
 	Address   *PaymentAddress
@@ -47,22 +52,29 @@ type AccountSaveRequest struct {
 
 type PaymentService struct {
 	client *client.API
+	countryService *service.CountryService
 }
 
-func NewPaymentService() (*PaymentService) {
+func NewPaymentService(countryService *service.CountryService) (*PaymentService) {
 	return &PaymentService{
 		client: client.New(os.Getenv("STRIPE_SECRET_KEY"), nil),
+		countryService: countryService,
 	}
 }
 
 // all user's can have an account associated with them... We don't NEED certain information
 // unless the user wants to allow donations / subscriptions
 func (service *PaymentService) SaveAccount(req *AccountSaveRequest) (*string, error) {
+	countryData := service.countryService.GetByISOCode(req.Country)
+	if countryData == nil {
+		return nil, errors.New("invalid country code")
+	}
+
 	params := &stripe.AccountParams{
 		Type:            stripe.String(string(stripe.AccountTypeCustom)),
 		Country:         stripe.String(req.Country),
 		Email:           stripe.String(req.Email),
-		DefaultCurrency: stripe.String(req.Currency),
+		DefaultCurrency: stripe.String(countryData.CurrencyCodes[0]),
 		RequestedCapabilities: stripe.StringSlice([]string{
 			"platform_payments",
 		}),
@@ -119,8 +131,19 @@ func (service *PaymentService) GetAccount(accountID string) (*stripe.Account) {
 }
 
 func (service *PaymentService) SaveBankAccount(req *BankAccountSaveRequest) (error) {
+	countryData := service.countryService.GetByISOCode(req.Country)
+	if countryData == nil {
+		return errors.New("invalid country code")
+	}
+
 	params := &stripe.BankAccountParams{
 		Account: stripe.String(req.AccountID),
+		AccountHolderName: stripe.String(req.AccountHolderName),
+		AccountHolderType: stripe.String(string(stripe.BankAccountAccountHolderTypeIndividual)),
+		AccountNumber: stripe.String(req.AccountNumber),
+		RoutingNumber: stripe.String(req.AccountRoutingNumber),
+		Currency: stripe.String(countryData.CurrencyCodes[0]),
+		Country: stripe.String(req.Country),
 	}
 
 	var err error
